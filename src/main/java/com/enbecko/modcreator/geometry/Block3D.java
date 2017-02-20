@@ -7,11 +7,11 @@ import com.enbecko.modcreator.linalg.vec3;
  */
 public class Block3D {
 
-    public final int dimension;
+    public final int dimension1;
     public final vec3.Int position;
 
     public Block3D(vec3.Int position, int dimension) {
-        this.dimension = dimension;
+        this.dimension1 = dimension;
         this.position = position;
     }
 }
