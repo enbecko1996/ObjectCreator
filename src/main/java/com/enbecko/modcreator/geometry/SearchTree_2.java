@@ -2,33 +2,30 @@ package com.enbecko.modcreator.geometry;
 
 import com.enbecko.modcreator.Main_ModCreator;
 import com.enbecko.modcreator.linalg.vec3;
-import jdk.nashorn.internal.ir.Block;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-
-import static com.enbecko.modcreator.geometry.SearchTree.Sortmode.XYZ;
 
 /**
  * Created by enbec on 07.01.2017.
  */
 public class SearchTree_2 {
 
-    private static BlockMatrix3x3[] xyzSorted = new BlockMatrix3x3[Main_ModCreator.maxBlockSize];
-    private static BlockMatrix3x3[] xzySorted = new BlockMatrix3x3[Main_ModCreator.maxBlockSize];
-    private static BlockMatrix3x3[] yxzSorted = new BlockMatrix3x3[Main_ModCreator.maxBlockSize];
-    private static BlockMatrix3x3[] yzxSorted = new BlockMatrix3x3[Main_ModCreator.maxBlockSize];
-    private static BlockMatrix3x3[] zxySorted = new BlockMatrix3x3[Main_ModCreator.maxBlockSize];
-    private static BlockMatrix3x3[] zyxSorted = new BlockMatrix3x3[Main_ModCreator.maxBlockSize];
+    private static BlockMatrix3x3[] xFaceyzSorted = new BlockMatrix3x3[Main_ModCreator.maxBlockSize];
+    private static BlockMatrix3x3[] xFacezySorted = new BlockMatrix3x3[Main_ModCreator.maxBlockSize];
+    private static BlockMatrix3x3[] yFacexzSorted = new BlockMatrix3x3[Main_ModCreator.maxBlockSize];
+    private static BlockMatrix3x3[] yFacezxSorted = new BlockMatrix3x3[Main_ModCreator.maxBlockSize];
+    private static BlockMatrix3x3[] zFacexySorted = new BlockMatrix3x3[Main_ModCreator.maxBlockSize];
+    private static BlockMatrix3x3[] zFaceyxSorted = new BlockMatrix3x3[Main_ModCreator.maxBlockSize];
     private BlockMatrix3x3[][] allSortedLists = new BlockMatrix3x3[6][];
 
     public SearchTree_2() {
-        this.allSortedLists[0] = xyzSorted;
-        this.allSortedLists[1] = xzySorted;
-        this.allSortedLists[2] = yxzSorted;
-        this.allSortedLists[3] = yzxSorted;
-        this.allSortedLists[4] = zxySorted;
-        this.allSortedLists[5] = zyxSorted;
+        this.allSortedLists[0] = xFaceyzSorted;
+        this.allSortedLists[1] = xFacezySorted;
+        this.allSortedLists[2] = yFacexzSorted;
+        this.allSortedLists[3] = yFacezxSorted;
+        this.allSortedLists[4] = zFacexySorted;
+        this.allSortedLists[5] = zFaceyxSorted;
         for (BlockMatrix3x3[] matrix3x3 : allSortedLists) {
             for (int k = 0; k < matrix3x3.length; k++)
                 matrix3x3[k] = new BlockMatrix3x3(k);
@@ -137,17 +134,17 @@ public class SearchTree_2 {
         public BlockMatrix3x3[] getMySortList() {
             switch (this) {
                 case XYZ:
-                    return xyzSorted;
+                    return xFaceyzSorted;
                 case XZY:
-                    return xzySorted;
+                    return xFacezySorted;
                 case YXZ:
-                    return yxzSorted;
+                    return yFacexzSorted;
                 case YZX:
-                    return yzxSorted;
+                    return yFacezxSorted;
                 case ZXY:
-                    return zxySorted;
+                    return zFacexySorted;
                 case ZYX:
-                    return zyxSorted;
+                    return zFaceyxSorted;
                 default:
                     return null;
             }

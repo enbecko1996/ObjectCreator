@@ -5,31 +5,10 @@ import javax.annotation.Nullable;
 /**
  * Created by Niclas on 15.11.2016.
  */
-public abstract class vec3 <T extends Number>{
+public abstract class vec3<T extends Number> {
 
+    boolean isChangeable;
     private double w = 1;
-
-    public abstract vec3Gen<T> getGenericVec();
-
-    public abstract T getPreciseX();
-
-    public abstract T getPreciseY();
-
-    public abstract T getPreciseZ();
-
-    public vec3.Double subAndMakeNewD(vec3 other) {
-        return new vec3.Double(this).subFromThis(other);
-    }
-
-    public abstract double getXD();
-
-    public abstract double getYD();
-
-    public abstract double getZD();
-
-    public double getW() {
-        return this.w;
-    }
 
     public static vec3 newVecWithPrecision(vecPrec precision, double x, double y, double z) {
         switch (precision) {
@@ -46,7 +25,7 @@ public abstract class vec3 <T extends Number>{
             case DOUBLE:
                 return new vec3.Double(x, y, z);
         }
-        throw new RuntimeException(precision+" cannot create a new vec");
+        throw new RuntimeException(precision + " cannot create a new vec");
     }
 
     public static vec3 newVecWithPrecision(vecPrec precision) {
@@ -57,60 +36,89 @@ public abstract class vec3 <T extends Number>{
         return newVecWithPrecision(precision, other.getXD(), other.getYD(), other.getZD());
     }
 
-    public vec3.Float newNormalizedF(){
+    public abstract vec3Gen<T> getGenericVec();
+
+    public abstract T getPreciseX();
+
+    public abstract T getPreciseY();
+
+    public abstract T getPreciseZ();
+
+    public vec3.Double subAndMakeNewD(vec3 other) {
+        return new vec3.Double(this).subFromThis(other);
+    }
+
+    public abstract double getXD();
+
+    public abstract void setXD(double x);
+
+    public abstract double getYD();
+
+    public abstract void setYD(double y);
+
+    public abstract double getZD();
+
+    public abstract void setZD(double z);
+
+    public double getW() {
+        return this.w;
+    }
+
+    public vec3<T> setChangeable(boolean changeable) {
+        this.isChangeable = changeable;
+        return this;
+    }
+
+    public vec3.Float newNormalizedF() {
         return new vec3.Float((float) (this.getXD()), (float) (this.getYD()), (float) (this.getZD())).normalize();
     }
 
     @Deprecated
-    public vec3.Float addToNewF(vec3 other){
-        return new vec3.Float((float) (this.getXD() + other.getXD()),(float) (this.getYD() + other.getYD()),(float) (this.getZD() + other.getZD()));
+    public vec3.Float addToNewF(vec3 other) {
+        return new vec3.Float((float) (this.getXD() + other.getXD()), (float) (this.getYD() + other.getYD()), (float) (this.getZD() + other.getZD()));
     }
 
     @Deprecated
-    public vec3.Float subToNewF(vec3 other){
+    public vec3.Float subToNewF(vec3 other) {
         return new vec3.Float((float) (this.getXD() - other.getXD()), (float) (this.getYD() - other.getYD()), (float) (this.getZD() - other.getZD()));
     }
 
     @Deprecated
-    public vec3.Float mulToNewF(double scale){
+    public vec3.Float mulToNewF(double scale) {
         return new vec3.Float((float) (this.getXD() * scale), (float) (this.getYD() * scale), (float) (this.getZD() * scale));
     }
 
     @Deprecated
-    public vec3.Float divToNewF(double scale){
+    public vec3.Float divToNewF(double scale) {
         return new vec3.Float((float) (this.getXD() / scale), (float) (this.getYD() / scale), (float) (this.getZD() / scale));
     }
 
-    public vec3.Double newNormalizedD(){
+    public vec3.Double newNormalizedD() {
         return new vec3.Double(this.getXD(), this.getYD(), this.getZD()).normalize();
     }
 
     @Deprecated
-    public vec3.Double addToNewD(vec3 other){
+    public vec3.Double addToNewD(vec3 other) {
         return new vec3.Double(this.getXD() + other.getXD(), this.getYD() + other.getYD(), this.getZD() + other.getZD());
     }
 
     @Deprecated
-    public vec3.Double subToNewD(vec3 other){
+    public vec3.Double subToNewD(vec3 other) {
         return new vec3.Double(this.getXD() - other.getXD(), this.getYD() - other.getYD(), this.getZD() - other.getZD());
     }
 
     @Deprecated
-    public vec3.Double mulToNewD(double scale){
+    public vec3.Double mulToNewD(double scale) {
         return new vec3.Double(this.getXD() * scale, this.getYD() * scale, this.getZD() * scale);
     }
 
     @Deprecated
-    public vec3.Double divToNewD(double scale){
+    public vec3.Double divToNewD(double scale) {
         return new vec3.Double(this.getXD() / scale, this.getYD() / scale, this.getZD() / scale);
     }
 
     public double length() {
         return MathHelper.getVecLength(this);
-    }
-
-    public enum vecPrec {
-        BYTE, SHORT, INT, LONG, FLOAT, DOUBLE;
     }
 
     public abstract vec3 mulToThis(double length);
@@ -253,31 +261,31 @@ public abstract class vec3 <T extends Number>{
 
     public abstract vecPrec getPrecision();
 
-    public abstract void setXD(double x);
+    public enum vecPrec {
+        BYTE, SHORT, INT, LONG, FLOAT, DOUBLE;
+    }
 
-    public abstract void setYD(double y);
-
-    public abstract void setZD(double z);
-
-    public static abstract class decimalVec3 <T extends Number> extends vec3 {
+    public static abstract class decimalVec3<T extends Number> extends vec3 {
 
     }
 
-    public static abstract class intVec3 <T extends Number> extends vec3 {
+    public static abstract class intVec3<T extends Number> extends vec3 {
         public int getXI() {
             return (int) this.getXD();
         }
+
         public int getYI() {
             return (int) this.getYD();
         }
+
         public int getZI() {
             return (int) this.getZD();
         }
     }
 
-    public static class Int extends intVec3 <Integer> {
+    public static class Int extends intVec3<Integer> {
 
-        public int x, y, z;
+        private int x, y, z;
         private vec3Gen<Integer> generic;
 
         public Int(vec3 vec3) {
@@ -297,9 +305,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Int update(int x, int y, int z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
             return this;
         }
 
@@ -319,9 +331,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Int addToThis(vec3 other) {
-            this.x += (int) other.getXD();
-            this.y += (int) other.getYD();
-            this.z += (int) other.getZD();
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x += (int) other.getXD();
+                this.y += (int) other.getYD();
+                this.z += (int) other.getZD();
+            }
             return this;
         }
 
@@ -330,9 +346,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Int mulToThis(int scale) {
-            this.x *= scale;
-            this.y *= scale;
-            this.z *= scale;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x *= scale;
+                this.y *= scale;
+                this.z *= scale;
+            }
             return this;
         }
 
@@ -341,9 +361,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Int divToThis(int scale) {
-            this.x /= scale;
-            this.y /= scale;
-            this.z /= scale;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x /= scale;
+                this.y /= scale;
+                this.z /= scale;
+            }
             return this;
         }
 
@@ -356,21 +380,6 @@ public abstract class vec3 <T extends Number>{
             return vecPrec.INT;
         }
 
-        @Override
-        public void setXD(double x) {
-            this.x = (int) x;
-        }
-
-        @Override
-        public void setYD(double y) {
-            this.y = (int) y;
-        }
-
-        @Override
-        public void setZD(double z) {
-            this.z = (int) z;
-        }
-
         public double dot(vec3 other) {
             return (int) (this.x * other.getXD() + this.y * other.getYD() + this.z * other.getZD());
         }
@@ -378,7 +387,7 @@ public abstract class vec3 <T extends Number>{
         @Override
         @SuppressWarnings("unchecked")
         public vec3Gen<Integer> getGenericVec() {
-            if(this.generic == null)
+            if (this.generic == null)
                 this.generic = new vec3Gen<Integer>(this.x, this.y, this.z);
             return this.generic;
         }
@@ -404,13 +413,31 @@ public abstract class vec3 <T extends Number>{
         }
 
         @Override
+        public void setXD(double x) {
+            if (this.isChangeable)
+                this.x = (int) x;
+        }
+
+        @Override
         public double getYD() {
             return this.y;
         }
 
         @Override
+        public void setYD(double y) {
+            if (this.isChangeable)
+                this.y = (int) y;
+        }
+
+        @Override
         public double getZD() {
             return this.z;
+        }
+
+        @Override
+        public void setZD(double z) {
+            if (this.isChangeable)
+                this.z = (int) z;
         }
 
         public int getX() {
@@ -426,13 +453,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public String toString() {
-            return "{x: "+this.x+",y: "+this.y+",z: "+this.z+"}";
+            return "{x: " + this.x + ",y: " + this.y + ",z: " + this.z + "}";
         }
     }
 
-    public static class Long extends intVec3 <java.lang.Long> {
+    public static class Long extends intVec3<java.lang.Long> {
 
-        public long x, y, z;
+        private long x, y, z;
         private vec3Gen<java.lang.Long> generic;
 
         public Long(vec3 vec3) {
@@ -452,9 +479,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Long update(long x, long y, long z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
             return this;
         }
 
@@ -463,9 +494,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Long subFromThis(vec3 other) {
-            this.x -= (long) other.getXD();
-            this.y -= (long) other.getYD();
-            this.z -= (long) other.getZD();
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x -= (long) other.getXD();
+                this.y -= (long) other.getYD();
+                this.z -= (long) other.getZD();
+            }
             return this;
         }
 
@@ -474,9 +509,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Long addToThis(vec3 other) {
-            this.x += (long) other.getXD();
-            this.y += (long) other.getYD();
-            this.z += (long) other.getZD();
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x += (long) other.getXD();
+                this.y += (long) other.getYD();
+                this.z += (long) other.getZD();
+            }
             return this;
         }
 
@@ -485,9 +524,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Long mulToThis(long scale) {
-            this.x *= scale;
-            this.y *= scale;
-            this.z *= scale;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x *= scale;
+                this.y *= scale;
+                this.z *= scale;
+            }
             return this;
         }
 
@@ -496,9 +539,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Long divToThis(long scale) {
-            this.x /= scale;
-            this.y /= scale;
-            this.z /= scale;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x /= scale;
+                this.y /= scale;
+                this.z /= scale;
+            }
             return this;
         }
 
@@ -518,7 +565,7 @@ public abstract class vec3 <T extends Number>{
         @Override
         @SuppressWarnings("unchecked")
         public vec3Gen<java.lang.Long> getGenericVec() {
-            if(this.generic == null)
+            if (this.generic == null)
                 this.generic = new vec3Gen<java.lang.Long>(this.x, this.y, this.z);
             return this.generic;
         }
@@ -529,13 +576,31 @@ public abstract class vec3 <T extends Number>{
         }
 
         @Override
+        public void setXD(double x) {
+            if (this.isChangeable)
+                this.x = (long) x;
+        }
+
+        @Override
         public double getYD() {
             return this.y;
         }
 
         @Override
+        public void setYD(double y) {
+            if (this.isChangeable)
+                this.y = (long) y;
+        }
+
+        @Override
         public double getZD() {
             return this.z;
+        }
+
+        @Override
+        public void setZD(double z) {
+            if (this.isChangeable)
+                this.z = (long) z;
         }
 
         @Override
@@ -565,35 +630,20 @@ public abstract class vec3 <T extends Number>{
             return this.z;
         }
 
-        @Override
-        public void setXD(double x) {
-            this.x = (long) x;
-        }
-
-        @Override
-        public void setYD(double y) {
-            this.y = (long) y;
-        }
-
-        @Override
-        public void setZD(double z) {
-            this.z = (long) z;
-        }
-
         public String toString() {
-            return "{x: "+this.x+",y: "+this.y+",z: "+this.z+"}";
+            return "{x: " + this.x + ",y: " + this.y + ",z: " + this.z + "}";
         }
     }
 
-    public static class Double extends intVec3 <java.lang.Double> {
+    public static class Double extends intVec3<java.lang.Double> {
 
-        public double x, y, z;
+        private double x, y, z;
         private vec3Gen<java.lang.Double> generic;
 
         public Double(vec3 vec3) {
-            this.x =  vec3.getXD();
-            this.y =  vec3.getYD();
-            this.z =  vec3.getZD();
+            this.x = vec3.getXD();
+            this.y = vec3.getYD();
+            this.z = vec3.getZD();
         }
 
         public Double() {
@@ -607,16 +657,24 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Double update(double x, double y, double z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
             return this;
         }
 
         public vec3.Double subFromThis(vec3 other) {
-            this.x -=  other.getXD();
-            this.y -=  other.getYD();
-            this.z -=  other.getZD();
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x -= other.getXD();
+                this.y -= other.getYD();
+                this.z -= other.getZD();
+            }
             return this;
         }
 
@@ -625,9 +683,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Double addToThis(vec3 other) {
-            this.x += other.getXD();
-            this.y += other.getYD();
-            this.z += other.getZD();
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x += other.getXD();
+                this.y += other.getYD();
+                this.z += other.getZD();
+            }
             return this;
         }
 
@@ -636,16 +698,24 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Double mulToThis(double scale) {
-            this.x *= scale;
-            this.y *= scale;
-            this.z *= scale;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x *= scale;
+                this.y *= scale;
+                this.z *= scale;
+            }
             return this;
         }
 
         public vec3.Double divToThis(double scale) {
-            this.x /= scale;
-            this.y /= scale;
-            this.z /= scale;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x /= scale;
+                this.y /= scale;
+                this.z /= scale;
+            }
             return this;
         }
 
@@ -666,7 +736,7 @@ public abstract class vec3 <T extends Number>{
         @Override
         @SuppressWarnings("unchecked")
         public vec3Gen<java.lang.Double> getGenericVec() {
-            if(this.generic == null)
+            if (this.generic == null)
                 this.generic = new vec3Gen<java.lang.Double>(this.x, this.y, this.z);
             return this.generic;
         }
@@ -677,13 +747,31 @@ public abstract class vec3 <T extends Number>{
         }
 
         @Override
+        public void setXD(double x) {
+            if (this.isChangeable)
+                this.x = x;
+        }
+
+        @Override
         public double getYD() {
             return this.y;
         }
 
         @Override
+        public void setYD(double y) {
+            if (this.isChangeable)
+                this.y = y;
+        }
+
+        @Override
         public double getZD() {
             return this.z;
+        }
+
+        @Override
+        public void setZD(double z) {
+            if (this.isChangeable)
+                this.z = z;
         }
 
         public double getX() {
@@ -713,29 +801,14 @@ public abstract class vec3 <T extends Number>{
             return this.z;
         }
 
-        @Override
-        public void setXD(double x) {
-            this.x = x;
-        }
-
-        @Override
-        public void setYD(double y) {
-            this.y = y;
-        }
-
-        @Override
-        public void setZD(double z) {
-            this.z = z;
-        }
-
         public String toString() {
-            return "{x: "+this.x+",y: "+this.y+",z: "+this.z+"}";
+            return "{x: " + this.x + ",y: " + this.y + ",z: " + this.z + "}";
         }
     }
 
     public static class Float extends intVec3<java.lang.Float> {
 
-        public float x, y, z;
+        private float x, y, z;
         private vec3Gen<java.lang.Float> generic;
 
         public Float(vec3 vec3) {
@@ -755,9 +828,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Float update(float x, float y, float z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
             return this;
         }
 
@@ -766,9 +843,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Float subFromThis(vec3 other) {
-            this.x -=  other.getXD();
-            this.y -=  other.getYD();
-            this.z -=  other.getZD();
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x -= other.getXD();
+                this.y -= other.getYD();
+                this.z -= other.getZD();
+            }
             return this;
         }
 
@@ -777,9 +858,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Float addToThis(vec3 other) {
-            this.x += (float) other.getXD();
-            this.y += (float) other.getYD();
-            this.z += (float) other.getZD();
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x += (float) other.getXD();
+                this.y += (float) other.getYD();
+                this.z += (float) other.getZD();
+            }
             return this;
         }
 
@@ -788,9 +873,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Float mulToThis(float scale) {
-            this.x *= scale;
-            this.y *= scale;
-            this.z *= scale;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x *= scale;
+                this.y *= scale;
+                this.z *= scale;
+            }
             return this;
         }
 
@@ -799,9 +888,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Float divToThis(float scale) {
-            this.x /= scale;
-            this.y /= scale;
-            this.z /= scale;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x /= scale;
+                this.y /= scale;
+                this.z /= scale;
+            }
             return this;
         }
 
@@ -826,7 +919,7 @@ public abstract class vec3 <T extends Number>{
         @Override
         @SuppressWarnings("unchecked")
         public vec3Gen<java.lang.Float> getGenericVec() {
-            if(this.generic == null)
+            if (this.generic == null)
                 this.generic = new vec3Gen<java.lang.Float>(this.x, this.y, this.z);
             return this.generic;
         }
@@ -837,13 +930,31 @@ public abstract class vec3 <T extends Number>{
         }
 
         @Override
+        public void setXD(double x) {
+            if (this.isChangeable)
+                this.x = (float) x;
+        }
+
+        @Override
         public double getYD() {
             return this.y;
         }
 
         @Override
+        public void setYD(double y) {
+            if (this.isChangeable)
+                this.y = (float) y;
+        }
+
+        @Override
         public double getZD() {
             return this.z;
+        }
+
+        @Override
+        public void setZD(double z) {
+            if (this.isChangeable)
+                this.z = (float) z;
         }
 
         public float getX() {
@@ -873,29 +984,14 @@ public abstract class vec3 <T extends Number>{
             return this.z;
         }
 
-        @Override
-        public void setXD(double x) {
-            this.x = (float) x;
-        }
-
-        @Override
-        public void setYD(double y) {
-            this.y = (float) y;
-        }
-
-        @Override
-        public void setZD(double z) {
-            this.z = (float) z;
-        }
-
         public String toString() {
-            return "{x: "+this.x+",y: "+this.y+",z: "+this.z+"}";
+            return "{x: " + this.x + ",y: " + this.y + ",z: " + this.z + "}";
         }
     }
 
     public static class Short extends intVec3<java.lang.Short> {
 
-        public short x, y, z;
+        private short x, y, z;
         private vec3Gen<java.lang.Short> generic;
 
         public Short(vec3 vec3) {
@@ -915,9 +1011,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Short update(short x, short y, short z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
             return this;
         }
 
@@ -926,9 +1026,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Short subFromThis(vec3 other) {
-            this.x -= (short) other.getXD();
-            this.y -= (short) other.getYD();
-            this.z -= (short) other.getZD();
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x -= (short) other.getXD();
+                this.y -= (short) other.getYD();
+                this.z -= (short) other.getZD();
+            }
             return this;
         }
 
@@ -937,9 +1041,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Short addToThis(vec3 other) {
-            this.x += (short) other.getXD();
-            this.y += (short) other.getYD();
-            this.z += (short) other.getZD();
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x += (short) other.getXD();
+                this.y += (short) other.getYD();
+                this.z += (short) other.getZD();
+            }
             return this;
         }
 
@@ -948,9 +1056,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Short mulToThis(short scale) {
-            this.x *= scale;
-            this.y *= scale;
-            this.z *= scale;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x *= scale;
+                this.y *= scale;
+                this.z *= scale;
+            }
             return this;
         }
 
@@ -959,9 +1071,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Short divToThis(short scale) {
-            this.x /= scale;
-            this.y /= scale;
-            this.z /= scale;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x /= scale;
+                this.y /= scale;
+                this.z /= scale;
+            }
             return this;
         }
 
@@ -981,7 +1097,7 @@ public abstract class vec3 <T extends Number>{
         @Override
         @SuppressWarnings("unchecked")
         public vec3Gen<java.lang.Short> getGenericVec() {
-            if(this.generic == null)
+            if (this.generic == null)
                 this.generic = new vec3Gen<java.lang.Short>(this.x, this.y, this.z);
             return this.generic;
         }
@@ -992,13 +1108,31 @@ public abstract class vec3 <T extends Number>{
         }
 
         @Override
+        public void setXD(double x) {
+            if (this.isChangeable)
+                this.x = (short) x;
+        }
+
+        @Override
         public double getYD() {
             return this.y;
         }
 
         @Override
+        public void setYD(double y) {
+            if (this.isChangeable)
+                this.y = (short) y;
+        }
+
+        @Override
         public double getZD() {
             return this.z;
+        }
+
+        @Override
+        public void setZD(double z) {
+            if (this.isChangeable)
+                this.z = (short) z;
         }
 
         public short getX() {
@@ -1028,29 +1162,14 @@ public abstract class vec3 <T extends Number>{
             return this.z;
         }
 
-        @Override
-        public void setXD(double x) {
-            this.x = (short) x;
-        }
-
-        @Override
-        public void setYD(double y) {
-            this.y = (short) y;
-        }
-
-        @Override
-        public void setZD(double z) {
-            this.z = (short) z;
-        }
-
         public String toString() {
-            return "{x: "+this.x+",y: "+this.y+",z: "+this.z+"}";
+            return "{x: " + this.x + ",y: " + this.y + ",z: " + this.z + "}";
         }
     }
 
     public static class Byte extends intVec3<java.lang.Byte> {
 
-        public byte x, y, z;
+        private byte x, y, z;
         private vec3Gen<java.lang.Byte> generic;
 
         public Byte(vec3 vec3) {
@@ -1070,9 +1189,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Byte update(byte x, byte y, byte z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
             return this;
         }
 
@@ -1081,9 +1204,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Byte subFromThis(vec3 other) {
-            this.x -= (byte) other.getXD();
-            this.y -= (byte) other.getYD();
-            this.z -= (byte) other.getZD();
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x -= (byte) other.getXD();
+                this.y -= (byte) other.getYD();
+                this.z -= (byte) other.getZD();
+            }
             return this;
         }
 
@@ -1092,9 +1219,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Byte addToThis(vec3 other) {
-            this.x += (byte) other.getXD();
-            this.y += (byte) other.getYD();
-            this.z += (byte) other.getZD();
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x += (byte) other.getXD();
+                this.y += (byte) other.getYD();
+                this.z += (byte) other.getZD();
+            }
             return this;
         }
 
@@ -1114,9 +1245,13 @@ public abstract class vec3 <T extends Number>{
         }
 
         public vec3.Byte divToThis(byte scale) {
-            this.x /= scale;
-            this.y /= scale;
-            this.z /= scale;
+            if (!this.isChangeable) {
+                throw new RuntimeException("you can't change unchangeable vecs" + this);
+            } else {
+                this.x /= scale;
+                this.y /= scale;
+                this.z /= scale;
+            }
             return this;
         }
 
@@ -1136,7 +1271,7 @@ public abstract class vec3 <T extends Number>{
         @Override
         @SuppressWarnings("unchecked")
         public vec3Gen<java.lang.Byte> getGenericVec() {
-            if(this.generic == null)
+            if (this.generic == null)
                 this.generic = new vec3Gen<java.lang.Byte>(this.x, this.y, this.z);
             return this.generic;
         }
@@ -1147,13 +1282,31 @@ public abstract class vec3 <T extends Number>{
         }
 
         @Override
+        public void setXD(double x) {
+            if (this.isChangeable)
+                this.x = (byte) x;
+        }
+
+        @Override
         public double getYD() {
             return this.y;
         }
 
         @Override
+        public void setYD(double y) {
+            if (this.isChangeable)
+                this.y = (byte) y;
+        }
+
+        @Override
         public double getZD() {
             return this.z;
+        }
+
+        @Override
+        public void setZD(double z) {
+            if (this.isChangeable)
+                this.z = (byte) z;
         }
 
         public byte getX() {
@@ -1183,23 +1336,8 @@ public abstract class vec3 <T extends Number>{
             return this.z;
         }
 
-        @Override
-        public void setXD(double x) {
-            this.x = (byte) x;
-        }
-
-        @Override
-        public void setYD(double y) {
-            this.y = (byte) y;
-        }
-
-        @Override
-        public void setZD(double z) {
-            this.z = (byte) z;
-        }
-
         public String toString() {
-            return "{x: "+this.x+",y: "+this.y+",z: "+this.z+"}";
+            return "{x: " + this.x + ",y: " + this.y + ",z: " + this.z + "}";
         }
     }
 }

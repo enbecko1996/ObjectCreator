@@ -3,38 +3,37 @@ package com.enbecko.modcreator.linalg;
 import javax.annotation.Nonnull;
 
 /**
- * Created by Niclas on 19.11.2016.
+ * Created by enbec on 21.02.2017.
  */
-public class RayTrace3D {
-
-    public vec3.Double getOnPoint() {
-        return onPointV;
-    }
-
-    public vec3.Double getVec1() {
-        return vec1V;
-    }
-
-    private final vec3.Double onPointV = new vec3.Double();
-    private final vec3.Double vec1V = new vec3.Double();
+public class RayTrace3D extends Line3D.Line3DManualUpdate {
+    private final boolean isEndless;
+    private final vec3.Double vec;
 
     public RayTrace3D(vec3.Double onPoint, vec3.Double vec1, boolean isEndless) {
-        this.onPointV.update(onPoint);
-        this.vec1V.update(vec1);
+        super(onPoint, (vec3.Double) onPoint.addAndMakeNew(vec3.vecPrec.DOUBLE, vec1));
+        this.vec = new vec3.Double(vec1);
+        this.isEndless = isEndless;
     }
 
-    public RayTrace3D updateOnPoint(vec3.Double onPoint) {
-        this.onPointV.update(onPoint);
+    public Line3D updateOnPoint(vec3.Double onPoint) {
+        this.onPoint.update(onPoint);
         return this;
     }
 
-    public void updateVec(vec3.Double vec1) {
-        this.vec1V.update(vec1);
+    public void updateEndPoint(vec3.Double end) {
+        this.endPoint.update(end);
+        this.vec.update(this.endPoint).subFromThis(this.onPoint);
     }
 
-    public RayTrace3D update(vec3.Double onPoint, @Nonnull vec3.Double vec1) {
-        this.onPointV.update(onPoint);
-        this.vec1V.update(vec1);
+    public void updateVec(vec3.Double vec) {
+        this.vec.update(vec);
+        this.endPoint.update(this.onPoint.addToThis(vec));
+        this.onPoint.update(this.endPoint.subFromThis(vec));
+    }
+
+    public Line3D update(vec3.Double onPoint, @Nonnull vec3.Double end) {
+        this.onPoint.update(onPoint);
+        this.endPoint.update(end);
         return this;
     }
 }
