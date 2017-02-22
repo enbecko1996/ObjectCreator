@@ -9,7 +9,6 @@ public class Bone {
     private vec3.Double rotPoint_global;
     private vec3.Double offset;
     private final float[] transformMat = new float[16], inv_transformMat = new float[16];
-    private Block3D[] blocks;
 
     public Bone() {
 

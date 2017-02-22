@@ -286,4 +286,30 @@ public class vec_n_DOUBLE extends vec3{
     public vecPrec getPrecision() {
         return vecPrec.DOUBLE;
     }
+
+    @Override
+    public double dot(vec3 other) {
+        if (other instanceof vec_n_DOUBLE) {
+            double[] vec = ((vec_n_DOUBLE) other).getVec();
+            if (this.vec.length == vec.length) {
+                double out = 0;
+                for (int k = 0; k < vec.length; k++) {
+                    out += this.vec[k] * vec[k];
+                }
+                return out;
+            } else
+                throw new RuntimeException("cannot do dot on different sized vectors" + this + " " + other);
+        } else if (this.vec.length == 3) {
+            return super.dot(other);
+        } else
+            throw new RuntimeException("cannot do dot on different sized vectors" + this + " " + other);
+    }
+
+    public String toString() {
+        return Arrays.toString(this.vec);
+    }
+
+    public int getLength() {
+        return this.vec.length;
+    }
 }
