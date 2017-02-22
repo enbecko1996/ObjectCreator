@@ -23,6 +23,7 @@ public class Face3D {
           TODO
           MAKE TWO TRIANGLE FACES AND CHECK IF RAYTRACE CROSSES ONE OF THEM.
          */
+
         return null;
     }
 
