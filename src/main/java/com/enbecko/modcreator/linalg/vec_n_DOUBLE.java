@@ -13,7 +13,7 @@ public class vec_n_DOUBLE extends vec3{
         this.vec = new double[size];
     }
 
-    public vec_n_DOUBLE(int size, int identWhere) {
+    public vec_n_DOUBLE(boolean ident, int size, int identWhere) {
         this.vec = new double[size];
         if(identWhere < this.vec.length)
             this.vec[identWhere] = 1;
@@ -37,7 +37,10 @@ public class vec_n_DOUBLE extends vec3{
             this.vec[1] = other.getYD();
             this.vec[2] = other.getZD();
         }
+    }
 
+    public vec_n_DOUBLE copy() {
+        return new vec_n_DOUBLE(this);
     }
 
     public double[] getVec() {

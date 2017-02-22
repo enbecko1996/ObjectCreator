@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
  */
 public abstract class vec3<T extends Number> {
 
-    boolean isChangeable;
+    boolean isChangeable = true;
     private double w = 1;
 
     public static vec3 newVecWithPrecision(vecPrec precision, double x, double y, double z) {
