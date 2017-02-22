@@ -22,17 +22,17 @@ public class MathHelper {
 
     public static float getAngleBetween(vec3.Double first, vec3.Double sec)
     {
-        return (float) Math.toDegrees(Math.acos((first.x * sec.x + first.y * sec.y + first.z * sec.z) / (getVecLength(first) * getVecLength(sec))));
+        return (float) Math.toDegrees(Math.acos((first.getX() * sec.getX() + first.getY() * sec.getY() + first.getZ() * sec.getZ()) / (getVecLength(first) * getVecLength(sec))));
     }
 
     public static float getAngleBetweenZ(vec3.Double first, vec3.Double sec)
     {
-        return (float) Math.toDegrees(Math.acos((first.x * sec.x + first.y * sec.y) / (getVecLength(first.x, first.y) * getVecLength(sec.x, sec.y))));
+        return (float) Math.toDegrees(Math.acos((first.getX() * sec.getX() + first.getY() * sec.getY()) / (getVecLength(first.getX(), first.getY()) * getVecLength(sec.getX(), sec.getY()))));
     }
 
     public static float getAngleBetweenX(vec3.Double first, vec3.Double sec)
     {
-        return (float) Math.toDegrees(Math.acos((first.z * sec.z + first.y * sec.y) / (getVecLength(first.z, first.y) * getVecLength(sec.z, sec.y))));
+        return (float) Math.toDegrees(Math.acos((first.getZ() * sec.getZ() + first.getY() * sec.getY()) / (getVecLength(first.getZ(), first.getY()) * getVecLength(sec.getZ(), sec.getY()))));
     }
 
     public static boolean sameSign(float a, float b) {
@@ -49,7 +49,7 @@ public class MathHelper {
     public static float getVecLength(vec3.Double vec)
     {
         double tmp = 0;
-        tmp = Math.pow(vec.x, 2)+Math.pow(vec.y, 2)+Math.pow(vec.z, 2);
+        tmp = Math.pow(vec.getX(), 2)+Math.pow(vec.getY(), 2)+Math.pow(vec.getZ(), 2);
         return (float)Math.sqrt(tmp);
     }
 
@@ -58,53 +58,6 @@ public class MathHelper {
         double tmp = 0;
         tmp = Math.pow(vec.getXD(), 2)+Math.pow(vec.getYD(), 2)+Math.pow(vec.getZD(), 2);
         return (float)Math.sqrt(tmp);
-    }
-
-    @Nonnull
-    public static <T extends Number> vec3Gen<T>[] lineBetweenGeneric(vec3Gen<T> p1, vec3Gen<T> p2, final T oneUnit) {
-        final double oU = oneUnit.doubleValue();
-        List<vec3Gen<T>> tmpVecs = new ArrayList<vec3Gen<T>>();
-        vec3Gen<T> delta = p2.subAndMakeNew(p1);
-        double mY = delta.y.doubleValue() / delta.x.doubleValue();
-        float up = 0;
-        int upSteps = 0;
-        System.out.println(p1+" "+p2+" "+delta+" "+mY);
-        for (double x = p1.x.doubleValue(); x < p2.x.doubleValue(); x += oU) {
-            up += mY * oU;
-            if(up >= oU) {
-                upSteps++;
-                up -= oU;
-            }
-            addGenericVec(p1.type, tmpVecs, x, upSteps * oU, p1.z.doubleValue());
-        }
-        double mZ = delta.y.doubleValue() / delta.z.doubleValue();
-        up = 0;
-        upSteps = 0;
-        System.out.println(p1+" "+p2+" "+delta+" "+mZ);
-        for (double z = p1.z.doubleValue(); z < p2.z.doubleValue(); z += oU) {
-            up += mZ * oU;
-            if(up >= oU) {
-                upSteps++;
-                up -= oU;
-            }
-            addGenericVec(p1.type, tmpVecs, p1.x.doubleValue(), upSteps * oU, z);
-        }
-        double mX = delta.z.doubleValue() / delta.x.doubleValue();
-        up = 0;
-        upSteps = 0;
-        System.out.println(p1+" "+p2+" "+delta+" "+mX);
-        for (double y = p1.y.doubleValue(); y < p2.y.doubleValue(); y += oU) {
-            up += mX * oU;
-            if(up >= oU) {
-                upSteps++;
-                up -= oU;
-            }
-            addGenericVec(p1.type, tmpVecs, p1.x.doubleValue(), y, upSteps * oU);
-        }
-
-        @SuppressWarnings("unchecked")
-        vec3Gen<T>[] out = new vec3Gen[tmpVecs.size()];
-        return tmpVecs.toArray(out);
     }
 
     /**
@@ -118,7 +71,7 @@ public class MathHelper {
     private static vec3[] lineBetween(@Nonnull vec3.vecPrec prec, vec3 p1, vec3 p2, final double oneUnit) {
         List<vec3> tmpVecsX = new ArrayList<vec3>(), tmpVecsY = new ArrayList<vec3>(), tmpVecsZ = new ArrayList<vec3>();
         vec3.Double delta = p2.subAndMakeNewD(p1);
-        double mY = delta.y / delta.x;
+        double mY = delta.getY() / delta.getX();
         float up = 0;
         int upSteps = 0;
         System.out.println(p1+" "+p2+" "+delta+" "+mY);
@@ -130,7 +83,7 @@ public class MathHelper {
             }
             addToList(prec, tmpVecsZ, x, upSteps * oneUnit, p1.getZD());
         }
-        double mZ = delta.y / delta.z;
+        double mZ = delta.getY() / delta.getZ();
         up = 0;
         upSteps = 0;
         System.out.println(p1+" "+p2+" "+delta+" "+mZ);
@@ -142,7 +95,7 @@ public class MathHelper {
             }
             addToList(prec, tmpVecsX, p1.getXD(), upSteps * oneUnit, z);
         }
-        double mX = delta.z / delta.x;
+        double mX = delta.getZ() / delta.getX();
         up = 0;
         upSteps = 0;
         System.out.println(p1+" "+p2+" "+delta+" "+mX);
