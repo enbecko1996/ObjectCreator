@@ -9,10 +9,16 @@ import javax.annotation.Nullable;
 public abstract class Face3D {
 
     final vec3 LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT;
-    vec3 tmpTop = new vec3.DoubleVec();
-    vec3 tmpBot = new vec3.DoubleVec();
-    vec3 tmpLeft = new vec3.DoubleVec();
-    vec3 tmpRight = new vec3.DoubleVec();
+    private vec3 tmpTop = new vec3.DoubleVec();
+    private vec3 tmpBot = new vec3.DoubleVec();
+    private vec3 tmpLeft = new vec3.DoubleVec();
+    private vec3 tmpRight = new vec3.DoubleVec();
+    private vec3 tmpDiag = new vec3.DoubleVec();
+    private vec3 tmpRhs = new vec3.DoubleVec();
+    //For example if objects should bounce of this surface.
+    //Normals are only nonnull if this isPhysical;
+    private boolean isPhysical;
+    private vec3 normTriang1, normTriang2;
     //The definition of Face is a Rectangle in this case.
     //The face is not flat when no Block with a flat surface can be applied to it.
     final double isFaceFlatThreshold = 0.001;
@@ -29,19 +35,53 @@ public abstract class Face3D {
         this.updateIsSymmetric();
     }
 
+    /**
+     *
+     * @param rayTrace3D's vecs are changed during the process. Should be made back to normal afterwards.
+     * @return null if no cross. crossposition as vec3 otherwise.
+     */
     @Nullable
     public vec3 checkIfCrosses(RayTrace3D rayTrace3D) {
         /*
           TODO
           MAKE TWO TRIANGLE FACES AND CHECK IF RAYTRACE CROSSES ONE OF THEM.
          */
-        if (this.isSymmetric()) {
-            tmpBot.update(this.LOW_RIGHT).subFromThis(this.LOW_LEFT);
-            tmpLeft.update(this.LOW_RIGHT).subFromThis(this.LOW_LEFT);
-            Matrix.Matrix_NxN matrix = Matrix.NxN_FACTORY.makeMatrixFromColumns(tmpBot, tmpLeft, rayTrace3D.getVec().mulToThis(-1));
-            vec3 rhs = (vec3) rayTrace3D.getOnPoint().subFromThis(this.LOW_LEFT);
-            matrix.doLUDecomposition();
-            matrix.solveLGS_fromLU(rhs);
+        synchronized (rayTrace3D) {
+            if (this.isSymmetric()) {
+                tmpTop.update(this.TOP_RIGHT).subFromThis(this.TOP_LEFT);
+                tmpLeft.update(this.LOW_LEFT).subFromThis(this.TOP_LEFT);
+                Matrix.Matrix_NxN matrix = Matrix.NxN_FACTORY.makeMatrixFromColumns(tmpTop, tmpLeft, rayTrace3D.getVec().mulToThis(-1));
+                rayTrace3D.getVec().mulToThis(-1);
+                tmpRhs.update(rayTrace3D.getOnPoint()).subFromThis(this.TOP_LEFT);
+                matrix.doLUDecomposition();
+                vec_n_DOUBLE r_s_t = matrix.solveLGS_fromLU(tmpRhs);
+                double[] rst = r_s_t.getVecD();
+                if (rst[2] >  0 && rst[2] < rayTrace3D.getLimit() && rst[0] >= 0 && rst[0] <= 1 && rst[1] >= 0 && rst[1] <= 1) {
+                    return rayTrace3D.advanceOnVecAndReturnPosition(rst[2]);
+                }
+            } else {
+                tmpTop.update(this.TOP_RIGHT).subFromThis(this.TOP_LEFT);
+                tmpLeft.update(this.LOW_LEFT).subFromThis(this.TOP_LEFT);
+                this.tmpDiag.update(this.LOW_RIGHT).subFromThis(this.TOP_LEFT);
+                Matrix.Matrix_NxN matrix = Matrix.NxN_FACTORY.makeMatrixFromColumns(tmpLeft, tmpDiag, rayTrace3D.getVec().mulToThis(-1));
+                rayTrace3D.getVec().mulToThis(-1);
+                matrix.doLUDecomposition();
+                tmpRhs.update(rayTrace3D.getOnPoint()).subFromThis(this.TOP_LEFT);
+                vec_n_DOUBLE r_s_t_1 = matrix.solveLGS_fromLU(tmpRhs);
+                double[] rst = r_s_t_1.getVecD();
+                if (rst[2] >  0 && rst[2] < rayTrace3D.getLimit() && rst[0] >= 0 && rst[0] <= 1 && rst[1] >= 0 && rst[1] <= 1) {
+                    return rayTrace3D.advanceOnVecAndReturnPosition(rst[2]);
+                } else {
+                    matrix.setColumn(0, tmpDiag);
+                    matrix.setColumn(1, tmpTop);
+                    matrix.doLUDecomposition();
+                    vec_n_DOUBLE r_s_t_2 = matrix.solveLGS_fromLU(tmpRhs);
+                    rst = r_s_t_2.getVecD();
+                    if (rst[2] >  0 && rst[2] < rayTrace3D.getLimit() && rst[0] >= 0 && rst[0] <= 1 && rst[1] >= 0 && rst[1] <= 1) {
+                        return rayTrace3D.advanceOnVecAndReturnPosition(rst[2]);
+                    }
+                }
+            }
         }
         return null;
     }
@@ -60,7 +100,6 @@ public abstract class Face3D {
         double fac = (tmpTop.getXD() != 0 && tmpBot.getXD() != 0) ? tmpBot.getXD() / tmpTop.getXD() : (tmpTop.getYD() != 0 && tmpBot.getYD() != 0) ? tmpBot.getYD() / tmpTop.getYD() : (tmpTop.getZD() != 0 && tmpBot.getZD() != 0) ? tmpBot.getZD() / tmpTop.getZD() : 0;
         if (fac != 0) {
             tmpTop.mulToThis(fac);
-            System.out.println(tmpTop + " " + tmpBot);
             this.isFlat = tmpTop.subFromThis(tmpBot).length() < this.isFaceFlatThreshold;
         }
     }
@@ -69,35 +108,77 @@ public abstract class Face3D {
         this.tmpTop.update(this.TOP_RIGHT).subFromThis(this.TOP_LEFT);
         this.tmpBot.update(this.LOW_RIGHT).subFromThis(this.LOW_LEFT);
         this.tmpLeft.update(this.TOP_LEFT).subFromThis(this.LOW_LEFT);
-        this.tmpBot.update(this.TOP_RIGHT).subFromThis(this.LOW_RIGHT);
+        this.tmpRight.update(this.TOP_RIGHT).subFromThis(this.LOW_RIGHT);
         this.isSymmetric = tmpTop.subFromThis(tmpBot).length() < isFaceRectThreshold && tmpLeft.subFromThis(tmpRight).length() < isFaceRectThreshold;
     }
 
-    public static class FaceAutoUpdateOnVecChange extends Face3D {
+    public void calculateNormals(vec3 left, vec3 diag, vec3 top) {
+        this.normTriang1 = ((vec3) left.mulToThis(-1)).cross(diag);
+        left.mulToThis(-1);
+        this.normTriang2 = diag.cross(top);
+    }
+
+    public void calculateNormals() {
+        this.tmpTop.update(this.TOP_RIGHT).subFromThis(this.TOP_LEFT);
+        this.tmpDiag.update(this.LOW_RIGHT).subFromThis(this.TOP_LEFT);
+        this.tmpLeft.update(this.TOP_LEFT).subFromThis(this.LOW_LEFT);
+        this.calculateNormals(tmpLeft, tmpDiag, tmpTop);
+    }
+
+    public void setPhysical(boolean physical) {
+        this.isPhysical = physical;
+        if (this.isPhysical)
+            this.calculateNormals();
+        else {
+            this.normTriang1 = null;
+            this.normTriang2 = null;
+        }
+    }
+
+    public vec3 getTriangleNormal1() {
+        if (this.isPhysical) {
+            return this.normTriang1;
+        } else
+            throw new RuntimeException("You can't get the normals of a Face which is not physical: " + this);
+    }
+
+    public vec3 getTriangleNormal2() {
+        if (this.isPhysical) {
+            return this.normTriang2;
+        } else
+            throw new RuntimeException("You can't get the normals of a Face which is not physical: " + this);
+    }
+
+    public boolean isPhysical() {
+        return this.isPhysical;
+    }
+
+    @Deprecated
+    public static class FaceAutoUpdateOnVecChange extends FaceManualUpdate {
         public FaceAutoUpdateOnVecChange(vec3 LOW_LEFT, vec3 LOW_RIGHT, vec3 TOP_RIGHT, vec3 TOP_LEFT) {
             super(LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT);
         }
 
+        public vec3 getTriangleNormal1() {
+            this.calculateNormals();
+            return super.getTriangleNormal1();
+        }
+
+        public vec3 getTriangleNormal2() {
+            this.calculateNormals();
+            return super.getTriangleNormal2();
+        }
+
         @Override
         public boolean isFlat() {
-            this.tmpTop.update(this.TOP_RIGHT).subFromThis(this.TOP_LEFT);
-            this.tmpBot.update(this.LOW_RIGHT).subFromThis(this.LOW_LEFT);
-            double fac = (tmpTop.getXD() != 0 && tmpBot.getXD() != 0) ? tmpBot.getXD() / tmpTop.getXD() : (tmpTop.getYD() != 0 && tmpBot.getYD() != 0) ? tmpBot.getYD() / tmpTop.getYD() : (tmpTop.getZD() != 0 && tmpBot.getZD() != 0) ? tmpBot.getZD() / tmpTop.getZD() : 0;
-            if (fac != 0) {
-                tmpTop.mulToThis(fac);
-                System.out.println(tmpTop + " " + tmpBot);
-                return (this.isFlat = tmpTop.subFromThis(tmpBot).length() < this.isFaceFlatThreshold);
-            }
-            return false;
+            this.updateIsFlat();
+            return super.isFlat();
         }
 
         @Override
         public boolean isSymmetric() {
-            this.tmpTop.update(this.TOP_RIGHT).subFromThis(this.TOP_LEFT);
-            this.tmpBot.update(this.LOW_RIGHT).subFromThis(this.LOW_LEFT);
-            this.tmpLeft.update(this.TOP_LEFT).subFromThis(this.LOW_LEFT);
-            this.tmpBot.update(this.TOP_RIGHT).subFromThis(this.LOW_RIGHT);
-            return (this.isSymmetric = tmpTop.subFromThis(tmpBot).length() < isFaceRectThreshold && tmpLeft.subFromThis(tmpRight).length() < isFaceRectThreshold);
+            this.updateIsSymmetric();
+            return super.isSymmetric();
         }
     }
 
@@ -111,6 +192,8 @@ public abstract class Face3D {
             this.LOW_LEFT.update(lowLeft);
             this.updateIsFlat();
             this.updateIsSymmetric();
+            if (this.isPhysical())
+                this.calculateNormals();
             return this;
         }
 
@@ -118,6 +201,8 @@ public abstract class Face3D {
             this.LOW_RIGHT.update(lowRight);
             this.updateIsFlat();
             this.updateIsSymmetric();
+            if (this.isPhysical())
+                this.calculateNormals();
             return this;
         }
 
@@ -125,6 +210,8 @@ public abstract class Face3D {
             this.TOP_LEFT.update(topLeft);
             this.updateIsFlat();
             this.updateIsSymmetric();
+            if (this.isPhysical())
+                this.calculateNormals();
             return this;
         }
 
@@ -132,6 +219,8 @@ public abstract class Face3D {
             this.TOP_RIGHT.update(topRight);
             this.updateIsFlat();
             this.updateIsSymmetric();
+            if (this.isPhysical())
+                this.calculateNormals();
             return this;
         }
 
@@ -142,6 +231,8 @@ public abstract class Face3D {
             this.updateTopRight(TOP_RIGHT);
             this.updateIsFlat();
             this.updateIsSymmetric();
+            if (this.isPhysical())
+                this.calculateNormals();
             return this;
         }
     }
@@ -154,7 +245,13 @@ public abstract class Face3D {
     }
 
     public static void main(String[] args) {
-        Face3D face = new FaceAutoUpdateOnVecChange(new vec3.DoubleVec(0, 0, 0), new vec3.DoubleVec(1, 0, 1), new vec3.DoubleVec(3, 1, -1), new vec3.DoubleVec(2, 1, -2));
-        System.out.println(face.isFlat());
+        Face3D face = new FaceAutoUpdateOnVecChange(new vec3.DoubleVec(0, 5, 0), new vec3.DoubleVec(1, 5, 0), new vec3.DoubleVec(1, 6, 0), new vec3.DoubleVec(0, 6, 0));
+        face.setPhysical(true);
+        RayTrace3D rayTrace3D = new RayTrace3D(new vec3.DoubleVec(-0, 5.5, 1), new vec3.DoubleVec(0, 0, -1), 100, true);
+        long startTime = System.currentTimeMillis();
+        int testCount = 100;
+        for (int k = 0; k < testCount; k++)
+            face.checkIfCrosses(rayTrace3D);
+        System.out.println("Time: " + (System.currentTimeMillis() - startTime));
     }
 }

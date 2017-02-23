@@ -61,4 +61,32 @@ public class vec_n_DOUBLE extends vec_n<Double>{
             throw new RuntimeException("Can't create vec3 from content with not 3 components.");
         }
     }
+
+    @Override
+    @Nullable
+    public vec_n mulAndMakeNew(vecPrec precision, double length) {
+        vec_n calc = new vec_n_DOUBLE(this).mulToThis(length);
+        return calc;
+    }
+
+    @Override
+    @Nullable
+    public vec_n addAndMakeNew(vecPrec precision, vec_n other) {
+        vec_n calc = new vec_n_DOUBLE(this).addToThis(other);
+        return calc;
+    }
+
+    @Override
+    @Nullable
+    public vec_n subAndMakeNew(vecPrec precision, vec_n other) {
+        vec_n calc = new vec_n_DOUBLE(this).subFromThis(other);
+        return calc;
+    }
+
+    @Override
+    @Nullable
+    public vec_n divAndMakeNew(vecPrec precision, double length) {
+        vec_n calc = new vec_n_DOUBLE(this).divToThis(length);
+        return calc;
+    }
 }

@@ -71,6 +71,82 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
     }
 
+    @Override
+    @Nullable
+    public vec_n mulAndMakeNew(vecPrec prec, double length) {
+        switch (prec) {
+            case BYTE:
+                return new vec3.ByteVec(this).mulToThis(length);
+            case SHORT:
+                return new vec3.ShortVec(this).mulToThis(length);
+            case INT:
+                return new vec3.IntVec(this).mulToThis(length);
+            case LONG:
+                return new vec3.LongVec(this).mulToThis(length);
+            case FLOAT:
+                return new vec3.FloatVec(this).mulToThis(length);
+            default:
+                return new vec3.DoubleVec(this).mulToThis(length);
+        }
+    }
+
+    @Override
+    @Nullable
+    public vec_n addAndMakeNew(vecPrec prec, vec_n other) {
+        switch (prec) {
+            case BYTE:
+                return new vec3.ByteVec(this).addToThis(other);
+            case SHORT:
+                return new vec3.ShortVec(this).addToThis(other);
+            case INT:
+                return new vec3.IntVec(this).addToThis(other);
+            case LONG:
+                return new vec3.LongVec(this).addToThis(other);
+            case FLOAT:
+                return new vec3.FloatVec(this).addToThis(other);
+            default:
+                return new vec3.DoubleVec(this).addToThis(other);
+        }
+    }
+
+    @Override
+    @Nullable
+    public vec_n subAndMakeNew(vecPrec prec, vec_n other) {
+        switch (prec) {
+            case BYTE:
+                return new vec3.ByteVec(this).subFromThis(other);
+            case SHORT:
+                return new vec3.ShortVec(this).subFromThis(other);
+            case INT:
+                return new vec3.IntVec(this).subFromThis(other);
+            case LONG:
+                return new vec3.LongVec(this).subFromThis(other);
+            case FLOAT:
+                return new vec3.FloatVec(this).subFromThis(other);
+            default:
+                return new vec3.DoubleVec(this).subFromThis(other);
+        }
+    }
+
+    @Override
+    @Nullable
+    public vec_n divAndMakeNew(vecPrec prec, double length) {
+        switch (prec) {
+            case BYTE:
+                return new vec3.ByteVec(this).divToThis(length);
+            case SHORT:
+                return new vec3.ShortVec(this).divToThis(length);
+            case INT:
+                return new vec3.IntVec(this).divToThis(length);
+            case LONG:
+                return new vec3.LongVec(this).divToThis(length);
+            case FLOAT:
+                return new vec3.FloatVec(this).divToThis(length);
+            default:
+                return new vec3.DoubleVec(this).divToThis(length);
+        }
+    }
+
     public vec3<T> setChangeable(boolean changeable) {
         this.isChangeable = changeable;
         return this;

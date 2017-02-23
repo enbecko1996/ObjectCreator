@@ -8,6 +8,32 @@ import java.util.Arrays;
  * Created by enbec on 22.02.2017.
  */
 public class Matrix {
+    public static void main(String[] args) {
+        vec_n_DOUBLE[] rows = {new vec_n_DOUBLE(1, 2, 3), new vec_n_DOUBLE(4, 5, 6), new vec_n_DOUBLE(7, 8, 8)};
+        Matrix_NxN test = NxN_FACTORY.makeMatrixFromRows(rows);
+        System.out.println(test);
+        test.doLUDecomposition();
+        long startLU = System.currentTimeMillis();
+        int testCount = 1000000;
+        System.out.print("0/" + testCount);
+        vec_n_DOUBLE rhs = new vec_n_DOUBLE(1, 2, 3);
+        for (int k = 0; k < testCount; k++) {
+            //System.out.print("\r"+k+"/"+testCount);
+            test.doLUDecomposition();
+            //test.solveLGS_fromLU(rhs);
+            test.getInverse_fromLU();
+        }
+        System.out.println("\nLU time: " + (System.currentTimeMillis() - startLU) + " " + test.solveLGS_fromLU(rhs));
+        long startGauss = System.currentTimeMillis();
+        System.out.print("0/" + testCount);
+        for (int k = 0; k < testCount; k++) {
+            //System.out.print("\r"+k+"/"+testCount);
+            //test.solveLGS_Gaussian(rhs);
+            test.getInverse_Gaussian();
+        }
+        System.out.println("\nGauss time: " + (System.currentTimeMillis() - startLU) + " " + test.solveLGS_Gaussian(rhs));
+    }
+
     public static class MxN_FACTORY {
         public static Matrix_MxN makeMatrixFromRows(@Nonnull vec_n... rows) {
             return new Matrix_MxN(true, true, rows);
@@ -37,7 +63,6 @@ public class Matrix {
         }
     }
 
-
     public static class NxN_FACTORY {
         public static Matrix_NxN makeMatrixFromRows(@Nonnull vec_n... rows) {
             return new Matrix_NxN(true, true, rows);
@@ -63,7 +88,6 @@ public class Matrix {
     }
 
     public static class Matrix_MxN {
-        private static MxN_FACTORY the_MxN_MxN_FACTORY;
         final vec_n_DOUBLE[] rows, columns;
         final int m, n;
 
@@ -123,18 +147,16 @@ public class Matrix {
             this.m = rows.length;
             int size = -1;
             for (int k = 0; k < m; k++) {
-                if (rows[k] instanceof vec_n_DOUBLE) {
-                    double[] vec = ((vec_n_DOUBLE) rows[k]).getVecD();
-                    if (k == 0)
-                        size = vec.length;
-                    else {
-                        if (vec.length != size || size < 0)
-                            throw new RuntimeException("trying to create Matrix from rows with wrong length(s)" + size + Arrays.toString(vec));
-                    }
+                double[] vec = rows[k].getVecD();
+                if (k == 0)
+                    size = vec.length;
+                else {
+                    if (vec.length != size || size < 0)
+                        throw new RuntimeException("trying to create Matrix from rows with wrong length(s)" + size + Arrays.toString(vec));
                 }
             }
             if (size < 0)
-                throw new RuntimeException("trying to create Matrix with wrong rows" + rows);
+                throw new RuntimeException("trying to create Matrix with wrong rows" + Arrays.toString(rows));
             this.n = size;
             this.rows = new vec_n_DOUBLE[m];
             for (int mm = 0; mm < this.rows.length; mm++) {
@@ -153,18 +175,17 @@ public class Matrix {
             this.n = columns.length;
             int size = -1;
             for (int k = 0; k < n; k++) {
-                if (columns[k] instanceof vec_n_DOUBLE) {
-                    double[] vec = ((vec_n_DOUBLE) columns[k]).getVecD();
-                    if (k == 0)
-                        size = vec.length;
-                    else {
-                        if (vec.length != size || size < 0)
-                            throw new RuntimeException("trying to create Matrix from columns with wrong length(s)" + size + Arrays.toString(vec));
-                    }
+                double[] vec = columns[k].getVecD();
+                if (k == 0)
+                    size = vec.length;
+                else {
+                    if (vec.length != size || size < 0)
+                        throw new RuntimeException("trying to create Matrix from columns with wrong length(s)" + size + Arrays.toString(vec));
                 }
+
             }
             if (size < 0)
-                throw new RuntimeException("trying to create Matrix with wrong columns" + columns);
+                throw new RuntimeException("trying to create Matrix with wrong columns" + Arrays.toString(columns));
             this.m = size;
             this.columns = new vec_n_DOUBLE[n];
             for (int nn = 0; nn < this.columns.length; nn++) {
@@ -268,7 +289,7 @@ public class Matrix {
                 throw new RuntimeException("Can't update " + columns.length + " columns from " + off + ". this.columnCount: " + this.getColumncount());
         }
 
-        public void setRow(int pos, vec_n_DOUBLE row) {
+        public void setRow(int pos, vec_n row) {
             try {
                 if (pos < this.getRowCount() && row.getSize() == this.getColumncount()) {
                     this.rows[pos].update(row);
@@ -283,7 +304,7 @@ public class Matrix {
             }
         }
 
-        public void setColumn(int pos, vec_n_DOUBLE column) {
+        public void setColumn(int pos, vec_n column) {
             try {
                 if (pos < this.getColumncount() && column.getSize() == this.getRowCount()) {
                     this.columns[pos].update(column);
@@ -424,8 +445,8 @@ public class Matrix {
         }
 
         @Deprecated
-        public vec_n_DOUBLE solveLGS_Gaussian(vec_n_DOUBLE rhs) {
-            vec_n_DOUBLE[] tmpColumns = new vec_n_DOUBLE[this.getSize() + 1];
+        public vec_n_DOUBLE solveLGS_Gaussian(vec_n rhs) {
+            vec_n[] tmpColumns = new vec_n[this.getSize() + 1];
             System.arraycopy(this.getColumns(), 0, tmpColumns, 0, this.getSize());
             tmpColumns[tmpColumns.length - 1] = rhs;
             Matrix_MxN gaussMat = MxN_FACTORY.makeMatrixFromColumns(tmpColumns);
@@ -488,7 +509,7 @@ public class Matrix {
          */
         public void doLUDecomposition() {
             if (LU_lhs == null) {
-                LU_rhs = NxN_FACTORY.makeEmpty(this.getSize());
+                LU_rhs = NxN_FACTORY.makeMatrixFromMatrix(this);
                 LU_lhs = NxN_FACTORY.makeIdent(this.getSize());
                 LU_permutation = NxN_FACTORY.makeIdent(this.getSize());
                 ident_Stub = NxN_FACTORY.makeIdent(this.getSize());
@@ -531,12 +552,16 @@ public class Matrix {
                 vec_n_DOUBLE topRowCopy = LU_rhs.getRowAt(k).copy();
                 for (int p = k + 1; p < size; p++) {
                     vec_n_DOUBLE row = LU_rhs.getRowAt(p);
-                    double fac = topRowCopy.getVecD()[k] != 0 ? -(row.getVecD()[k] / topRowCopy.getVecD()[k]) : 0;
-                    row.addToThis(topRowCopy.mulToThis(fac));
-                    topRowCopy.mulToThis(fac != 0 && !Double.isInfinite(fac) && !Double.isNaN(fac) ? 1 / fac : 1);
-                    LU_lhs.set(p, k, -fac);
+                    if (row.getVecD()[k] != 0) {
+                        double fac = topRowCopy.getVecD()[k] != 0 ? -(row.getVecD()[k] / topRowCopy.getVecD()[k]) : 0;
+                        row.addToThis(topRowCopy.mulToThis(fac));
+                        topRowCopy.mulToThis(fac != 0 && !Double.isInfinite(fac) && !Double.isNaN(fac) ? 1 / fac : 1);
+                        LU_lhs.set(p, k, -fac);
+                    }
                 }
             }
+            //DEBUG
+            //System.out.println("lhs: "+this.LU_lhs+" rhs: "+this.LU_rhs+" permut: "+this.LU_permutation);
         }
 
         public Matrix_NxN getInverse_fromLU() {
@@ -580,31 +605,5 @@ public class Matrix {
             else
                 throw new RuntimeException("Unfortunately this NxN-Matrix seems to have become MxN");
         }
-    }
-
-    public static void main(String[] args) {
-        vec_n_DOUBLE[] rows = {new vec_n_DOUBLE(1, 2, 3), new vec_n_DOUBLE(4, 5, 6), new vec_n_DOUBLE(7, 8, 8)};
-        Matrix_NxN test = NxN_FACTORY.makeMatrixFromRows(rows);
-        System.out.println(test);
-        test.doLUDecomposition();
-        long startLU = System.currentTimeMillis();
-        int testCount = 1000000;
-        System.out.print("0/" + testCount);
-        vec_n_DOUBLE rhs = new vec_n_DOUBLE(1, 2, 3);
-        for (int k = 0; k < testCount; k++) {
-            //System.out.print("\r"+k+"/"+testCount);
-            test.doLUDecomposition();
-            //test.solveLGS_fromLU(rhs);
-            test.getInverse_fromLU();
-        }
-        System.out.println("\nLU time: " + (System.currentTimeMillis() - startLU) + " " + test.solveLGS_fromLU(rhs));
-        long startGauss = System.currentTimeMillis();
-        System.out.print("0/" + testCount);
-        for (int k = 0; k < testCount; k++) {
-            //System.out.print("\r"+k+"/"+testCount);
-            //test.solveLGS_Gaussian(rhs);
-            test.getInverse_Gaussian();
-        }
-        System.out.println("\nGauss time: " + (System.currentTimeMillis() - startLU) + " " + test.solveLGS_Gaussian(rhs));
     }
 }

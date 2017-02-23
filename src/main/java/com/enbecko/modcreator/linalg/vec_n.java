@@ -103,28 +103,16 @@ public abstract class vec_n<T extends Number> {
     }
 
     @Nullable
-    public vec_n mulAndMakeNew(vecPrec precision, double length) {
-        vec_n calc = new vec_n_DOUBLE(this).mulToThis(length);
-        return calc;
-    }
+    public abstract vec_n mulAndMakeNew(vecPrec precision, double length);
 
     @Nullable
-    public vec_n addAndMakeNew(vecPrec precision, vec_n other) {
-        vec_n calc = new vec_n_DOUBLE(this).addToThis(other);
-        return calc;
-    }
+    public abstract vec_n addAndMakeNew(vecPrec precision, vec_n other);
 
     @Nullable
-    public vec_n subAndMakeNew(vecPrec precision, vec_n other) {
-        vec_n calc = new vec_n_DOUBLE(this).subFromThis(other);
-        return calc;
-    }
+    public abstract vec_n subAndMakeNew(vecPrec precision, vec_n other);
 
     @Nullable
-    public vec_n divAndMakeNew(vecPrec precision, double length) {
-        vec_n calc = new vec_n_DOUBLE(this).divToThis(length);
-        return calc;
-    }
+    public abstract vec_n divAndMakeNew(vecPrec precision, double length);
 
     public vec_n update(vec_n other) {
         return this.update(0, other.getVecD());
@@ -169,6 +157,13 @@ public abstract class vec_n<T extends Number> {
 
     public double[] getVecD() {
         return this.vec;
+    }
+
+    public double getAtD(int pos) {
+        if (pos < this.getSize()) {
+            return this.vec[pos];
+        }
+        throw new RuntimeException("Can't get value at " + pos + " in vector " + this);
     }
 
     public int getSize() {
