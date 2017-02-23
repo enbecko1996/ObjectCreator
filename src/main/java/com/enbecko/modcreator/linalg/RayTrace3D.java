@@ -7,11 +7,11 @@ import javax.annotation.Nonnull;
  */
 public class RayTrace3D extends Line3D.Line3DManualUpdate {
     private final boolean isEndless;
-    private final vec3.Double vec;
+    private final vec3.DoubleVec vec;
 
-    public RayTrace3D(vec3.Double onPoint, vec3.Double vec1, boolean isEndless) {
-        super(onPoint, (vec3.Double) onPoint.addAndMakeNew(vec3.vecPrec.DOUBLE, vec1));
-        this.vec = new vec3.Double(vec1);
+    public RayTrace3D(vec3.DoubleVec onPoint, vec3.DoubleVec vec1, boolean isEndless) {
+        super(onPoint, (vec3.DoubleVec) onPoint.addAndMakeNew(vec_n.vecPrec.DOUBLE, vec1));
+        this.vec = new vec3.DoubleVec(vec1);
         this.isEndless = isEndless;
     }
 
@@ -27,7 +27,7 @@ public class RayTrace3D extends Line3D.Line3DManualUpdate {
         this.vec.update(this.endPoint).subFromThis(this.onPoint);
     }
 
-    public void updateVec(vec3.Double vec) {
+    public void updateVec(vec3.DoubleVec vec) {
         this.vec.update(vec);
         this.endPoint.update(this.onPoint.addToThis(vec));
         this.onPoint.update(this.endPoint.subFromThis(vec));
@@ -41,7 +41,7 @@ public class RayTrace3D extends Line3D.Line3DManualUpdate {
         return this;
     }
 
-    public vec3.Double getVec() {
+    public vec3.DoubleVec getVec() {
         return this.vec;
     }
 }

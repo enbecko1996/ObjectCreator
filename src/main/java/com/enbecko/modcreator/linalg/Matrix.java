@@ -9,7 +9,7 @@ import java.util.Arrays;
  */
 public class Matrix {
     public static class MxN_FACTORY {
-        public static Matrix_MxN makeMatrixFromRows(@Nonnull vec3... rows) {
+        public static Matrix_MxN makeMatrixFromRows(@Nonnull vec_n... rows) {
             return new Matrix_MxN(true, true, rows);
         }
 
@@ -19,12 +19,12 @@ public class Matrix {
             throw new RuntimeException("This matrix is not valid: " + matrix);
         }
 
-        public static Matrix_MxN makeMatrixFromColumns(@Nonnull vec3... columns) {
+        public static Matrix_MxN makeMatrixFromColumns(@Nonnull vec_n... columns) {
             return new Matrix_MxN(true, columns);
         }
 
         @Deprecated
-        public static Matrix_MxN makeMatrixFromRowsAndColumns(@Nonnull vec3[] rows, @Nonnull vec3[] columns) {
+        public static Matrix_MxN makeMatrixFromRowsAndColumns(@Nonnull vec_n[] rows, @Nonnull vec_n[] columns) {
             return new Matrix_MxN(rows, columns);
         }
 
@@ -39,11 +39,11 @@ public class Matrix {
 
 
     public static class NxN_FACTORY {
-        public static Matrix_NxN makeMatrixFromRows(@Nonnull vec3... rows) {
+        public static Matrix_NxN makeMatrixFromRows(@Nonnull vec_n... rows) {
             return new Matrix_NxN(true, true, rows);
         }
 
-        public static Matrix_NxN makeMatrixFromColumns(@Nonnull vec3... columns) {
+        public static Matrix_NxN makeMatrixFromColumns(@Nonnull vec_n... columns) {
             return new Matrix_NxN(true, columns);
         }
 
@@ -99,12 +99,12 @@ public class Matrix {
         }
 
         @Deprecated
-        private Matrix_MxN(vec3[] rows, vec3[] columns) {
+        private Matrix_MxN(vec_n[] rows, vec_n[] columns) {
             this.m = rows.length;
             this.n = columns.length;
             this.rows = new vec_n_DOUBLE[m];
             for (int mm = 0; mm < this.rows.length; mm++) {
-                if (rows[mm] instanceof vec_n_DOUBLE && ((vec_n_DOUBLE) rows[mm]).getVec().length == n)
+                if (rows[mm] instanceof vec_n_DOUBLE && ((vec_n_DOUBLE) rows[mm]).getVecD().length == n)
                     this.rows[mm] = new vec_n_DOUBLE(rows[mm]);
                 else
                     throw new RuntimeException("The row vecs content has a different size then the needed columns" + m + " " + n + rows[mm]);
@@ -112,19 +112,19 @@ public class Matrix {
             }
             this.columns = new vec_n_DOUBLE[n];
             for (int nn = 0; nn < this.columns.length; nn++) {
-                if (columns[nn] instanceof vec_n_DOUBLE && ((vec_n_DOUBLE) columns[nn]).getVec().length == m)
+                if (columns[nn] instanceof vec_n_DOUBLE && ((vec_n_DOUBLE) columns[nn]).getVecD().length == m)
                     this.columns[nn] = new vec_n_DOUBLE(columns[nn]);
                 else
                     throw new RuntimeException("The column vecs content has a different size then the needed row" + m + " " + n + columns[nn]);
             }
         }
 
-        private Matrix_MxN(boolean stub, boolean stub2, @Nonnull vec3... rows) {
+        private Matrix_MxN(boolean stub, boolean stub2, @Nonnull vec_n... rows) {
             this.m = rows.length;
             int size = -1;
             for (int k = 0; k < m; k++) {
                 if (rows[k] instanceof vec_n_DOUBLE) {
-                    double[] vec = ((vec_n_DOUBLE) rows[k]).getVec();
+                    double[] vec = ((vec_n_DOUBLE) rows[k]).getVecD();
                     if (k == 0)
                         size = vec.length;
                     else {
@@ -144,17 +144,17 @@ public class Matrix {
             for (int nn = 0; nn < this.columns.length; nn++) {
                 double[] column = new double[m];
                 for (int k = 0; k < m; k++)
-                    column[k] = this.rows[k].getVec()[nn];
+                    column[k] = this.rows[k].getVecD()[nn];
                 this.columns[nn] = new vec_n_DOUBLE(column);
             }
         }
 
-        private Matrix_MxN(boolean stub, @Nonnull vec3... columns) {
+        private Matrix_MxN(boolean stub, @Nonnull vec_n... columns) {
             this.n = columns.length;
             int size = -1;
             for (int k = 0; k < n; k++) {
                 if (columns[k] instanceof vec_n_DOUBLE) {
-                    double[] vec = ((vec_n_DOUBLE) columns[k]).getVec();
+                    double[] vec = ((vec_n_DOUBLE) columns[k]).getVecD();
                     if (k == 0)
                         size = vec.length;
                     else {
@@ -174,7 +174,7 @@ public class Matrix {
             for (int mm = 0; mm < this.rows.length; mm++) {
                 double[] row = new double[n];
                 for (int k = 0; k < n; k++)
-                    row[k] = this.columns[k].getVec()[mm];
+                    row[k] = this.columns[k].getVecD()[mm];
                 this.rows[mm] = new vec_n_DOUBLE(row);
             }
         }
@@ -182,8 +182,8 @@ public class Matrix {
         public boolean compare(Matrix_MxN other) {
             if (this.isValid() && other.isValid() && this.getRowCount() == other.getRowCount() && this.getColumncount() == other.getColumncount()) {
                 for (int mm = 0; mm < this.m; mm++) {
-                    double[] rowVec = this.rows[mm].getVec();
-                    double[] otherRowVec = other.rows[mm].getVec();
+                    double[] rowVec = this.rows[mm].getVecD();
+                    double[] otherRowVec = other.rows[mm].getVecD();
                     for (int nn = 0; nn < this.n; nn++) {
                         if (rowVec[nn] != otherRowVec[nn])
                             return false;
@@ -199,7 +199,7 @@ public class Matrix {
             try {
                 for (int mm = 0; mm < this.m; mm++) {
                     for (int nn = 0; nn < this.n; nn++) {
-                        if (this.rows[mm].getVec()[nn] != this.columns[nn].getVec()[mm])
+                        if (this.rows[mm].getVecD()[nn] != this.columns[nn].getVecD()[mm])
                             return false;
                     }
                 }
@@ -270,11 +270,11 @@ public class Matrix {
 
         public void setRow(int pos, vec_n_DOUBLE row) {
             try {
-                if (pos < this.getRowCount() && row.getLength() == this.getColumncount()) {
+                if (pos < this.getRowCount() && row.getSize() == this.getColumncount()) {
                     this.rows[pos].update(row);
-                    double[] vec = row.getVec();
+                    double[] vec = row.getVecD();
                     for (int nn = 0; nn < this.getColumncount(); nn++) {
-                        this.columns[nn].getVec()[pos] = vec[nn];
+                        this.columns[nn].getVecD()[pos] = vec[nn];
                     }
                 } else
                     throw new RuntimeException("Can't set row " + row + " at column " + pos + " in matrix " + this);
@@ -285,11 +285,11 @@ public class Matrix {
 
         public void setColumn(int pos, vec_n_DOUBLE column) {
             try {
-                if (pos < this.getColumncount() && column.getLength() == this.getRowCount()) {
+                if (pos < this.getColumncount() && column.getSize() == this.getRowCount()) {
                     this.columns[pos].update(column);
-                    double[] vec = column.getVec();
+                    double[] vec = column.getVecD();
                     for (int mm = 0; mm < this.getRowCount(); mm++) {
-                        this.rows[mm].getVec()[pos] = vec[mm];
+                        this.rows[mm].getVecD()[pos] = vec[mm];
                     }
                 } else
                     throw new RuntimeException("Can't set column " + column + " at row " + pos + " in matrix " + this);
@@ -314,8 +314,8 @@ public class Matrix {
         public void set(int row, int column, double value) {
             try {
                 if (row < this.getRowCount() && column < this.getColumncount()) {
-                    this.rows[row].getVec()[column] = value;
-                    this.columns[column].getVec()[row] = value;
+                    this.rows[row].getVecD()[column] = value;
+                    this.columns[column].getVecD()[row] = value;
                 } else
                     throw new RuntimeException("Can't set value at " + row + "," + column + " in matrix " + this);
             } catch (Exception e) {
@@ -326,7 +326,7 @@ public class Matrix {
         public double get(int row, int column) {
             try {
                 if (row < this.getRowCount() && column < this.getColumncount()) {
-                    return this.rows[row].getVec()[column];
+                    return this.rows[row].getVecD()[column];
                 } else
                     throw new RuntimeException("No value at " + row + "," + column + " in matrix " + this);
             } catch (Exception e) {
@@ -348,15 +348,15 @@ public class Matrix {
             }
         }
 
-        public vec_n_DOUBLE multiplyWithVector(vec_n_DOUBLE rhs) {
-            if (this.getColumncount() == rhs.getLength()) {
-                vec_n_DOUBLE out = new vec_n_DOUBLE(rhs.getLength());
-                double[] vec = out.getVec();
+        public vec_n_DOUBLE multiplyWithVector(vec_n rhs) {
+            if (this.getColumncount() == rhs.getSize()) {
+                vec_n_DOUBLE out = new vec_n_DOUBLE(rhs.getSize());
+                double[] vec = out.getVecD();
                 for (int k = 0; k < vec.length; k++)
                     vec[k] = this.getColumnAt(k).dot(rhs);
                 return out;
             } else {
-                throw new RuntimeException("Can't multiply this matrix with vector: lhs = " + this.getRowCount() + "x" + this.getColumncount() + " rhs = " + rhs.getLength());
+                throw new RuntimeException("Can't multiply this matrix with vector: lhs = " + this.getRowCount() + "x" + this.getColumncount() + " rhs = " + rhs.getSize());
             }
         }
 
@@ -365,7 +365,7 @@ public class Matrix {
             int[] maxLength = new int[this.columns.length];
             for (int m = 0; m < this.rows.length; m++) {
                 for (int n = 0; n < this.columns.length; n++) {
-                    double[] vec = this.rows[m].getVec();
+                    double[] vec = this.rows[m].getVecD();
                     if ((vec[n] + "").length() > maxLength[n])
                         maxLength[n] = (vec[n] + "").length();
                 }
@@ -373,7 +373,7 @@ public class Matrix {
             for (int m = 0; m < this.rows.length; m++) {
                 builder.append("\n| ");
                 for (int n = 0; n < this.columns.length; n++) {
-                    double[] vec = this.rows[m].getVec();
+                    double[] vec = this.rows[m].getVecD();
                     int len = (vec[n] + "").length(), diff = maxLength[n] - len + 1;
                     builder.append("" + vec[n]);
                     for (int k = 0; k < diff; k++)
@@ -383,32 +383,6 @@ public class Matrix {
             }
             builder.append("\n");
             return builder.toString();
-        }
-
-        public static void main(String[] args) {
-            vec_n_DOUBLE[] rows = {new vec_n_DOUBLE(1, 2, 3), new vec_n_DOUBLE(4, 5, 6), new vec_n_DOUBLE(7, 8, 8)};
-            Matrix_NxN test = NxN_FACTORY.makeMatrixFromRows(rows);
-            System.out.println(test);
-            test.doLUDecomposition();
-            long startLU = System.currentTimeMillis();
-            int testCount = 1000000;
-            System.out.print("0/" + testCount);
-            vec_n_DOUBLE rhs = new vec_n_DOUBLE(1, 2, 3);
-            for (int k = 0; k < testCount; k++) {
-                //System.out.print("\r"+k+"/"+testCount);
-                test.doLUDecomposition();
-                //test.solveLGS_fromLU(rhs);
-                test.getInverse_fromLU();
-            }
-            System.out.println("\nLU time: " + (System.currentTimeMillis() - startLU) + " " + test.solveLGS_fromLU(rhs));
-            long startGauss = System.currentTimeMillis();
-            System.out.print("0/" + testCount);
-            for (int k = 0; k < testCount; k++) {
-                //System.out.print("\r"+k+"/"+testCount);
-                //test.solveLGS_Gaussian(rhs);
-                test.getInverse_Gaussian();
-            }
-            System.out.println("\nGauss time: " + (System.currentTimeMillis() - startLU) + " " + test.solveLGS_Gaussian(rhs));
         }
     }
 
@@ -422,13 +396,13 @@ public class Matrix {
             super(ident, size, size);
         }
 
-        private Matrix_NxN(boolean stub, boolean stub2, @Nonnull vec3... rows) {
+        private Matrix_NxN(boolean stub, boolean stub2, @Nonnull vec_n... rows) {
             super(stub, stub2, rows);
             if (this.getRowCount() != this.getColumncount())
                 throw new RuntimeException("Tried to create NxN matrix with MxN components (row) " + this);
         }
 
-        private Matrix_NxN(boolean stub, @Nonnull vec3... columns) {
+        private Matrix_NxN(boolean stub, @Nonnull vec_n... columns) {
             super(stub, columns);
             if (this.getRowCount() != this.getColumncount())
                 throw new RuntimeException("Tried to create NxN matrix with MxN components (row) " + this);
@@ -464,7 +438,7 @@ public class Matrix {
             int size = this.getRowCount();
             for (int k = 0; k < size; k++) {
                 vec_n_DOUBLE tmpCol = gaussMat.getColumnAt(k);
-                double[] col = tmpCol.getVec();
+                double[] col = tmpCol.getVecD();
                 //PIVOTING
                 boolean foundPivot = true;
                 if (col[k] == 0) {
@@ -484,14 +458,14 @@ public class Matrix {
                 }
                 //Eliminating
                 vec_n_DOUBLE topRow = gaussMat.getRowAt(k);
-                double[] topRowVec = topRow.getVec();
+                double[] topRowVec = topRow.getVecD();
                 if (topRowVec[k] != 1)
-                    gaussMat.setRow(k, topRow.mulToThis(1d / topRowVec[k]));
+                    gaussMat.setRow(k, (vec_n_DOUBLE) topRow.mulToThis(1d / topRowVec[k]));
                 vec_n_DOUBLE topRowCopy = gaussMat.getRowAt(k).copy();
                 for (int p = k + 1; p < size; p++) {
                     vec_n_DOUBLE row = gaussMat.getRowAt(p);
-                    double fac = topRowCopy.getVec()[k] != 0 ? -(row.getVec()[k] / topRowCopy.getVec()[k]) : 0;
-                    gaussMat.setRow(p, row.addToThis(topRowCopy.mulToThis(fac)));
+                    double fac = topRowCopy.getVecD()[k] != 0 ? -(row.getVecD()[k] / topRowCopy.getVecD()[k]) : 0;
+                    gaussMat.setRow(p, (vec_n_DOUBLE) row.addToThis(topRowCopy.mulToThis(fac)));
                     topRowCopy.mulToThis(fac != 0 && !Double.isInfinite(fac) && !Double.isNaN(fac) ? 1 / fac : 1);
                 }
             }
@@ -499,8 +473,8 @@ public class Matrix {
                 vec_n_DOUBLE botRowCopy = gaussMat.getRowAt(size - 1 - k).copy();
                 for (int p = k + 1; p < size; p++) {
                     vec_n_DOUBLE row = gaussMat.getRowAt(size - 1 - p);
-                    double fac = botRowCopy.getVec()[size - 1 - k] != 0 ? -(row.getVec()[size - 1 - k] / botRowCopy.getVec()[size - 1 - k]) : 0;
-                    gaussMat.setRow(size - 1 - p, row.addToThis(botRowCopy.mulToThis(fac)));
+                    double fac = botRowCopy.getVecD()[size - 1 - k] != 0 ? -(row.getVecD()[size - 1 - k] / botRowCopy.getVecD()[size - 1 - k]) : 0;
+                    gaussMat.setRow(size - 1 - p, (vec_n_DOUBLE) row.addToThis(botRowCopy.mulToThis(fac)));
                     botRowCopy.mulToThis(fac != 0 && !Double.isInfinite(fac) && !Double.isNaN(fac) ? 1 / fac : 1);
                 }
             }
@@ -526,7 +500,7 @@ public class Matrix {
             int size = this.getRowCount();
             for (int k = 0; k < size; k++) {
                 vec_n_DOUBLE tmpCol = LU_rhs.getColumnAt(k);
-                double[] col = tmpCol.getVec();
+                double[] col = tmpCol.getVecD();
                 //PIVOTING
                 boolean foundPivot = true;
                 if (col[k] == 0) {
@@ -557,7 +531,7 @@ public class Matrix {
                 vec_n_DOUBLE topRowCopy = LU_rhs.getRowAt(k).copy();
                 for (int p = k + 1; p < size; p++) {
                     vec_n_DOUBLE row = LU_rhs.getRowAt(p);
-                    double fac = topRowCopy.getVec()[k] != 0 ? -(row.getVec()[k] / topRowCopy.getVec()[k]) : 0;
+                    double fac = topRowCopy.getVecD()[k] != 0 ? -(row.getVecD()[k] / topRowCopy.getVecD()[k]) : 0;
                     row.addToThis(topRowCopy.mulToThis(fac));
                     topRowCopy.mulToThis(fac != 0 && !Double.isInfinite(fac) && !Double.isNaN(fac) ? 1 / fac : 1);
                     LU_lhs.set(p, k, -fac);
@@ -572,13 +546,13 @@ public class Matrix {
             return NxN_FACTORY.makeMatrixFromColumns(outColumns);
         }
 
-        public vec_n_DOUBLE solveLGS_fromLU(vec_n_DOUBLE rhs) {
+        public vec_n_DOUBLE solveLGS_fromLU(vec_n rhs) {
             if (this.LU_permutation != null && this.LU_lhs != null && this.LU_rhs != null) {
                 //solve Ly = Pb
-                vec_n_DOUBLE y = new vec_n_DOUBLE(rhs.getLength());
+                vec_n_DOUBLE y = new vec_n_DOUBLE(rhs.getSize());
                 vec_n_DOUBLE Pb = this.LU_permutation.multiplyWithVector(rhs);
-                double[] yVec = y.getVec();
-                double[] PbVec = Pb.getVec();
+                double[] yVec = y.getVecD();
+                double[] PbVec = Pb.getVecD();
                 for (int k = 0; k < yVec.length; k++) {
                     double sumOfLower = 0;
                     for (int i = 0; i <= k - 1; i++)
@@ -586,8 +560,8 @@ public class Matrix {
                     yVec[k] = (PbVec[k] - sumOfLower) / this.LU_lhs.get(k, k);
                 }
                 //solving Rx = y
-                vec_n_DOUBLE x = new vec_n_DOUBLE(rhs.getLength());
-                double[] xVec = x.getVec();
+                vec_n_DOUBLE x = new vec_n_DOUBLE(rhs.getSize());
+                double[] xVec = x.getVecD();
                 for (int k = 0; k < xVec.length; k++) {
                     double sumOfLower = 0;
                     for (int i = 0; i <= k - 1; i++)
@@ -606,5 +580,31 @@ public class Matrix {
             else
                 throw new RuntimeException("Unfortunately this NxN-Matrix seems to have become MxN");
         }
+    }
+
+    public static void main(String[] args) {
+        vec_n_DOUBLE[] rows = {new vec_n_DOUBLE(1, 2, 3), new vec_n_DOUBLE(4, 5, 6), new vec_n_DOUBLE(7, 8, 8)};
+        Matrix_NxN test = NxN_FACTORY.makeMatrixFromRows(rows);
+        System.out.println(test);
+        test.doLUDecomposition();
+        long startLU = System.currentTimeMillis();
+        int testCount = 1000000;
+        System.out.print("0/" + testCount);
+        vec_n_DOUBLE rhs = new vec_n_DOUBLE(1, 2, 3);
+        for (int k = 0; k < testCount; k++) {
+            //System.out.print("\r"+k+"/"+testCount);
+            test.doLUDecomposition();
+            //test.solveLGS_fromLU(rhs);
+            test.getInverse_fromLU();
+        }
+        System.out.println("\nLU time: " + (System.currentTimeMillis() - startLU) + " " + test.solveLGS_fromLU(rhs));
+        long startGauss = System.currentTimeMillis();
+        System.out.print("0/" + testCount);
+        for (int k = 0; k < testCount; k++) {
+            //System.out.print("\r"+k+"/"+testCount);
+            //test.solveLGS_Gaussian(rhs);
+            test.getInverse_Gaussian();
+        }
+        System.out.println("\nGauss time: " + (System.currentTimeMillis() - startLU) + " " + test.solveLGS_Gaussian(rhs));
     }
 }

@@ -9,10 +9,10 @@ import javax.annotation.Nullable;
 public abstract class Face3D {
 
     final vec3 LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT;
-    vec3 tmpTop = new vec3.Double();
-    vec3 tmpBot = new vec3.Double();
-    vec3 tmpLeft = new vec3.Double();
-    vec3 tmpRight = new vec3.Double();
+    vec3 tmpTop = new vec3.DoubleVec();
+    vec3 tmpBot = new vec3.DoubleVec();
+    vec3 tmpLeft = new vec3.DoubleVec();
+    vec3 tmpRight = new vec3.DoubleVec();
     //The definition of Face is a Rectangle in this case.
     //The face is not flat when no Block with a flat surface can be applied to it.
     final double isFaceFlatThreshold = 0.001;
@@ -39,7 +39,7 @@ public abstract class Face3D {
             tmpBot.update(this.LOW_RIGHT).subFromThis(this.LOW_LEFT);
             tmpLeft.update(this.LOW_RIGHT).subFromThis(this.LOW_LEFT);
             Matrix.Matrix_NxN matrix = Matrix.NxN_FACTORY.makeMatrixFromColumns(tmpBot, tmpLeft, rayTrace3D.getVec().mulToThis(-1));
-            vec3 rhs = rayTrace3D.getOnPoint().subFromThis(this.LOW_LEFT);
+            vec3 rhs = (vec3) rayTrace3D.getOnPoint().subFromThis(this.LOW_LEFT);
             matrix.doLUDecomposition();
             matrix.solveLGS_fromLU(rhs);
         }
@@ -154,7 +154,7 @@ public abstract class Face3D {
     }
 
     public static void main(String[] args) {
-        Face3D face = new FaceAutoUpdateOnVecChange(new vec3.Double(0, 0, 0), new vec3.Double(1, 0, 1), new vec3.Double(3, 1, -1), new vec3.Double(2, 1, -2));
+        Face3D face = new FaceAutoUpdateOnVecChange(new vec3.DoubleVec(0, 0, 0), new vec3.DoubleVec(1, 0, 1), new vec3.DoubleVec(3, 1, -1), new vec3.DoubleVec(2, 1, -2));
         System.out.println(face.isFlat());
     }
 }

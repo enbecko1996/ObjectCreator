@@ -48,16 +48,16 @@ public class vec3Gen<T extends Number> {
             this.type = Double.class;
     }
 
-    public vec3.Double newDoubleVec3() {
-        return new vec3.Double(this.x.doubleValue(), this.y.doubleValue(), this.z.doubleValue());
+    public vec3.DoubleVec newDoubleVec3() {
+        return new vec3.DoubleVec(this.x.doubleValue(), this.y.doubleValue(), this.z.doubleValue());
     }
 
     public vec3Gen<Float> newFloatVec3() {
         return new vec3Gen<Float>(this.x.floatValue(), this.y.floatValue(), this.z.floatValue());
     }
 
-    public vec3.Int newIntVec3() {
-        return new vec3.Int(this.x.intValue(), this.y.intValue(), this.z.intValue());
+    public vec3.IntVec newIntVec3() {
+        return new vec3.IntVec(this.x.intValue(), this.y.intValue(), this.z.intValue());
     }
 
     public vec3Gen<Long> newLongVec3() {

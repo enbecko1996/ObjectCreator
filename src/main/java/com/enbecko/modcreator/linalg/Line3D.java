@@ -53,7 +53,7 @@ public class Line3D {
     public static class Line3DNoUpdate extends Line3D {
         public Line3DNoUpdate(vec3 onPoint, vec3 end) {
             //super(new vec3(onPoint), new vec3(end));
-            super(vec3.newVecWithPrecision(onPoint.getPrecision(), onPoint).setChangeable(false), vec3.newVecWithPrecision(end.getPrecision(), end).setChangeable(false));
+            super((vec3) vec3.newVecWithPrecision(onPoint.getPrecision(), onPoint).setChangeable(false), (vec3) vec3.newVecWithPrecision(end.getPrecision(), end).setChangeable(false));
         }
     }
 }

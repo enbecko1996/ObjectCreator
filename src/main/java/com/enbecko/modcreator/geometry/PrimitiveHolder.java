@@ -14,7 +14,7 @@ import java.util.List;
 public class PrimitiveHolder extends CubicContentHolder {
     private List<Primitive3D> content = new ArrayList<Primitive3D>();
 
-    public PrimitiveHolder(Bone parentBone, vec3.Byte positionInParentInOrdersOfEdgeLength, vec3.Int positionInBoneCoords, boolean isMaxOrder) {
+    public PrimitiveHolder(Bone parentBone, vec3.ByteVec positionInParentInOrdersOfEdgeLength, vec3.IntVec positionInBoneCoords, boolean isMaxOrder) {
         super(parentBone, positionInParentInOrdersOfEdgeLength, positionInBoneCoords, (byte) 1, isMaxOrder);
     }
 
