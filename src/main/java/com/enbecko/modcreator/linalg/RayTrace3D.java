@@ -15,12 +15,14 @@ public class RayTrace3D extends Line3D.Line3DManualUpdate {
         this.isEndless = isEndless;
     }
 
-    public Line3D updateOnPoint(vec3.Double onPoint) {
+    @Override
+    public Line3D updateOnPoint(vec3 onPoint) {
         this.onPoint.update(onPoint);
         return this;
     }
 
-    public void updateEndPoint(vec3.Double end) {
+    @Override
+    public void updateEndPoint(vec3 end) {
         this.endPoint.update(end);
         this.vec.update(this.endPoint).subFromThis(this.onPoint);
     }
@@ -31,9 +33,15 @@ public class RayTrace3D extends Line3D.Line3DManualUpdate {
         this.onPoint.update(this.endPoint.subFromThis(vec));
     }
 
-    public Line3D update(vec3.Double onPoint, @Nonnull vec3.Double end) {
+    @Override
+    public Line3D update(vec3 onPoint, @Nonnull vec3 end) {
         this.onPoint.update(onPoint);
         this.endPoint.update(end);
+        this.vec.update(this.endPoint).subFromThis(this.onPoint);
         return this;
+    }
+
+    public vec3.Double getVec() {
+        return this.vec;
     }
 }
