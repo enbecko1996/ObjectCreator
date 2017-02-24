@@ -10,12 +10,12 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         super(3);
     }
 
-    public vec3(double x, double y, double z) {
-        super(x, y, z);
+    public vec3(double x, double y, double z, boolean floor) {
+        super(floor, x, y, z);
     }
 
-    public vec3(vec3 other) {
-        super(other);
+    public vec3(vec3 other, boolean floor) {
+        super(other, floor);
     }
 
     @Override
@@ -47,103 +47,103 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         return (float) this.vec[2];
     }
 
-    public abstract vec3 cross(vec3 other);
+    public abstract vec3 cross(vec3 other, boolean floor);
 
     public abstract void update(double x, double y, double z);
     public abstract void setX(double x);
     public abstract void setY(double y);
     public abstract void setZ(double z);
 
-    public static vec3 newVecWithPrecision(vecPrec prec, vec3 old) {
+    public static vec3 newVecWithPrecision(vecPrec prec, vec3 old, boolean floor) {
         switch (prec) {
             case BYTE:
-                return new vec3.ByteVec(old);
+                return new vec3.ByteVec(old, floor);
             case SHORT:
-                return new vec3.ShortVec(old);
+                return new vec3.ShortVec(old, floor);
             case INT:
-                return new vec3.IntVec(old);
+                return new vec3.IntVec(old, floor);
             case LONG:
-                return new vec3.LongVec(old);
+                return new vec3.LongVec(old, floor);
             case FLOAT:
-                return new vec3.FloatVec(old);
+                return new vec3.FloatVec(old, floor);
             default:
-                return new vec3.DoubleVec(old);
+                return new vec3.DoubleVec(old, floor);
         }
     }
 
     @Override
     @Nullable
-    public vec_n mulAndMakeNew(vecPrec prec, double length) {
+    public vec_n mulAndMakeNew(vecPrec prec, double length, boolean floor) {
         switch (prec) {
             case BYTE:
-                return new vec3.ByteVec(this).mulToThis(length);
+                return new vec3.ByteVec(this, floor).mulToThis(length);
             case SHORT:
-                return new vec3.ShortVec(this).mulToThis(length);
+                return new vec3.ShortVec(this, floor).mulToThis(length);
             case INT:
-                return new vec3.IntVec(this).mulToThis(length);
+                return new vec3.IntVec(this, floor).mulToThis(length);
             case LONG:
-                return new vec3.LongVec(this).mulToThis(length);
+                return new vec3.LongVec(this, floor).mulToThis(length);
             case FLOAT:
-                return new vec3.FloatVec(this).mulToThis(length);
+                return new vec3.FloatVec(this, floor).mulToThis(length);
             default:
-                return new vec3.DoubleVec(this).mulToThis(length);
+                return new vec3.DoubleVec(this, floor).mulToThis(length);
         }
     }
 
     @Override
     @Nullable
-    public vec_n addAndMakeNew(vecPrec prec, vec_n other) {
+    public vec_n addAndMakeNew(vecPrec prec, vec_n other, boolean floor) {
         switch (prec) {
             case BYTE:
-                return new vec3.ByteVec(this).addToThis(other);
+                return new vec3.ByteVec(this, floor).addToThis(other);
             case SHORT:
-                return new vec3.ShortVec(this).addToThis(other);
+                return new vec3.ShortVec(this, floor).addToThis(other);
             case INT:
-                return new vec3.IntVec(this).addToThis(other);
+                return new vec3.IntVec(this, floor).addToThis(other);
             case LONG:
-                return new vec3.LongVec(this).addToThis(other);
+                return new vec3.LongVec(this, floor).addToThis(other);
             case FLOAT:
-                return new vec3.FloatVec(this).addToThis(other);
+                return new vec3.FloatVec(this, floor).addToThis(other);
             default:
-                return new vec3.DoubleVec(this).addToThis(other);
+                return new vec3.DoubleVec(this, floor).addToThis(other);
         }
     }
 
     @Override
     @Nullable
-    public vec_n subAndMakeNew(vecPrec prec, vec_n other) {
+    public vec_n subAndMakeNew(vecPrec prec, vec_n other, boolean floor) {
         switch (prec) {
             case BYTE:
-                return new vec3.ByteVec(this).subFromThis(other);
+                return new vec3.ByteVec(this, floor).subFromThis(other);
             case SHORT:
-                return new vec3.ShortVec(this).subFromThis(other);
+                return new vec3.ShortVec(this, floor).subFromThis(other);
             case INT:
-                return new vec3.IntVec(this).subFromThis(other);
+                return new vec3.IntVec(this, floor).subFromThis(other);
             case LONG:
-                return new vec3.LongVec(this).subFromThis(other);
+                return new vec3.LongVec(this, floor).subFromThis(other);
             case FLOAT:
-                return new vec3.FloatVec(this).subFromThis(other);
+                return new vec3.FloatVec(this, floor).subFromThis(other);
             default:
-                return new vec3.DoubleVec(this).subFromThis(other);
+                return new vec3.DoubleVec(this, floor).subFromThis(other);
         }
     }
 
     @Override
     @Nullable
-    public vec_n divAndMakeNew(vecPrec prec, double length) {
+    public vec_n divAndMakeNew(vecPrec prec, double length, boolean floor) {
         switch (prec) {
             case BYTE:
-                return new vec3.ByteVec(this).divToThis(length);
+                return new vec3.ByteVec(this, floor).divToThis(length);
             case SHORT:
-                return new vec3.ShortVec(this).divToThis(length);
+                return new vec3.ShortVec(this, floor).divToThis(length);
             case INT:
-                return new vec3.IntVec(this).divToThis(length);
+                return new vec3.IntVec(this, floor).divToThis(length);
             case LONG:
-                return new vec3.LongVec(this).divToThis(length);
+                return new vec3.LongVec(this, floor).divToThis(length);
             case FLOAT:
-                return new vec3.FloatVec(this).divToThis(length);
+                return new vec3.FloatVec(this, floor).divToThis(length);
             default:
-                return new vec3.DoubleVec(this).divToThis(length);
+                return new vec3.DoubleVec(this, floor).divToThis(length);
         }
     }
 
@@ -157,17 +157,17 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super();
         }
 
-        public IntVec(double x, double y, double z) {
-            super(x, y, z);
+        public IntVec(double x, double y, double z, boolean floor) {
+            super(x, y, z, floor);
         }
 
-        public IntVec(vec3 other) {
-            super(other);
+        public IntVec(vec3 other, boolean floor) {
+            super(other, floor);
         }
         
         @Override
-        public vec3.IntVec cross(vec3 other) {
-            return new vec3.IntVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD());
+        public vec3.IntVec cross(vec3 other, boolean floor) {
+            return new vec3.IntVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD(), floor);
         }
 
         @Override
@@ -232,10 +232,13 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
 
         @Override
-        public void setVec(double... content) {
+        public void setVec(boolean floor, double... content) {
             if (content.length == 3) {
                 for (int k = 0; k < 3; k++)
-                    this.vec[k] = (int) content[k];
+                    if (floor)
+                        this.vec[k] = (int) Math.floor(content[k]);
+                    else
+                        this.vec[k] = (int) content[k];
             } else {
                 throw new RuntimeException("Can't create vec3 from content with not 3 components.");
             }
@@ -247,17 +250,17 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super();
         }
 
-        public LongVec(double x, double y, double z) {
-            super(x, y, z);
+        public LongVec(double x, double y, double z, boolean floor) {
+            super(x, y, z, floor);
         }
 
-        public LongVec(vec3 other) {
-            super(other);
+        public LongVec(vec3 other, boolean floor) {
+            super(other, floor);
         }
 
         @Override
-        public vec3.LongVec cross(vec3 other) {
-            return new vec3.LongVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD());
+        public vec3.LongVec cross(vec3 other, boolean floor) {
+            return new vec3.LongVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD(), floor);
         }
         
         @Override
@@ -322,10 +325,13 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
 
         @Override
-        public void setVec(double... content) {
+        public void setVec(boolean floor, double... content) {
             if (content.length == 3) {
                 for (int k = 0; k < 3; k++)
-                    this.vec[k] = (long) content[k];
+                    if (floor)
+                        this.vec[k] = (long) Math.floor(content[k]);
+                    else
+                        this.vec[k] = (long) content[k];
             } else {
                 throw new RuntimeException("Can't create vec3 from content with not 3 components.");
             }
@@ -337,17 +343,17 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super();
         }
 
-        public DoubleVec(double x, double y, double z) {
-            super(x, y, z);
+        public DoubleVec(double x, double y, double z, boolean floor) {
+            super(x, y, z, floor);
         }
 
-        public DoubleVec(vec3 other) {
-            super(other);
+        public DoubleVec(vec3 other, boolean floor) {
+            super(other, floor);
         }
 
         @Override
-        public vec3.DoubleVec cross(vec3 other) {
-            return new vec3.DoubleVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD());
+        public vec3.DoubleVec cross(vec3 other, boolean floor) {
+            return new vec3.DoubleVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD(), floor);
         }
         
         @Override
@@ -410,7 +416,7 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
 
         @Override
-        public void setVec(double... content) {
+        public void setVec(boolean floor, double... content) {
             if (content.length == 3) {
                 System.arraycopy(content, 0, this.vec, 0, 3);
             } else {
@@ -424,17 +430,17 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super();
         }
 
-        public FloatVec(double x, double y, double z) {
-            super(x, y, z);
+        public FloatVec(double x, double y, double z, boolean floor) {
+            super(x, y, z, floor);
         }
 
-        public FloatVec(vec3 other) {
-            super(other);
+        public FloatVec(vec3 other, boolean floor) {
+            super(other, floor);
         }
 
         @Override
-        public vec3.FloatVec cross(vec3 other) {
-            return new vec3.FloatVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD());
+        public vec3.FloatVec cross(vec3 other, boolean floor) {
+            return new vec3.FloatVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD(), floor);
         }
         
         @Override
@@ -499,10 +505,13 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
 
         @Override
-        public void setVec(double... content) {
+        public void setVec(boolean floor, double... content) {
             if (content.length == 3) {
                 for (int k = 0; k < 3; k++)
-                    this.vec[k] = (float) content[k];
+                    if (floor)
+                        this.vec[k] = (float) Math.floor(content[k]);
+                    else
+                        this.vec[k] = (float) content[k];
             } else {
                 throw new RuntimeException("Can't create vec3 from content with not 3 components.");
             }
@@ -514,17 +523,17 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super();
         }
 
-        public ShortVec(double x, double y, double z) {
-            super(x, y, z);
+        public ShortVec(double x, double y, double z, boolean floor) {
+            super(x, y, z, floor);
         }
 
-        public ShortVec(vec3 other) {
-            super(other);
+        public ShortVec(vec3 other, boolean floor) {
+            super(other, floor);
         }
 
         @Override
-        public vec3.ShortVec cross(vec3 other) {
-            return new vec3.ShortVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD());
+        public vec3.ShortVec cross(vec3 other, boolean floor) {
+            return new vec3.ShortVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD(), floor);
         }
         
         @Override
@@ -589,10 +598,13 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
 
         @Override
-        public void setVec(double... content) {
+        public void setVec(boolean floor, double... content) {
             if (content.length == 3) {
                 for (int k = 0; k < 3; k++)
-                    this.vec[k] = (short) content[k];
+                    if (floor)
+                        this.vec[k] = (short) Math.floor(content[k]);
+                    else
+                        this.vec[k] = (short) content[k];
             } else {
                 throw new RuntimeException("Can't create vec3 from content with not 3 components.");
             }
@@ -604,17 +616,17 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super();
         }
 
-        public ByteVec(double x, double y, double z) {
-            super(x, y, z);
+        public ByteVec(double x, double y, double z, boolean floor) {
+            super(x, y, z, floor);
         }
 
-        public ByteVec(vec3 other) {
-            super(other);
+        public ByteVec(vec3 other, boolean floor) {
+            super(other, floor);
         }
 
         @Override
-        public vec3.ByteVec cross(vec3 other) {
-            return new vec3.ByteVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD());
+        public vec3.ByteVec cross(vec3 other, boolean floor) {
+            return new vec3.ByteVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD(), floor);
         }
         
         @Override
@@ -679,10 +691,14 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
 
         @Override
-        public void setVec(double... content) {
+        public void setVec(boolean floor, double... content) {
             if (content.length == 3) {
-                for (int k = 0; k < 3; k++)
-                    this.vec[k] = (byte) content[k];
+                for (int k = 0; k < 3; k++) {
+                    if (floor)
+                        this.vec[k] = (byte) Math.floor(content[k]);
+                    else
+                        this.vec[k] = (byte) content[k];
+                }
             } else {
                 throw new RuntimeException("Can't create vec3 from content with not 3 components.");
             }

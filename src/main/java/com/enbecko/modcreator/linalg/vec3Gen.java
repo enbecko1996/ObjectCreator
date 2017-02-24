@@ -49,7 +49,7 @@ public class vec3Gen<T extends Number> {
     }
 
     public vec3.DoubleVec newDoubleVec3() {
-        return new vec3.DoubleVec(this.x.doubleValue(), this.y.doubleValue(), this.z.doubleValue());
+        return new vec3.DoubleVec(this.x.doubleValue(), this.y.doubleValue(), this.z.doubleValue(), false);
     }
 
     public vec3Gen<Float> newFloatVec3() {
@@ -57,7 +57,7 @@ public class vec3Gen<T extends Number> {
     }
 
     public vec3.IntVec newIntVec3() {
-        return new vec3.IntVec(this.x.intValue(), this.y.intValue(), this.z.intValue());
+        return new vec3.IntVec(this.x.intValue(), this.y.intValue(), this.z.intValue(), false);
     }
 
     public vec3Gen<Long> newLongVec3() {

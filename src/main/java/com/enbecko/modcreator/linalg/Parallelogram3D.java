@@ -16,7 +16,7 @@ public abstract class Parallelogram3D extends Face3D {
     private final boolean isEndless;
 
     private Parallelogram3D(@Nonnull vec3 onPoint, @Nonnull vec3 vec1, @Nonnull vec3 vec2, boolean isEndless) {
-        super(new vec3.FloatVec(onPoint), (vec3.FloatVec) onPoint.addAndMakeNew(vec_n.vecPrec.FLOAT, vec1), (vec3.FloatVec) onPoint.addAndMakeNew(vec_n.vecPrec.FLOAT, vec1).addToThis(vec2), (vec3.FloatVec) onPoint.addAndMakeNew(vec_n.vecPrec.FLOAT, vec2));
+        super(new vec3.FloatVec(onPoint, false), (vec3.FloatVec) onPoint.addAndMakeNew(vec_n.vecPrec.FLOAT, vec1, false), (vec3.FloatVec) onPoint.addAndMakeNew(vec_n.vecPrec.FLOAT, vec1, false).addToThis(vec2), (vec3.FloatVec) onPoint.addAndMakeNew(vec_n.vecPrec.FLOAT, vec2, false));
         this.isEndless = isEndless;
         this.onPoint = onPoint;
         this.vec1 = vec1;
@@ -38,7 +38,7 @@ public abstract class Parallelogram3D extends Face3D {
     @Deprecated
     public static class ParallelogramManualUpdate extends Parallelogram3D {
         public ParallelogramManualUpdate(@Nonnull vec3 onPoint, @Nonnull vec3 vec1, @Nonnull vec3 vec2, boolean isEndless) {
-            super(new vec3.DoubleVec(onPoint), new vec3.DoubleVec(vec1), new vec3.DoubleVec(vec2), isEndless);
+            super(new vec3.DoubleVec(onPoint, false), new vec3.DoubleVec(vec1, false), new vec3.DoubleVec(vec2, false), isEndless);
         }
 
         public Parallelogram3D updateOnPoint(@Nonnull vec3 onPoint) {
@@ -78,7 +78,7 @@ public abstract class Parallelogram3D extends Face3D {
     @Deprecated
     public static class ParallelogramNoUpdate extends Parallelogram3D {
         public ParallelogramNoUpdate(vec3 onPoint, vec3 vec1, vec3 vec2, boolean isEndless) {
-            super(new vec3.DoubleVec(onPoint), new vec3.DoubleVec(vec1), new vec3.DoubleVec(vec2), isEndless);
+            super(new vec3.DoubleVec(onPoint, false), new vec3.DoubleVec(vec1, false), new vec3.DoubleVec(vec2, false), isEndless);
         }
     }
 }

@@ -70,7 +70,7 @@ public class MathHelper {
     @Nullable
     private static vec3[] lineBetween(@Nonnull vec3.vecPrec prec, vec3 p1, vec3 p2, final double oneUnit) {
         List<vec3> tmpVecsX = new ArrayList<vec3>(), tmpVecsY = new ArrayList<vec3>(), tmpVecsZ = new ArrayList<vec3>();
-        vec3.DoubleVec delta = (vec3.DoubleVec) new vec3.DoubleVec(p2).subFromThis(p1);
+        vec3.DoubleVec delta = (vec3.DoubleVec) new vec3.DoubleVec(p2, false).subFromThis(p1);
         double mY = delta.getY() / delta.getX();
         float up = 0;
         int upSteps = 0;
@@ -135,22 +135,22 @@ public class MathHelper {
     private static void addToList(vec3.vecPrec prec, List<vec3> list, double x, double y, double z) {
         switch (prec) {
             case BYTE:
-                list.add(new vec3.ByteVec((byte) x, (byte) y, (byte) z));
+                list.add(new vec3.ByteVec((byte) x, (byte) y, (byte) z, false));
                 break;
             case SHORT:
-                list.add(new vec3.ShortVec((short) x, (short) y, (short) z));
+                list.add(new vec3.ShortVec((short) x, (short) y, (short) z, false));
                 break;
             case INT:
-                list.add(new vec3.IntVec((int) x, (int) y, (int) z));
+                list.add(new vec3.IntVec((int) x, (int) y, (int) z, false));
                 break;
             case LONG:
-                list.add(new vec3.LongVec((long) x, (long) y, (long) z));
+                list.add(new vec3.LongVec((long) x, (long) y, (long) z, false));
                 break;
             case FLOAT:
-                list.add(new vec3.FloatVec((float) x, (float) y, (float) z));
+                list.add(new vec3.FloatVec((float) x, (float) y, (float) z, false));
                 break;
             case DOUBLE:
-                list.add(new vec3.DoubleVec(x, y, z));
+                list.add(new vec3.DoubleVec(x, y, z, false));
                 break;
         }
     }

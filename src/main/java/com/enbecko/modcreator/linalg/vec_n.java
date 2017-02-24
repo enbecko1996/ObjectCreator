@@ -18,16 +18,16 @@ public abstract class vec_n<T extends Number> {
         this.vec = new double[size];
     }
 
-    public vec_n(double ... content) {
+    public vec_n(boolean floor, double... content) {
         this.size = content.length;
         this.vec = new double[size];
-        this.setVec(content);
+        this.setVec(floor, content);
     }
 
-    public vec_n(vec_n other) {
+    public vec_n(vec_n other, boolean floor) {
         this.size = other.getSize();
         this.vec = new double[size];
-        this.setVec(other.getVecD());
+        this.setVec(floor, other.getVecD());
     }
 
     public vec_n(boolean ident, int size, int identWhere) {
@@ -38,7 +38,7 @@ public abstract class vec_n<T extends Number> {
         else
             throw new RuntimeException("Can't create identity vector: vecLength = " + vec.length + ", makeOne = " + identWhere);
         this.vec = new double[size];
-        this.setVec(vec);
+        this.setVec(false, vec);
     }
 
     public vec_n mulToThis(double length) {
@@ -103,16 +103,16 @@ public abstract class vec_n<T extends Number> {
     }
 
     @Nullable
-    public abstract vec_n mulAndMakeNew(vecPrec precision, double length);
+    public abstract vec_n mulAndMakeNew(vecPrec precision, double length, boolean floor);
 
     @Nullable
-    public abstract vec_n addAndMakeNew(vecPrec precision, vec_n other);
+    public abstract vec_n addAndMakeNew(vecPrec precision, vec_n other, boolean floor);
 
     @Nullable
-    public abstract vec_n subAndMakeNew(vecPrec precision, vec_n other);
+    public abstract vec_n subAndMakeNew(vecPrec precision, vec_n other, boolean floor);
 
     @Nullable
-    public abstract vec_n divAndMakeNew(vecPrec precision, double length);
+    public abstract vec_n divAndMakeNew(vecPrec precision, double length, boolean floor);
 
     public vec_n update(vec_n other) {
         return this.update(0, other.getVecD());
@@ -179,7 +179,7 @@ public abstract class vec_n<T extends Number> {
 
     public abstract void applyPrecision();
 
-    public abstract void setVec(double ... content);
+    public abstract void setVec(boolean floor, double... content);
 
     public enum vecPrec {
         BYTE, SHORT, INT, LONG, FLOAT, DOUBLE;

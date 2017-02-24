@@ -13,12 +13,12 @@ public abstract class Content {
     protected final vec3[] cornersInBoneCoords;
     protected Line3D[] edgesInBoneCoords;
     protected Face3D[] facesInBoneCoords;
-    final vec3.IntVec positionInBoneCoords;
+    final vec3 positionInBoneCoords;
     @Nonnull
     private final Bone parentBone;
 
     public Content(Bone parentBone, vec3.IntVec positionInBoneCoords, int size) {
-        this.positionInBoneCoords = (vec3.IntVec) new vec3.IntVec(positionInBoneCoords).setChangeable(false);
+        this.positionInBoneCoords = (vec3.IntVec) new vec3.IntVec(positionInBoneCoords, false).setChangeable(false);
         this.parentBone = parentBone;
         this.cornersInBoneCoords = new vec3[size];
     }
@@ -28,7 +28,7 @@ public abstract class Content {
         return this.parentBone;
     }
 
-    public vec3.IntVec getPositionInBoneCoords() {
+    public vec3 getPositionInBoneCoords() {
         return this.positionInBoneCoords;
     }
 

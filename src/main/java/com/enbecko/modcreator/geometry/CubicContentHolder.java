@@ -17,7 +17,7 @@ public class CubicContentHolder <T extends Content> extends CubicContent impleme
     public CubicContentHolder(Bone parentBone, vec3.ByteVec positionInParentInOrdersOfEdgeLength, vec3.IntVec positionInBoneCoords, byte order, boolean isMaxOrder) {
         super(parentBone, positionInBoneCoords);
         this.order = order;
-        this.positionInParentInOrdersOfEdgeLength = (vec3.ByteVec) new vec3.ByteVec(positionInParentInOrdersOfEdgeLength.getX(), positionInParentInOrdersOfEdgeLength.getY(), positionInParentInOrdersOfEdgeLength.getZ()).setChangeable(false);
+        this.positionInParentInOrdersOfEdgeLength = (vec3.ByteVec) new vec3.ByteVec(positionInParentInOrdersOfEdgeLength.getX(), positionInParentInOrdersOfEdgeLength.getY(), positionInParentInOrdersOfEdgeLength.getZ(), false).setChangeable(false);
         this.isMaxOrder = isMaxOrder;
     }
 
@@ -30,7 +30,7 @@ public class CubicContentHolder <T extends Content> extends CubicContent impleme
     }
 
     public vec3.IntVec getPositionInBoneCoords() {
-        return this.positionInBoneCoords;
+        return (vec3.IntVec) this.positionInBoneCoords;
     }
 
     public vec3.ByteVec getPositionInParentInOrdersOfEdgeLength() {
@@ -45,17 +45,18 @@ public class CubicContentHolder <T extends Content> extends CubicContent impleme
     @Override
     public void init() {
         int size = this.getSize();
+        vec3.IntVec pos = this.getPositionInBoneCoords();
         //FRONT FACE COUNTERCLOCKWISE (CCW)
-        this.cornersInBoneCoords[0] = new vec3.IntVec(this.positionInBoneCoords.getX(), this.positionInBoneCoords.getY(), this.positionInBoneCoords.getZ()).setChangeable(false);
-        this.cornersInBoneCoords[1] = new vec3.IntVec(this.positionInBoneCoords.getX(), this.positionInBoneCoords.getY(), this.positionInBoneCoords.getZ() + size).setChangeable(false);
-        this.cornersInBoneCoords[2] = new vec3.IntVec(this.positionInBoneCoords.getX(), this.positionInBoneCoords.getY() + size, this.positionInBoneCoords.getZ() + size).setChangeable(false);
-        this.cornersInBoneCoords[3] = new vec3.IntVec(this.positionInBoneCoords.getX(), this.positionInBoneCoords.getY() + size, this.positionInBoneCoords.getZ()).setChangeable(false);
+        this.cornersInBoneCoords[0] = new vec3.IntVec(pos.getX(), pos.getY(), pos.getZ(), false).setChangeable(false);
+        this.cornersInBoneCoords[1] = new vec3.IntVec(pos.getX(), pos.getY(), pos.getZ() + size, false).setChangeable(false);
+        this.cornersInBoneCoords[2] = new vec3.IntVec(pos.getX(), pos.getY() + size, pos.getZ() + size, false).setChangeable(false);
+        this.cornersInBoneCoords[3] = new vec3.IntVec(pos.getX(), pos.getY() + size, pos.getZ(), false).setChangeable(false);
 
         //BACK FACE CLOCKWISE (CW)
-        this.cornersInBoneCoords[4] = new vec3.IntVec(this.positionInBoneCoords.getX() + size, this.positionInBoneCoords.getY(), this.positionInBoneCoords.getZ() + size).setChangeable(false);
-        this.cornersInBoneCoords[5] = new vec3.IntVec(this.positionInBoneCoords.getX() + size, this.positionInBoneCoords.getY(), this.positionInBoneCoords.getZ()).setChangeable(false);
-        this.cornersInBoneCoords[6] = new vec3.IntVec(this.positionInBoneCoords.getX() + size, this.positionInBoneCoords.getY() + size, this.positionInBoneCoords.getZ()).setChangeable(false);
-        this.cornersInBoneCoords[7] = new vec3.IntVec(this.positionInBoneCoords.getX() + size, this.positionInBoneCoords.getY() + size, this.positionInBoneCoords.getZ() + size).setChangeable(false);
+        this.cornersInBoneCoords[4] = new vec3.IntVec(pos.getX() + size, pos.getY(), pos.getZ() + size, false).setChangeable(false);
+        this.cornersInBoneCoords[5] = new vec3.IntVec(pos.getX() + size, pos.getY(), pos.getZ(), false).setChangeable(false);
+        this.cornersInBoneCoords[6] = new vec3.IntVec(pos.getX() + size, pos.getY() + size, pos.getZ(), false).setChangeable(false);
+        this.cornersInBoneCoords[7] = new vec3.IntVec(pos.getX() + size, pos.getY() + size, pos.getZ() + size, false).setChangeable(false);
     }
 
     public vec3.IntVec[] getCornersInBoneCoords() {

@@ -1,5 +1,6 @@
 package com.enbecko.modcreator.geometry;
 
+import com.enbecko.modcreator.Main_ModCreator;
 import com.enbecko.modcreator.linalg.Matrix;
 import com.enbecko.modcreator.linalg.vec3;
 
@@ -18,6 +19,13 @@ public class Bone {
     }
 
     public void addContent(Content content, Content ... adjacent) {
-        if (this.boneContent != null && this.boneContent.isInside(content.getPositionInBoneCoords()))
+        if (this.boneContent == null) {
+            vec3 pos = content.getPositionInBoneCoords();
+            vec3 posInOrder1 = new vec3.IntVec((vec3) new vec3.DoubleVec(pos, false).divToThis(Main_ModCreator.contentCubesPerCube), true);
+        } else if ( !this.boneContent.isInside(content.getPositionInBoneCoords())) {
+
+        } else {
+
+        }
     }
 }

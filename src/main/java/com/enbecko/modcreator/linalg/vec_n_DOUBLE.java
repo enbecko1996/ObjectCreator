@@ -16,11 +16,11 @@ public class vec_n_DOUBLE extends vec_n<Double>{
     }
 
     public vec_n_DOUBLE(double  ... content) {
-        super(content);
+        super(false, content);
     }
 
     public vec_n_DOUBLE(vec_n other) {
-        super(other);
+        super(other, false);
     }
 
     public vec_n_DOUBLE copy() {
@@ -53,7 +53,7 @@ public class vec_n_DOUBLE extends vec_n<Double>{
     }
 
     @Override
-    public void setVec(double... content) {
+    public void setVec(boolean floor, double... content) {
         if (content.length == this.size) {
             for (int k = 0; k < this.size; k++)
                 this.vec[k] = content[k];
@@ -64,28 +64,28 @@ public class vec_n_DOUBLE extends vec_n<Double>{
 
     @Override
     @Nullable
-    public vec_n mulAndMakeNew(vecPrec precision, double length) {
+    public vec_n mulAndMakeNew(vecPrec precision, double length, boolean floor) {
         vec_n calc = new vec_n_DOUBLE(this).mulToThis(length);
         return calc;
     }
 
     @Override
     @Nullable
-    public vec_n addAndMakeNew(vecPrec precision, vec_n other) {
+    public vec_n addAndMakeNew(vecPrec precision, vec_n other, boolean floor) {
         vec_n calc = new vec_n_DOUBLE(this).addToThis(other);
         return calc;
     }
 
     @Override
     @Nullable
-    public vec_n subAndMakeNew(vecPrec precision, vec_n other) {
+    public vec_n subAndMakeNew(vecPrec precision, vec_n other, boolean floor) {
         vec_n calc = new vec_n_DOUBLE(this).subFromThis(other);
         return calc;
     }
 
     @Override
     @Nullable
-    public vec_n divAndMakeNew(vecPrec precision, double length) {
+    public vec_n divAndMakeNew(vecPrec precision, double length, boolean floor) {
         vec_n calc = new vec_n_DOUBLE(this).divToThis(length);
         return calc;
     }

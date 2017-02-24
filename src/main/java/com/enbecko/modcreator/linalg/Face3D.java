@@ -113,9 +113,9 @@ public abstract class Face3D {
     }
 
     public void calculateNormals(vec3 left, vec3 diag, vec3 top) {
-        this.normTriang1 = ((vec3) left.mulToThis(-1)).cross(diag);
+        this.normTriang1 = ((vec3) left.mulToThis(-1)).cross(diag, false);
         left.mulToThis(-1);
-        this.normTriang2 = diag.cross(top);
+        this.normTriang2 = diag.cross(top, false);
     }
 
     public void calculateNormals() {
@@ -185,7 +185,7 @@ public abstract class Face3D {
     public static class FaceManualUpdate extends Face3D {
         public FaceManualUpdate(vec3 LOW_LEFT, vec3 LOW_RIGHT, vec3 TOP_RIGHT, vec3 TOP_LEFT) {
             //super(new vec3(LOW_LEFT), new vec3(LOW_RIGHT), new vec3(TOP_RIGHT), new vec3(TOP_LEFT));
-            super(vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), LOW_LEFT), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), LOW_RIGHT), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), TOP_RIGHT), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), TOP_LEFT));
+            super(vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), LOW_LEFT, false), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), LOW_RIGHT, false), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), TOP_RIGHT, false), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), TOP_LEFT, false));
         }
 
         public Face3D updateLowLeft(@Nonnull vec3 lowLeft) {
@@ -240,14 +240,14 @@ public abstract class Face3D {
     public static class FaceNoUpdate extends Face3D {
         public FaceNoUpdate(vec3 LOW_LEFT, vec3 LOW_RIGHT, vec3 TOP_RIGHT, vec3 TOP_LEFT) {
             //super(new vec3(LOW_LEFT), new vec3(LOW_RIGHT), new vec3(TOP_RIGHT), new vec3(TOP_LEFT));
-            super(vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), LOW_LEFT).setChangeable(false), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), LOW_RIGHT).setChangeable(false), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), TOP_RIGHT).setChangeable(false), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), TOP_LEFT).setChangeable(false));
+            super(vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), LOW_LEFT, false).setChangeable(false), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), LOW_RIGHT, false).setChangeable(false), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), TOP_RIGHT, false).setChangeable(false), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), TOP_LEFT, false).setChangeable(false));
         }
     }
 
     public static void main(String[] args) {
-        Face3D face = new FaceAutoUpdateOnVecChange(new vec3.DoubleVec(0, 5, 0), new vec3.DoubleVec(1, 5, 0), new vec3.DoubleVec(1, 6, 0), new vec3.DoubleVec(0, 6, 0));
+        Face3D face = new FaceAutoUpdateOnVecChange(new vec3.DoubleVec(0, 5, 0, false), new vec3.DoubleVec(1, 5, 0, false), new vec3.DoubleVec(1, 6, 0, false), new vec3.DoubleVec(0, 6, 0, false));
         face.setPhysical(true);
-        RayTrace3D rayTrace3D = new RayTrace3D(new vec3.DoubleVec(-0, 5.5, 1), new vec3.DoubleVec(0, 0, -1), 100, true);
+        RayTrace3D rayTrace3D = new RayTrace3D(new vec3.DoubleVec(-0, 5.5, 1, false), new vec3.DoubleVec(0, 0, -1, false), 100, true);
         long startTime = System.currentTimeMillis();
         int testCount = 100;
         for (int k = 0; k < testCount; k++)
