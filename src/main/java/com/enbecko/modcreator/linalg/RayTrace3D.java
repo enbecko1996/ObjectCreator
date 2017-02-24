@@ -26,27 +26,27 @@ public class RayTrace3D extends Line3D.Line3DManualUpdate {
 
     @Override
     public Line3D updateOnPoint(vec3 onPoint) {
-        this.onPoint.update(onPoint);
+        this.onPoint.update(onPoint, false);
         return this;
     }
 
     @Override
     public void updateEndPoint(vec3 end) {
-        this.endPoint.update(end);
-        this.vec.update(this.endPoint).subFromThis(this.onPoint);
+        this.endPoint.update(end, false);
+        this.vec.update(this.endPoint, false).subFromThis(this.onPoint);
     }
 
     public void updateVec(vec3.DoubleVec vec) {
-        this.vec.update(vec);
-        this.endPoint.update(this.onPoint.addToThis(vec));
-        this.onPoint.update(this.endPoint.subFromThis(vec));
+        this.vec.update(vec, false);
+        this.endPoint.update(this.onPoint.addToThis(vec), false);
+        this.onPoint.update(this.endPoint.subFromThis(vec), false);
     }
 
     @Override
     public Line3D update(vec3 onPoint, @Nonnull vec3 end) {
-        this.onPoint.update(onPoint);
-        this.endPoint.update(end);
-        this.vec.update(this.endPoint).subFromThis(this.onPoint);
+        this.onPoint.update(onPoint, false);
+        this.endPoint.update(end, false);
+        this.vec.update(this.endPoint, false).subFromThis(this.onPoint);
         return this;
     }
 

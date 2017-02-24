@@ -36,7 +36,7 @@ public class Bone {
                 for (int k = 0; k < content.getCornerCount(); k++) {
                     vec3 cur = content.getCorner(k);
                     if (!base.isInside(cur)) {
-                        tmpDouble.update(cur);
+                        tmpDouble.update(cur, false);
                         posInOrder1.update((vec3) tmpDouble.divToThis(cpC), true);
                     }
                 }

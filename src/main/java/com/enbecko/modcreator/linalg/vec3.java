@@ -235,9 +235,13 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
 
         @Override
-        public void applyPrecision() {
-            for (int k = 0; k < this.getSize(); k++)
-                this.vec[k] = (int) this.vec[k];
+        public void applyPrecision(boolean floor) {
+            for (int k = 0; k < this.getSize(); k++) {
+                if (floor)
+                    this.vec[k] = (int) Math.floor(this.vec[k]);
+                else
+                    this.vec[k] = (int) this.vec[k];
+            }
         }
 
         @Override
@@ -334,9 +338,13 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
 
         @Override
-        public void applyPrecision() {
-            for (int k = 0; k < this.getSize(); k++)
-                this.vec[k] = (long) this.vec[k];
+        public void applyPrecision(boolean floor) {
+            for (int k = 0; k < this.getSize(); k++) {
+                if (floor)
+                    this.vec[k] = (long) Math.floor(this.vec[k]);
+                else
+                    this.vec[k] = (long) this.vec[k];
+            }
         }
 
         @Override
@@ -427,7 +435,7 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
 
         @Override
-        public void applyPrecision() {
+        public void applyPrecision(boolean floor) {
         }
 
         @Override
@@ -514,7 +522,7 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
 
         @Override
-        public void applyPrecision() {
+        public void applyPrecision(boolean floor) {
             for (int k = 0; k < this.getSize(); k++)
                 this.vec[k] = (float) this.vec[k];
         }
@@ -610,9 +618,13 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
 
         @Override
-        public void applyPrecision() {
-            for (int k = 0; k < this.getSize(); k++)
-                this.vec[k] = (short) this.vec[k];
+        public void applyPrecision(boolean floor) {
+            for (int k = 0; k < this.getSize(); k++) {
+                if (floor)
+                    this.vec[k] = (short) Math.floor(this.vec[k]);
+                else
+                    this.vec[k] = (short) this.vec[k];this.vec[k] = (short) this.vec[k];
+            }
         }
 
         @Override
@@ -709,9 +721,13 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
 
         @Override
-        public void applyPrecision() {
-            for (int k = 0; k < this.getSize(); k++)
-                this.vec[k] = (byte) this.vec[k];
+        public void applyPrecision(boolean floor) {
+            for (int k = 0; k < this.getSize(); k++){
+                if (floor)
+                    this.vec[k] = (byte) Math.floor(this.vec[k]);
+                else
+                    this.vec[k] = (byte) this.vec[k];this.vec[k] = (short) this.vec[k];
+            }
         }
 
         @Override

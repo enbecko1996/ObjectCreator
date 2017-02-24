@@ -35,17 +35,17 @@ public class Line3D {
         }
 
         public Line3D updateOnPoint(vec3 onPoint) {
-            this.onPoint.update(onPoint);
+            this.onPoint.update(onPoint, false);
             return this;
         }
 
         public void updateEndPoint(vec3 end) {
-            this.endPoint.update(end);
+            this.endPoint.update(end, false);
         }
 
         public Line3D update(vec3 onPoint, @Nonnull vec3 end) {
-            this.onPoint.update(onPoint);
-            this.endPoint.update(end);
+            this.onPoint.update(onPoint, false);
+            this.endPoint.update(end, false);
             return this;
         }
     }

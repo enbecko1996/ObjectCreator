@@ -48,7 +48,7 @@ public abstract class vec_n<T extends Number> {
             double[] vec = this.getVecD();
             for (int k = 0; k < vec.length; k++)
                 vec[k] *= length;
-            this.applyPrecision();
+            this.applyPrecision(false);
         }
         return this;
     }
@@ -65,7 +65,7 @@ public abstract class vec_n<T extends Number> {
             double[] vec = this.getVecD();
             for (int k = 0; k < vec.length; k++)
                 vec[k] /= length;
-            this.applyPrecision();
+            this.applyPrecision(false);
         }
         return this;
     }
@@ -114,17 +114,18 @@ public abstract class vec_n<T extends Number> {
     @Nullable
     public abstract vec_n divAndMakeNew(vecPrec precision, double length, boolean floor);
 
-    public vec_n update(vec_n other) {
-        return this.update(0, other.getVecD());
+    public vec_n update(vec_n other, boolean floor) {
+        return this.update(0, floor, other.getVecD());
     }
 
     public vec_n update(double... cont) {
-        return this.update(0, cont);
+        return this.update(0, false, cont);
     }
 
-    public vec_n update(int off, double... cont) {
+    public vec_n update(int off, boolean floor, double... cont) {
         if (cont.length + off <= this.vec.length)
             System.arraycopy(cont, 0, this.vec, off, cont.length);
+        this.applyPrecision(floor);
         return this;
     }
 
@@ -177,7 +178,7 @@ public abstract class vec_n<T extends Number> {
         return Math.sqrt(sum);
     }
 
-    public abstract void applyPrecision();
+    public abstract void applyPrecision(boolean floor);
 
     public abstract void setVec(boolean floor, double... content);
 

@@ -292,7 +292,7 @@ public class Matrix {
         public void setRow(int pos, vec_n row) {
             try {
                 if (pos < this.getRowCount() && row.getSize() == this.getColumncount()) {
-                    this.rows[pos].update(row);
+                    this.rows[pos].update(row, false);
                     double[] vec = row.getVecD();
                     for (int nn = 0; nn < this.getColumncount(); nn++) {
                         this.columns[nn].getVecD()[pos] = vec[nn];
@@ -307,7 +307,7 @@ public class Matrix {
         public void setColumn(int pos, vec_n column) {
             try {
                 if (pos < this.getColumncount() && column.getSize() == this.getRowCount()) {
-                    this.columns[pos].update(column);
+                    this.columns[pos].update(column, false);
                     double[] vec = column.getVecD();
                     for (int mm = 0; mm < this.getRowCount(); mm++) {
                         this.rows[mm].getVecD()[pos] = vec[mm];

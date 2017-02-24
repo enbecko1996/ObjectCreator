@@ -42,35 +42,35 @@ public abstract class Parallelogram3D extends Face3D {
         }
 
         public Parallelogram3D updateOnPoint(@Nonnull vec3 onPoint) {
-            this.onPoint.update(onPoint);
-            super.LOW_LEFT.update(onPoint);
-            super.LOW_RIGHT.update(super.LOW_LEFT.addToThis(vec1));
-            super.TOP_LEFT.update(super.LOW_LEFT.addToThis(vec1).addToThis(vec2));
-            super.TOP_RIGHT.update(super.LOW_LEFT.addToThis(vec2));
+            this.onPoint.update(onPoint, false);
+            super.LOW_LEFT.update(onPoint, false);
+            super.LOW_RIGHT.update(super.LOW_LEFT.addToThis(vec1), false);
+            super.TOP_LEFT.update(super.LOW_LEFT.addToThis(vec1).addToThis(vec2), false);
+            super.TOP_RIGHT.update(super.LOW_LEFT.addToThis(vec2), false);
             return this;
         }
 
         public Parallelogram3D updateVecs(@Nullable vec3 vec1, @Nullable vec3 vec2) {
             if(vec1 != null)
-                this.vec1.update(vec1);
+                this.vec1.update(vec1, false);
             if(vec2 != null)
-                this.vec2.update(vec2);
-            super.LOW_RIGHT.update(super.LOW_LEFT.addToThis(this.vec1));
-            super.TOP_LEFT.update(super.LOW_LEFT.addToThis(this.vec1).addToThis(this.vec2));
-            super.TOP_RIGHT.update(super.LOW_LEFT.addToThis(this.vec2));
+                this.vec2.update(vec2, false);
+            super.LOW_RIGHT.update(super.LOW_LEFT.addToThis(this.vec1), false);
+            super.TOP_LEFT.update(super.LOW_LEFT.addToThis(this.vec1).addToThis(this.vec2), false);
+            super.TOP_RIGHT.update(super.LOW_LEFT.addToThis(this.vec2), false);
             return this;
         }
 
         public Parallelogram3D update(@Nonnull vec3 onPoint, @Nullable vec3 vec1, @Nullable vec3 vec2) {
-            this.onPoint.update(onPoint);
+            this.onPoint.update(onPoint, false);
             if(vec1 != null)
-                this.vec1.update(vec1);
+                this.vec1.update(vec1, false);
             if(vec2 != null)
-                this.vec2.update(vec2);
-            super.LOW_LEFT.update(this.onPoint);
-            super.LOW_RIGHT.update(super.LOW_LEFT.addToThis(this.vec1));
-            super.TOP_LEFT.update(super.LOW_LEFT.addToThis(this.vec1).addToThis(this.vec2));
-            super.TOP_RIGHT.update(super.LOW_LEFT.addToThis(this.vec2));
+                this.vec2.update(vec2, false);
+            super.LOW_LEFT.update(this.onPoint, false);
+            super.LOW_RIGHT.update(super.LOW_LEFT.addToThis(this.vec1), false);
+            super.TOP_LEFT.update(super.LOW_LEFT.addToThis(this.vec1).addToThis(this.vec2), false);
+            super.TOP_RIGHT.update(super.LOW_LEFT.addToThis(this.vec2), false);
             return this;
         }
     }

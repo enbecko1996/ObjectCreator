@@ -48,11 +48,11 @@ public abstract class Face3D {
          */
         synchronized (rayTrace3D) {
             if (this.isSymmetric()) {
-                tmpTop.update(this.TOP_RIGHT).subFromThis(this.TOP_LEFT);
-                tmpLeft.update(this.LOW_LEFT).subFromThis(this.TOP_LEFT);
+                tmpTop.update(this.TOP_RIGHT, false).subFromThis(this.TOP_LEFT);
+                tmpLeft.update(this.LOW_LEFT, false).subFromThis(this.TOP_LEFT);
                 Matrix.Matrix_NxN matrix = Matrix.NxN_FACTORY.makeMatrixFromColumns(tmpTop, tmpLeft, rayTrace3D.getVec().mulToThis(-1));
                 rayTrace3D.getVec().mulToThis(-1);
-                tmpRhs.update(rayTrace3D.getOnPoint()).subFromThis(this.TOP_LEFT);
+                tmpRhs.update(rayTrace3D.getOnPoint(), false).subFromThis(this.TOP_LEFT);
                 matrix.doLUDecomposition();
                 vec_n_DOUBLE r_s_t = matrix.solveLGS_fromLU(tmpRhs);
                 double[] rst = r_s_t.getVecD();
@@ -60,13 +60,13 @@ public abstract class Face3D {
                     return rayTrace3D.advanceOnVecAndReturnPosition(rst[2]);
                 }
             } else {
-                tmpTop.update(this.TOP_RIGHT).subFromThis(this.TOP_LEFT);
-                tmpLeft.update(this.LOW_LEFT).subFromThis(this.TOP_LEFT);
-                this.tmpDiag.update(this.LOW_RIGHT).subFromThis(this.TOP_LEFT);
+                tmpTop.update(this.TOP_RIGHT, false).subFromThis(this.TOP_LEFT);
+                tmpLeft.update(this.LOW_LEFT, false).subFromThis(this.TOP_LEFT);
+                this.tmpDiag.update(this.LOW_RIGHT, false).subFromThis(this.TOP_LEFT);
                 Matrix.Matrix_NxN matrix = Matrix.NxN_FACTORY.makeMatrixFromColumns(tmpLeft, tmpDiag, rayTrace3D.getVec().mulToThis(-1));
                 rayTrace3D.getVec().mulToThis(-1);
                 matrix.doLUDecomposition();
-                tmpRhs.update(rayTrace3D.getOnPoint()).subFromThis(this.TOP_LEFT);
+                tmpRhs.update(rayTrace3D.getOnPoint(), false).subFromThis(this.TOP_LEFT);
                 vec_n_DOUBLE r_s_t_1 = matrix.solveLGS_fromLU(tmpRhs);
                 double[] rst = r_s_t_1.getVecD();
                 if (rst[2] >  0 && rst[2] < rayTrace3D.getLimit() && rst[0] >= 0 && rst[0] <= 1 && rst[1] >= 0 && rst[1] <= 1) {
@@ -95,8 +95,8 @@ public abstract class Face3D {
     }
 
     public void updateIsFlat() {
-        this.tmpTop.update(this.TOP_RIGHT).subFromThis(this.TOP_LEFT);
-        this.tmpBot.update(this.LOW_RIGHT).subFromThis(this.LOW_LEFT);
+        this.tmpTop.update(this.TOP_RIGHT, false).subFromThis(this.TOP_LEFT);
+        this.tmpBot.update(this.LOW_RIGHT, false).subFromThis(this.LOW_LEFT);
         double fac = (tmpTop.getXD() != 0 && tmpBot.getXD() != 0) ? tmpBot.getXD() / tmpTop.getXD() : (tmpTop.getYD() != 0 && tmpBot.getYD() != 0) ? tmpBot.getYD() / tmpTop.getYD() : (tmpTop.getZD() != 0 && tmpBot.getZD() != 0) ? tmpBot.getZD() / tmpTop.getZD() : 0;
         if (fac != 0) {
             tmpTop.mulToThis(fac);
@@ -105,10 +105,10 @@ public abstract class Face3D {
     }
 
     public void updateIsSymmetric() {
-        this.tmpTop.update(this.TOP_RIGHT).subFromThis(this.TOP_LEFT);
-        this.tmpBot.update(this.LOW_RIGHT).subFromThis(this.LOW_LEFT);
-        this.tmpLeft.update(this.TOP_LEFT).subFromThis(this.LOW_LEFT);
-        this.tmpRight.update(this.TOP_RIGHT).subFromThis(this.LOW_RIGHT);
+        this.tmpTop.update(this.TOP_RIGHT, false).subFromThis(this.TOP_LEFT);
+        this.tmpBot.update(this.LOW_RIGHT, false).subFromThis(this.LOW_LEFT);
+        this.tmpLeft.update(this.TOP_LEFT, false).subFromThis(this.LOW_LEFT);
+        this.tmpRight.update(this.TOP_RIGHT, false).subFromThis(this.LOW_RIGHT);
         this.isSymmetric = tmpTop.subFromThis(tmpBot).length() < isFaceRectThreshold && tmpLeft.subFromThis(tmpRight).length() < isFaceRectThreshold;
     }
 
@@ -119,9 +119,9 @@ public abstract class Face3D {
     }
 
     public void calculateNormals() {
-        this.tmpTop.update(this.TOP_RIGHT).subFromThis(this.TOP_LEFT);
-        this.tmpDiag.update(this.LOW_RIGHT).subFromThis(this.TOP_LEFT);
-        this.tmpLeft.update(this.TOP_LEFT).subFromThis(this.LOW_LEFT);
+        this.tmpTop.update(this.TOP_RIGHT, false).subFromThis(this.TOP_LEFT);
+        this.tmpDiag.update(this.LOW_RIGHT, false).subFromThis(this.TOP_LEFT);
+        this.tmpLeft.update(this.TOP_LEFT, false).subFromThis(this.LOW_LEFT);
         this.calculateNormals(tmpLeft, tmpDiag, tmpTop);
     }
 
@@ -189,7 +189,7 @@ public abstract class Face3D {
         }
 
         public Face3D updateLowLeft(@Nonnull vec3 lowLeft) {
-            this.LOW_LEFT.update(lowLeft);
+            this.LOW_LEFT.update(lowLeft, false);
             this.updateIsFlat();
             this.updateIsSymmetric();
             if (this.isPhysical())
@@ -198,7 +198,7 @@ public abstract class Face3D {
         }
 
         public Face3D updateLowRight(@Nonnull vec3 lowRight) {
-            this.LOW_RIGHT.update(lowRight);
+            this.LOW_RIGHT.update(lowRight, false);
             this.updateIsFlat();
             this.updateIsSymmetric();
             if (this.isPhysical())
@@ -207,7 +207,7 @@ public abstract class Face3D {
         }
 
         public Face3D updateTopLeft(@Nonnull vec3 topLeft) {
-            this.TOP_LEFT.update(topLeft);
+            this.TOP_LEFT.update(topLeft, false);
             this.updateIsFlat();
             this.updateIsSymmetric();
             if (this.isPhysical())
@@ -216,7 +216,7 @@ public abstract class Face3D {
         }
 
         public Face3D updateTopRight(@Nonnull vec3 topRight) {
-            this.TOP_RIGHT.update(topRight);
+            this.TOP_RIGHT.update(topRight, false);
             this.updateIsFlat();
             this.updateIsSymmetric();
             if (this.isPhysical())
