@@ -20,12 +20,37 @@ public class Bone {
 
     public void addContent(Content content, Content ... adjacent) {
         if (this.boneContent == null) {
+            int cpC = Main_ModCreator.contentCubesPerCube;
             vec3 pos = content.getPositionInBoneCoords();
-            vec3 posInOrder1 = new vec3.IntVec((vec3) new vec3.DoubleVec(pos, false).divToThis(Main_ModCreator.contentCubesPerCube), true);
+            vec3.DoubleVec tmpDouble = new vec3.DoubleVec(pos, false);
+            vec3.IntVec posInOrder1 = new vec3.IntVec((vec3) tmpDouble.divToThis(cpC), true);
+            int diff;
+            vec3.ByteVec posInNext = new vec3.ByteVec((diff = (posInOrder1.getX() % cpC)) >= 0 ? diff : cpC + diff,
+                    (diff = (posInOrder1.getY() % cpC)) >= 0 ? diff : cpC + diff,
+                    (diff = (posInOrder1.getZ() % cpC)) >= 0 ? diff : cpC + diff ,
+                    false);
+            PrimitiveHolder base = new PrimitiveHolder(this, posInNext, (vec3.IntVec) posInOrder1.mulToThis(cpC), true);
+            if (base.isFullInside(content))
+                base.setMaxOrder(true);
+            else {
+                for (int k = 0; k < content.getCornerCount(); k++) {
+                    vec3 cur = content.getCorner(k);
+                    if (!base.isInside(cur)) {
+                        tmpDouble.update(cur);
+                        posInOrder1.update((vec3) tmpDouble.divToThis(cpC), true);
+                    }
+                }
+            }
+            System.out.println(posInNext+ " " + posInOrder1+" "+base.isFullInside(content));
         } else if ( !this.boneContent.isInside(content.getPositionInBoneCoords())) {
 
         } else {
 
         }
+    }
+
+    public static void main(String[] args) {
+        Bone b;
+        (b = new Bone()).addContent(new Visible_Cube(b, new vec3.IntVec(16, 4, 2, false), 2));
     }
 }

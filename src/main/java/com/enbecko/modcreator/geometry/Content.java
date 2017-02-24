@@ -17,8 +17,8 @@ public abstract class Content {
     @Nonnull
     private final Bone parentBone;
 
-    public Content(Bone parentBone, vec3.IntVec positionInBoneCoords, int size) {
-        this.positionInBoneCoords = (vec3.IntVec) new vec3.IntVec(positionInBoneCoords, false).setChangeable(false);
+    public Content(Bone parentBone, vec3 positionInBoneCoords, int size) {
+        this.positionInBoneCoords = new vec3.IntVec(positionInBoneCoords, false).setChangeable(false);
         this.parentBone = parentBone;
         this.cornersInBoneCoords = new vec3[size];
     }
@@ -32,8 +32,8 @@ public abstract class Content {
         return this.positionInBoneCoords;
     }
 
-    public vec3[] getCornersInBoneCoords() {
-        return this.cornersInBoneCoords;
+    public vec3 getCorner(int pos) {
+        return this.cornersInBoneCoords[pos];
     }
 
     public abstract boolean isColliding(Content other);
@@ -43,5 +43,9 @@ public abstract class Content {
     public abstract boolean isInside(vec3 vec);
 
     public abstract void init();
+
+    public int getCornerCount() {
+        return this.cornersInBoneCoords.length;
+    }
 
 }
