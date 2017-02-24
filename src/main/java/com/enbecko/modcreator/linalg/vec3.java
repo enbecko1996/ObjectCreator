@@ -49,7 +49,10 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
 
     public abstract vec3 cross(vec3 other, boolean floor);
 
-    public abstract void update(double x, double y, double z);
+    public void update(double x, double y, double z) {
+        this.update(x, y, z, false);
+    }
+    public abstract void update(double x, double y, double z, boolean floor);
     public abstract void setX(double x);
     public abstract void setY(double y);
     public abstract void setZ(double z);
@@ -171,11 +174,17 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
 
         @Override
-        public void update(double x, double y, double z) {
+        public void update(double x, double y, double z, boolean floor) {
             if(this.isChangeable) {
-                this.vec[0] = (int) x;
-                this.vec[1] = (int) y;
-                this.vec[2] = (int) z;
+                if (floor) {
+                    this.vec[0] = (int) Math.floor(x);
+                    this.vec[1] = (int) Math.floor(y);
+                    this.vec[2] = (int) Math.floor(z);
+                } else {
+                    this.vec[0] = (int) x;
+                    this.vec[1] = (int) y;
+                    this.vec[2] = (int) z;
+                }
             } else {
                 throw new RuntimeException("Can't change unchangeable vecs " + this);
             }
@@ -264,11 +273,17 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
         
         @Override
-        public void update(double x, double y, double z) {
+        public void update(double x, double y, double z, boolean floor) {
             if(this.isChangeable) {
-                this.vec[0] = (long) x;
-                this.vec[1] = (long) y;
-                this.vec[2] = (long) z;
+                if (floor) {
+                    this.vec[0] = (long) Math.floor(x);
+                    this.vec[1] = (long) Math.floor(y);
+                    this.vec[2] = (long) Math.floor(z);
+                } else {
+                    this.vec[0] = (long) x;
+                    this.vec[1] = (long) y;
+                    this.vec[2] = (long) z;
+                }
             } else {
                 throw new RuntimeException("Can't change unchangeable vecs " + this);
             }
@@ -357,7 +372,7 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
         
         @Override
-        public void update(double x, double y, double z) {
+        public void update(double x, double y, double z, boolean floor) {
             if(this.isChangeable) {
                 this.vec[0] = x;
                 this.vec[1] = y;
@@ -444,7 +459,7 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
         
         @Override
-        public void update(double x, double y, double z) {
+        public void update(double x, double y, double z, boolean floor) {
             if(this.isChangeable) {
                 this.vec[0] = (float) x;
                 this.vec[1] = (float) y;
@@ -508,10 +523,7 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         public void setVec(boolean floor, double... content) {
             if (content.length == 3) {
                 for (int k = 0; k < 3; k++)
-                    if (floor)
-                        this.vec[k] = (float) Math.floor(content[k]);
-                    else
-                        this.vec[k] = (float) content[k];
+                    this.vec[k] = (float) content[k];
             } else {
                 throw new RuntimeException("Can't create vec3 from content with not 3 components.");
             }
@@ -537,11 +549,17 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
         
         @Override
-        public void update(double x, double y, double z) {
+        public void update(double x, double y, double z, boolean floor) {
             if(this.isChangeable) {
-                this.vec[0] = (short) x;
-                this.vec[1] = (short) y;
-                this.vec[2] = (short) z;
+                if (floor) {
+                    this.vec[0] = (short) Math.floor(x);
+                    this.vec[1] = (short) Math.floor(y);
+                    this.vec[2] = (short) Math.floor(z);
+                } else {
+                    this.vec[0] = (short) x;
+                    this.vec[1] = (short) y;
+                    this.vec[2] = (short) z;
+                }
             } else {
                 throw new RuntimeException("Can't change unchangeable vecs " + this);
             }
@@ -630,11 +648,17 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
         
         @Override
-        public void update(double x, double y, double z) {
+        public void update(double x, double y, double z, boolean floor) {
             if(this.isChangeable) {
-                this.vec[0] = (byte) x;
-                this.vec[1] = (byte) y;
-                this.vec[2] = (byte) z;
+                if (floor) {
+                    this.vec[0] = (byte) Math.floor(x);
+                    this.vec[1] = (byte) Math.floor(y);
+                    this.vec[2] = (byte) Math.floor(z);
+                } else {
+                    this.vec[0] = (byte) x;
+                    this.vec[1] = (byte) y;
+                    this.vec[2] = (byte) z;
+                }
             } else {
                 throw new RuntimeException("Can't change unchangeable vecs " + this);
             }
