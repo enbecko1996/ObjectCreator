@@ -27,6 +27,7 @@ public abstract class Parallelogram3D extends Face3D {
         return isEndless;
     }
 
+    @Override
     @Nullable
     public vec3.DoubleVec checkIfCrosses(RayTrace3D rayTrace3D) {
         /*

@@ -1,5 +1,6 @@
 package com.enbecko.modcreator.geometry;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -7,4 +8,6 @@ import java.util.List;
  */
 public interface ContentHolder <T extends Content>{
     public List<T> getContent();
+
+    public abstract boolean addContent(@Nonnull T content);
 }

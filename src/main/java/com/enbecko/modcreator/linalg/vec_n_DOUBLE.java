@@ -27,6 +27,7 @@ public class vec_n_DOUBLE extends vec_n<Double>{
         return new vec_n_DOUBLE(this);
     }
 
+    @Override
     public vec_n_DOUBLE update(int off, boolean floor, double... cont) {
         if(cont.length + off <= this.vec.length)
             System.arraycopy(cont, 0, this.vec, off, cont.length);

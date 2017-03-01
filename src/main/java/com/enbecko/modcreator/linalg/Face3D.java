@@ -153,17 +153,18 @@ public abstract class Face3D {
         return this.isPhysical;
     }
 
-    @Deprecated
-    public static class FaceAutoUpdateOnVecChange extends FaceManualUpdate {
+    public static class FaceAutoUpdateOnVecChange extends Face3D {
         public FaceAutoUpdateOnVecChange(vec3 LOW_LEFT, vec3 LOW_RIGHT, vec3 TOP_RIGHT, vec3 TOP_LEFT) {
             super(LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT);
         }
 
+        @Override
         public vec3 getTriangleNormal1() {
             this.calculateNormals();
             return super.getTriangleNormal1();
         }
 
+        @Override
         public vec3 getTriangleNormal2() {
             this.calculateNormals();
             return super.getTriangleNormal2();

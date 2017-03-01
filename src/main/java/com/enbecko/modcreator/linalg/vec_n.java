@@ -118,6 +118,11 @@ public abstract class vec_n<T extends Number> {
         return this.update(0, floor, other.getVecD());
     }
 
+    public vec_n update(vec_n other) {
+        return this.update(0, false, other.getVecD());
+    }
+
+
     public vec_n update(double... cont) {
         return this.update(0, false, cont);
     }

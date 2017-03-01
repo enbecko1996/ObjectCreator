@@ -8,16 +8,20 @@ import com.enbecko.modcreator.linalg.vec3;
  * Created by enbec on 07.01.2017.
  */
 public class Bone {
+    @Deprecated
     private CubicContentHolder boneContent = null;
     private vec3.DoubleVec rotPoint_global;
     private vec3.DoubleVec offset;
     private final Matrix.Matrix_NxN transform = Matrix.NxN_FACTORY.makeIdent(4);
     private final Matrix.Matrix_NxN inverseTransform = Matrix.NxN_FACTORY.makeIdent(4);
+    private Content.CuboidContent[] octants = new Content.CuboidContent[8];
 
     public Bone() {
 
     }
 
+    /**
+    @Deprecated
     public void addContent(Content content, Content ... adjacent) {
         if (this.boneContent == null) {
             int cpC = Main_ModCreator.contentCubesPerCube;
@@ -29,15 +33,49 @@ public class Bone {
                     (diff = (posInOrder1.getY() % cpC)) >= 0 ? diff : cpC + diff,
                     (diff = (posInOrder1.getZ() % cpC)) >= 0 ? diff : cpC + diff ,
                     false);
-            PrimitiveHolder base = new PrimitiveHolder(this, posInNext, (vec3.IntVec) posInOrder1.mulToThis(cpC), true);
-            if (base.isFullInside(content))
+            FirstOrderHolder base = new FirstOrderHolder(this, posInNext, (vec3.IntVec) posInOrder1.mulToThis(cpC), false);
+            base.addContent(content);
+            if (base.isFullInside(content)) {
                 base.setMaxOrder(true);
-            else {
+                this.boneContent = base;
+            } else {
+                int order = 2;
+                int len = (int) Math.pow(cpC, order);
+                posInOrder1.update(tmpDouble.update(pos, false).divToThis(len), true);
+                posInNext.update((diff = (posInOrder1.getX() % len)) >= 0 ? diff : cpC + diff,
+                        (diff = (posInOrder1.getY() % len)) >= 0 ? diff : cpC + diff,
+                        (diff = (posInOrder1.getZ() % len)) >= 0 ? diff : cpC + diff,
+                        false);
+                HigherOrderHolder order2 = new HigherOrderHolder(this, posInNext, (vec3.IntVec) posInOrder1.mulToThis(len), (byte) order, true);
+                base.setMaxOrder(false);
+                base.setParent(order2);
+                order2.addContent(base);
                 for (int k = 0; k < content.getCornerCount(); k++) {
                     vec3 cur = content.getCorner(k);
                     if (!base.isInside(cur)) {
                         tmpDouble.update(cur, false);
-                        posInOrder1.update((vec3) tmpDouble.divToThis(cpC), true);
+                        posInOrder1.update(tmpDouble.update(pos, false).divToThis(cpC), true);
+                        posInNext.update((diff = (posInOrder1.getX() % cpC)) >= 0 ? diff : cpC + diff,
+                                (diff = (posInOrder1.getY() % cpC)) >= 0 ? diff : cpC + diff,
+                                (diff = (posInOrder1.getZ() % cpC)) >= 0 ? diff : cpC + diff,
+                                false);
+                        FirstOrderHolder newHold = new FirstOrderHolder(this, posInNext, (vec3.IntVec) posInOrder1.mulToThis(cpC), false);
+                        if (order2.isInside(cur)) {
+                            order2.addContent(newHold);
+                        } else {
+                            order = 2;
+                            len = (int) Math.pow(cpC, order);
+                            posInOrder1.update(tmpDouble.update(cur, false).divToThis(len), true);
+                            posInNext.update((diff = (posInOrder1.getX() % len)) >= 0 ? diff : cpC + diff,
+                                    (diff = (posInOrder1.getY() % len)) >= 0 ? diff : cpC + diff,
+                                    (diff = (posInOrder1.getZ() % len)) >= 0 ? diff : cpC + diff,
+                                    false);
+                            HigherOrderHolder order2_2 = new HigherOrderHolder(this, posInNext, (vec3.IntVec) posInOrder1.mulToThis(len), (byte) order, true);
+                            newHold.setMaxOrder(false);
+                            newHold.setParent(order2_2);
+                            order2_2.addContent(newHold);
+
+                        }
                     }
                 }
             }
@@ -47,6 +85,11 @@ public class Bone {
         } else {
 
         }
+    }
+    */
+
+    public void addContent(Content content, Content ... adjacent) {
+
     }
 
     public static void main(String[] args) {

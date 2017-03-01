@@ -35,15 +35,15 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         return this.vec[2];
     }
 
-    public double getXF() {
+    public float getXF() {
         return (float) this.vec[0];
     }
 
-    public double getYF() {
+    public float getYF() {
         return (float) this.vec[1];
     }
 
-    public double getZF() {
+    public float getZF() {
         return (float) this.vec[2];
     }
 
@@ -150,6 +150,7 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
     }
 
+    @Override
     public vec3<T> setChangeable(boolean changeable) {
         this.isChangeable = changeable;
         return this;
@@ -167,7 +168,15 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         public IntVec(vec3 other, boolean floor) {
             super(other, floor);
         }
-        
+
+        public IntVec(vec3 other) {
+            super(other, false);
+        }
+
+        public IntVec(double x, double y, double z) {
+            super(x, y, z, false);
+        }
+
         @Override
         public vec3.IntVec cross(vec3 other, boolean floor) {
             return new vec3.IntVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD(), floor);
@@ -271,6 +280,14 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super(other, floor);
         }
 
+        public LongVec(vec3 other) {
+            super(other, false);
+        }
+
+        public LongVec(double x, double y, double z) {
+            super(x, y, z, false);
+        }
+
         @Override
         public vec3.LongVec cross(vec3 other, boolean floor) {
             return new vec3.LongVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD(), floor);
@@ -370,9 +387,18 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super(x, y, z, floor);
         }
 
+        public DoubleVec(vec3 other) {
+            super(other, false);
+        }
+
+        public DoubleVec(double x, double y, double z) {
+            super(x, y, z, false);
+        }
+
         public DoubleVec(vec3 other, boolean floor) {
             super(other, floor);
         }
+
 
         @Override
         public vec3.DoubleVec cross(vec3 other, boolean floor) {
@@ -459,6 +485,14 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
 
         public FloatVec(vec3 other, boolean floor) {
             super(other, floor);
+        }
+
+        public FloatVec(vec3 other) {
+            super(other, false);
+        }
+
+        public FloatVec(double x, double y, double z) {
+            super(x, y, z, false);
         }
 
         @Override
@@ -549,6 +583,14 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
 
         public ShortVec(vec3 other, boolean floor) {
             super(other, floor);
+        }
+
+        public ShortVec(vec3 other) {
+            super(other, false);
+        }
+
+        public ShortVec(double x, double y, double z) {
+            super(x, y, z, false);
         }
 
         @Override
@@ -652,6 +694,14 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
 
         public ByteVec(vec3 other, boolean floor) {
             super(other, floor);
+        }
+
+        public ByteVec(vec3 other) {
+            super(other, false);
+        }
+
+        public ByteVec(double x, double y, double z) {
+            super(x, y, z, false);
         }
 
         @Override
