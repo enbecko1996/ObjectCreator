@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by enbec on 21.02.2017.
  */
-public class FirstOrderHolder extends CubicContentHolder implements ContentHolder <Content> {
+public class FirstOrderHolder extends CubicContentHolderGeometry implements ContentHolder <Content> {
     private List<Content> content = new ArrayList<Content>();
     HigherOrderHolder parent;
 
@@ -24,6 +24,21 @@ public class FirstOrderHolder extends CubicContentHolder implements ContentHolde
 
     @Override
     public boolean addContent(@Nonnull Content content) {
+        if (!this.content.contains(content)) {
+            this.content.add(content);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean removeContent(@Nonnull Content content) {
+        if (this.content.contains(content)) {
+            this.content.remove(content);
+            if (this.content.size() <= 0)
+                this.getParent().removeContent(this);
+            return true;
+        }
         return false;
     }
 
@@ -37,7 +52,7 @@ public class FirstOrderHolder extends CubicContentHolder implements ContentHolde
         return this.parent;
     }
 
-    public CubicContentHolder getParent() {
+    public HigherOrderHolder getParent() {
         return this.parent;
     }
 

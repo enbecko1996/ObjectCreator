@@ -23,7 +23,7 @@ public abstract class Content {
     private boolean canChangeGeometry;
 
     public Content(Bone parentBone, vec3 positionInBoneCoords, int size, boolean canChangePosition) {
-        this.positionInBoneCoords = new vec3.IntVec(positionInBoneCoords, false).setChangeable(canChangePosition);
+        this.positionInBoneCoords = vec3.newVecWithPrecision(positionInBoneCoords.getPrecision(), positionInBoneCoords, false).setChangeable(canChangePosition);
         this.parentBone = parentBone;
         this.cornersInBoneCoords = new vec3[size];
         this.canChangePosition = canChangePosition;
@@ -171,14 +171,14 @@ public abstract class Content {
     public abstract static class CuboidContent extends Content {
         double xSize, ySize, zSize;
 
-        protected CuboidContent(Bone parentBone, vec3.IntVec positionInBoneCoords, double xSize, double ySize, double zSize) {
+        protected CuboidContent(Bone parentBone, vec3 positionInBoneCoords, double xSize, double ySize, double zSize) {
             super(parentBone, positionInBoneCoords, 8);
             if (xSize > 0 && ySize > 0 && zSize > 0) {
                 this.xSize = xSize;
                 this.ySize = ySize;
                 this.zSize = zSize;
             } else {
-                throw new RuntimeException("This doesn't create a valid cuboid: " + xSize + " " + ySize + " " + zSize);
+                throw new RuntimeException("This doesn't create a valid cuboid: xSize = " + xSize + ", ySize = " + ySize + ", zSize = " + zSize);
             }
         }
 
@@ -188,7 +188,7 @@ public abstract class Content {
                 this.ySize = ySize;
                 this.zSize = zSize;
             } else {
-                throw new RuntimeException("This doesn't create a valid cuboid: " + xSize + " " + ySize + " " + zSize);
+                throw new RuntimeException("This doesn't create a valid cuboid: xSize = " + xSize + ", ySize = " + ySize + ", zSize = " + zSize);
             }
             this.updateGeometry();
         }
@@ -198,7 +198,7 @@ public abstract class Content {
             this.ySize = yMax - yMin;
             this.zSize = zMax - zMin;
             if (!(xSize > 0 && ySize > 0 && zSize > 0)) {
-                throw new RuntimeException("This doesn't create a valid cuboid: " + xSize + " " + ySize + " " + zSize);
+                throw new RuntimeException("This doesn't create a valid cuboid: xSize = " + xSize + ", ySize = " + ySize + ", zSize = " + zSize);
             }
             this.updatePosition(xMin, yMin, zMin);
             this.updateSize(this.xSize, this.ySize, this.zSize);
@@ -357,6 +357,15 @@ public abstract class Content {
             if (!(vec.getYD() <= this.getCorner(3).getYD() && vec.getYD() >= this.getCorner(0).getYD() && vec.getXD() <= this.getCorner(4).getXD() && vec.getXD() >= this.getCorner(0).getXD() && vec.getZD() <= this.getCorner(1).getZD() && vec.getZD() >= this.getCorner(0).getZD()))
                 return true;
             return false;
+        }
+
+        public String getGeometryInfo() {
+            return "{pos = " + this.positionInBoneCoords + ", xSize = " + this.xSize +
+                    ", ySize = " + this.ySize + ", zSize = " + this.zSize +"}";
+        }
+
+        public String toString() {
+            return "CuboidContent: " + this.getGeometryInfo();
         }
     }
 

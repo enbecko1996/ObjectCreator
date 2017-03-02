@@ -102,6 +102,20 @@ public abstract class vec_n<T extends Number> {
         return this;
     }
 
+    public vec_n addToThis(double ... cont) {
+        if (!this.isChangeable) {
+            throw new RuntimeException("you can't change unchangeable vecs" + this);
+        } else {
+            if (cont.length <= vec.length) {
+                for (int k = 0; k < cont.length; k++)
+                    vec[k] += cont[k];
+            } else {
+                throw new RuntimeException("Adding a higher dim. vector to a lower one is not possible!" + this + " " + Arrays.toString(cont));
+            }
+        }
+        return this;
+    }
+
     @Nullable
     public abstract vec_n mulAndMakeNew(vecPrec precision, double length, boolean floor);
 

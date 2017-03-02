@@ -112,6 +112,25 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         }
     }
 
+    //@Override
+    @Nullable
+    public vec_n addAndMakeNew(vecPrec prec, boolean floor, double ... cont) {
+        switch (prec) {
+            case BYTE:
+                return new vec3.ByteVec(this, floor).addToThis(cont);
+            case SHORT:
+                return new vec3.ShortVec(this, floor).addToThis(cont);
+            case INT:
+                return new vec3.IntVec(this, floor).addToThis(cont);
+            case LONG:
+                return new vec3.LongVec(this, floor).addToThis(cont);
+            case FLOAT:
+                return new vec3.FloatVec(this, floor).addToThis(cont);
+            default:
+                return new vec3.DoubleVec(this, floor).addToThis(cont);
+        }
+    }
+
     @Override
     @Nullable
     public vec_n subAndMakeNew(vecPrec prec, vec_n other, boolean floor) {
@@ -173,7 +192,7 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super(other, false);
         }
 
-        public IntVec(double x, double y, double z) {
+        public IntVec(int x, int y, int z) {
             super(x, y, z, false);
         }
 
@@ -284,7 +303,7 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super(other, false);
         }
 
-        public LongVec(double x, double y, double z) {
+        public LongVec(long x, long y, long z) {
             super(x, y, z, false);
         }
 
@@ -491,7 +510,7 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super(other, false);
         }
 
-        public FloatVec(double x, double y, double z) {
+        public FloatVec(float x, float y, float z) {
             super(x, y, z, false);
         }
 
@@ -589,7 +608,7 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super(other, false);
         }
 
-        public ShortVec(double x, double y, double z) {
+        public ShortVec(short x, short y, short z) {
             super(x, y, z, false);
         }
 
@@ -700,7 +719,7 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super(other, false);
         }
 
-        public ByteVec(double x, double y, double z) {
+        public ByteVec(byte x, byte y, byte z) {
             super(x, y, z, false);
         }
 

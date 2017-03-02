@@ -1,23 +1,42 @@
 package com.enbecko.modcreator.geometry;
 
-import com.enbecko.modcreator.Main_ModCreator;
 import com.enbecko.modcreator.linalg.Matrix;
 import com.enbecko.modcreator.linalg.vec3;
+import com.enbecko.modcreator.linalg.vec_n;
+
+import static com.enbecko.modcreator.linalg.vec_n.vecPrec.INT;
 
 /**
  * Created by enbec on 07.01.2017.
  */
 public class Bone {
     @Deprecated
-    private CubicContentHolder boneContent = null;
+    private CubicContentHolderGeometry boneContent = null;
     private vec3.DoubleVec rotPoint_global;
     private vec3.DoubleVec offset;
     private final Matrix.Matrix_NxN transform = Matrix.NxN_FACTORY.makeIdent(4);
     private final Matrix.Matrix_NxN inverseTransform = Matrix.NxN_FACTORY.makeIdent(4);
-    private Content.CuboidContent[] octants = new Content.CuboidContent[8];
+    private final Octant I, II, III, IV, V, VI, VII, VIII;
+    private final Octant[] octants = new Octant[8];
 
     public Bone() {
-
+        vec3.IntVec center = new vec3.IntVec();
+        this.I = new Octant(this, center, 1, 1, 1, Octant.OCTANTS.I);
+        this.II = new Octant(this, (vec3.IntVec) center.addAndMakeNew(INT, false, -1, 0, 0), 1, 1, 1, Octant.OCTANTS.II);
+        this.III = new Octant(this, (vec3.IntVec) center.addAndMakeNew(INT, false, -1, -1, 0), 1, 1, 1, Octant.OCTANTS.III);
+        this.IV = new Octant(this, (vec3.IntVec) center.addAndMakeNew(INT, false, 0, -1, 0), 1, 1, 1, Octant.OCTANTS.IV);
+        this.V = new Octant(this, (vec3.IntVec) center.addAndMakeNew(INT, false, 0, 0, -1), 1, 1, 1, Octant.OCTANTS.V);
+        this.VI = new Octant(this, (vec3.IntVec) center.addAndMakeNew(INT, false, -1, 0, -1), 1, 1, 1, Octant.OCTANTS.VI);
+        this.VII = new Octant(this, (vec3.IntVec) center.addAndMakeNew(INT, false, -1, -1, -1), 1, 1, 1, Octant.OCTANTS.VII);
+        this.VIII = new Octant(this, (vec3.IntVec) center.addAndMakeNew(INT, false, 0, -1, -1), 1, 1, 1, Octant.OCTANTS.VIII);
+        this.octants[0] = this.I;
+        this.octants[1] = this.II;
+        this.octants[2] = this.III;
+        this.octants[3] = this.IV;
+        this.octants[4] = this.V;
+        this.octants[5] = this.VI;
+        this.octants[6] = this.VII;
+        this.octants[7] = this.VIII;
     }
 
     /**
@@ -90,6 +109,13 @@ public class Bone {
 
     public void addContent(Content content, Content ... adjacent) {
 
+    }
+
+    public void octantEmpty(Octant octant) {
+        for (Octant octant1 : this.octants) {
+            if (octant == octant1)
+                octant1.setActive(false);
+        }
     }
 
     public static void main(String[] args) {

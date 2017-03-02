@@ -10,4 +10,6 @@ public interface ContentHolder <T extends Content>{
     public List<T> getContent();
 
     public abstract boolean addContent(@Nonnull T content);
+
+    public abstract boolean removeContent(@Nonnull T content);
 }

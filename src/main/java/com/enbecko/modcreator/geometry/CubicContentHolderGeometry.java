@@ -6,13 +6,14 @@ import com.enbecko.modcreator.linalg.vec3;
 /**
  * Created by enbec on 25.02.2017.
  */
-public abstract class CubicContentHolder extends Content.CubicContent {
+public abstract class CubicContentHolderGeometry extends Content.CubicContent {
     private byte order;
+    @Deprecated
     final vec3.ByteVec positionInParentInOrdersOfEdgeLength;
-    boolean isMaxOrder;
+    private boolean isMaxOrder;
     private int size;
 
-    public CubicContentHolder(Bone parentBone, vec3.ByteVec positionInParentInOrdersOfEdgeLength, vec3.IntVec positionInBoneCoords, byte order, boolean isMaxOrder) {
+    protected CubicContentHolderGeometry(Bone parentBone, @Deprecated vec3.ByteVec positionInParentInOrdersOfEdgeLength, vec3.IntVec positionInBoneCoords, byte order, boolean isMaxOrder) {
         super(parentBone, positionInBoneCoords, (int) Math.pow(Main_ModCreator.contentCubesPerCube, order));
         this.setCanChangePosition(false);
         this.size = (int) Math.pow(Main_ModCreator.contentCubesPerCube, order);
@@ -39,6 +40,7 @@ public abstract class CubicContentHolder extends Content.CubicContent {
         return (vec3.IntVec) this.cornersInBoneCoords[pos];
     }
 
+    @Deprecated
     public vec3.ByteVec getPositionInParentInOrdersOfEdgeLength() {
         return this.positionInParentInOrdersOfEdgeLength;
     }
