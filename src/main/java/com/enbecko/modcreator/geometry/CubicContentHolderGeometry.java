@@ -8,17 +8,14 @@ import com.enbecko.modcreator.linalg.vec3;
  */
 public abstract class CubicContentHolderGeometry extends Content.CubicContent {
     private byte order;
-    @Deprecated
-    final vec3.ByteVec positionInParentInOrdersOfEdgeLength;
     private boolean isMaxOrder;
     private int size;
 
-    protected CubicContentHolderGeometry(Bone parentBone, @Deprecated vec3.ByteVec positionInParentInOrdersOfEdgeLength, vec3.IntVec positionInBoneCoords, byte order, boolean isMaxOrder) {
+    protected CubicContentHolderGeometry(Bone parentBone, vec3.IntVec positionInBoneCoords, byte order, boolean isMaxOrder) {
         super(parentBone, positionInBoneCoords, (int) Math.pow(Main_ModCreator.contentCubesPerCube, order));
         this.setCanChangePosition(false);
         this.size = (int) Math.pow(Main_ModCreator.contentCubesPerCube, order);
         this.order = order;
-        this.positionInParentInOrdersOfEdgeLength = (vec3.ByteVec) new vec3.ByteVec(positionInParentInOrdersOfEdgeLength.getX(), positionInParentInOrdersOfEdgeLength.getY(), positionInParentInOrdersOfEdgeLength.getZ(), false).setChangeable(false);
         this.isMaxOrder = isMaxOrder;
     }
 
@@ -38,11 +35,6 @@ public abstract class CubicContentHolderGeometry extends Content.CubicContent {
     @Override
     public vec3.IntVec getCorner(int pos) {
         return (vec3.IntVec) this.cornersInBoneCoords[pos];
-    }
-
-    @Deprecated
-    public vec3.ByteVec getPositionInParentInOrdersOfEdgeLength() {
-        return this.positionInParentInOrdersOfEdgeLength;
     }
 
     @Override

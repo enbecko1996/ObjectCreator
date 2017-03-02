@@ -13,7 +13,7 @@ public class OctantTest {
         Bone b = new Bone();
         vec3.DoubleVec center = new vec3.DoubleVec(0, -1, -1);
         Octant tmp = new Octant(b, center, 1, 1, 1, Octant.OCTANTS.VIII);
-        tmp.addContent(new FirstOrderHolder(b, ));
+        tmp.addContent(new FirstOrderHolder(b));
         tmp.setActive(true);
         System.out.println(tmp);
     }
