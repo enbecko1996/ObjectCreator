@@ -13,7 +13,7 @@ public class FirstOrderHolder extends CubicContentHolderGeometry implements Cont
     private List<Content> content = new ArrayList<Content>();
     HigherOrderHolder parent;
 
-    public FirstOrderHolder(Bone parentBone, vec3.ByteVec positionInParentInOrdersOfEdgeLength, vec3.IntVec positionInBoneCoords, boolean isMaxOrder) {
+    public FirstOrderHolder(Bone parentBone, vec3.IntVec positionInBoneCoords, boolean isMaxOrder) {
         super(parentBone, positionInBoneCoords, (byte) 1, isMaxOrder);
     }
 

@@ -15,7 +15,7 @@ public class HigherOrderHolder extends CubicContentHolderGeometry implements Con
     private CubicContentHolderGeometry[][][] content;
     HigherOrderHolder parent;
 
-    public HigherOrderHolder(Bone parentBone, vec3.ByteVec positionInParentInOrdersOfEdgeLength, vec3.IntVec positionInBoneCoords, byte order, boolean isMaxOrder) {
+    public HigherOrderHolder(Bone parentBone, vec3.IntVec positionInBoneCoords, byte order, boolean isMaxOrder) {
         super(parentBone, positionInBoneCoords, order, isMaxOrder);
     }
 
