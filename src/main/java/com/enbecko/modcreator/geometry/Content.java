@@ -205,6 +205,12 @@ public abstract class Content {
             this.updateGeometry();
         }
 
+        public void update(vec3 pos, double xSize, double ySize, double zSize) {
+            double xMin = pos.getXD(), yMin = pos.getYD(), zMin = pos.getZD(),
+                    xMax = xMin + xSize, yMax = yMin + ySize, zMax = zMin + zSize;
+            this.update(xMin, yMin, zMin, xMax, yMax, zMax);
+        }
+
         @Override
         public void updateGeometry() {
             vec3 pos = this.getPositionInBoneCoords();

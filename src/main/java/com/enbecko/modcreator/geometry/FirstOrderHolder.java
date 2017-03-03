@@ -23,7 +23,17 @@ public class FirstOrderHolder extends CubicContentHolderGeometry implements Cont
     }
 
     @Override
-    public boolean addContent(@Nonnull Content content) {
+    public boolean addContent(@Nonnull vec3 decisiveVec, @Nonnull Content toAdd) {
+        return false;
+    }
+
+    @Override
+    public int getContentCount() {
+        return this.content.size();
+    }
+
+    @Override
+    public boolean addNewChild(@Nonnull Content content) {
         if (!this.content.contains(content)) {
             this.content.add(content);
             return true;
@@ -32,14 +42,19 @@ public class FirstOrderHolder extends CubicContentHolderGeometry implements Cont
     }
 
     @Override
-    public boolean removeContent(@Nonnull Content content) {
+    public boolean removeChild(@Nonnull Content content) {
         if (this.content.contains(content)) {
             this.content.remove(content);
             if (this.content.size() <= 0)
-                this.getParent().removeContent(this);
+                this.getParent().removeChild(this);
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void askForOrderDegrade(@Nonnull Content asker, CubicContentHolderGeometry degradeTo) {
+
     }
 
     @Override

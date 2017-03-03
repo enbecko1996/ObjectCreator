@@ -41,9 +41,9 @@ public class Bone {
 
     /**
     @Deprecated
-    public void addContent(Content content, Content ... adjacent) {
+    public void addNewChild(Content content, Content ... adjacent) {
         if (this.boneContent == null) {
-            int cpC = Main_ModCreator.contentCubesPerCube;
+            int cpC = Main_BlockHeroes.contentCubesPerCube;
             vec3 pos = content.getPositionInBoneCoords();
             vec3.DoubleVec tmpDouble = new vec3.DoubleVec(pos, false);
             vec3.IntVec posInOrder1 = new vec3.IntVec((vec3) tmpDouble.divToThis(cpC), true);
@@ -53,7 +53,7 @@ public class Bone {
                     (diff = (posInOrder1.getZ() % cpC)) >= 0 ? diff : cpC + diff ,
                     false);
             FirstOrderHolder base = new FirstOrderHolder(this, posInNext, (vec3.IntVec) posInOrder1.mulToThis(cpC), false);
-            base.addContent(content);
+            base.addNewChild(content);
             if (base.isFullInside(content)) {
                 base.setMaxOrder(true);
                 this.boneContent = base;
@@ -68,7 +68,7 @@ public class Bone {
                 HigherOrderHolder order2 = new HigherOrderHolder(this, posInNext, (vec3.IntVec) posInOrder1.mulToThis(len), (byte) order, true);
                 base.setMaxOrder(false);
                 base.setParent(order2);
-                order2.addContent(base);
+                order2.addNewChild(base);
                 for (int k = 0; k < content.getCornerCount(); k++) {
                     vec3 cur = content.getCorner(k);
                     if (!base.isInside(cur)) {
@@ -80,7 +80,7 @@ public class Bone {
                                 false);
                         FirstOrderHolder newHold = new FirstOrderHolder(this, posInNext, (vec3.IntVec) posInOrder1.mulToThis(cpC), false);
                         if (order2.isInside(cur)) {
-                            order2.addContent(newHold);
+                            order2.addNewChild(newHold);
                         } else {
                             order = 2;
                             len = (int) Math.pow(cpC, order);
@@ -92,7 +92,7 @@ public class Bone {
                             HigherOrderHolder order2_2 = new HigherOrderHolder(this, posInNext, (vec3.IntVec) posInOrder1.mulToThis(len), (byte) order, true);
                             newHold.setMaxOrder(false);
                             newHold.setParent(order2_2);
-                            order2_2.addContent(newHold);
+                            order2_2.addNewChild(newHold);
 
                         }
                     }

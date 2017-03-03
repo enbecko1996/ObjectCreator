@@ -1,6 +1,6 @@
 package com.enbecko.modcreator.geometry;
 
-import com.enbecko.modcreator.Main_ModCreator;
+import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
 import com.enbecko.modcreator.linalg.vec3;
 
 /**
@@ -12,9 +12,9 @@ public abstract class CubicContentHolderGeometry extends Content.CubicContent {
     private int size;
 
     protected CubicContentHolderGeometry(Bone parentBone, vec3.IntVec positionInBoneCoords, byte order, boolean isMaxOrder) {
-        super(parentBone, positionInBoneCoords, (int) Math.pow(Main_ModCreator.contentCubesPerCube, order));
+        super(parentBone, positionInBoneCoords, (int) Math.pow(Main_BlockHeroes.contentCubesPerCube, order));
         this.setCanChangePosition(false);
-        this.size = (int) Math.pow(Main_ModCreator.contentCubesPerCube, order);
+        this.size = (int) Math.pow(Main_BlockHeroes.contentCubesPerCube, order);
         this.order = order;
         this.isMaxOrder = isMaxOrder;
     }
