@@ -171,8 +171,9 @@ public abstract class vec_n<T extends Number> {
         return Arrays.toString(this.vec);
     }
 
-    public void normalize() {
+    public vec_n normalize() {
         this.mulToThis(1d / this.length());
+        return this;
     }
 
     public double[] getVecD() {
