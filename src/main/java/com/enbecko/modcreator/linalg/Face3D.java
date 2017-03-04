@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
  */
 public abstract class Face3D {
 
-    final vec3 LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT;
+    public final vec3 LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT;
     private vec3 tmpTop = new vec3.DoubleVec();
     private vec3 tmpBot = new vec3.DoubleVec();
     private vec3 tmpLeft = new vec3.DoubleVec();

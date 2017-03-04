@@ -41,6 +41,11 @@ public abstract class vec_n<T extends Number> {
         this.setVec(false, vec);
     }
 
+    public vec_n invert() {
+        this.mulToThis(-1);
+        return this;
+    }
+
     public vec_n mulToThis(double length) {
         if (!this.isChangeable) {
             throw new RuntimeException("you can't change unchangeable vecs" + this);
