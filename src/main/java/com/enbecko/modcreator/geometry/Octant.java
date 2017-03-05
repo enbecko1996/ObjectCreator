@@ -247,7 +247,6 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
                             holder.setMaxOrder(true).addParent(this);
                         this.makeSizeFromNewContentList();
                     }
-
                 }
             } else if (content.getMinX() == this.getMinX() || content.getMinY() == this.getMinY() || content.getMinZ() == this.getMinZ() ||
                     content.getMaxX() == this.getMaxX() || content.getMaxY() == this.getMaxY() || content.getMaxZ() == this.getMaxZ()) {

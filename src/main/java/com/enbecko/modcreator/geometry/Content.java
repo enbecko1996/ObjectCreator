@@ -115,7 +115,7 @@ public abstract class Content {
     public double getMaxZ() {
         double max = Double.NEGATIVE_INFINITY, tmp;
         for (vec3 cornersInBoneCoord : this.boundingCornersInBoneCoords) {
-            if ((tmp = cornersInBoneCoord.getZD()) > max)
+          if ((tmp = cornersInBoneCoord.getZD()) > max)
                 max = tmp;
         }
         return max;
