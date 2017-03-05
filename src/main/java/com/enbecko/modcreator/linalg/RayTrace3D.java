@@ -3,38 +3,62 @@ package com.enbecko.modcreator.linalg;
 import javax.annotation.Nonnull;
 
 /**
- * Created by Niclas on 19.11.2016.
+ * Created by enbec on 21.02.2017.
  */
-public class RayTrace3D {
+public class RayTrace3D extends Line3D.Line3DManualUpdate {
+    private final boolean isEndless;
+    private final vec3.DoubleVec vec;
+    private final float limit;
 
-    public vec3.Double getOnPoint() {
-        return onPointV;
+    public RayTrace3D(vec3.DoubleVec onPoint, vec3.DoubleVec vec1, float limit, boolean isEndless) {
+        super(onPoint, (vec3.DoubleVec) onPoint.addAndMakeNew(vec_n.vecPrec.DOUBLE, vec1, false));
+        this.vec = new vec3.DoubleVec(vec1, false);
+        this.isEndless = isEndless;
+        if(limit > 0)
+            this.limit = limit;
+        else
+            throw new RuntimeException("Can't create Raycast with negative or 0 limit.");
     }
 
-    public vec3.Double getVec1() {
-        return vec1V;
+    public vec3 advanceOnVecAndReturnPosition(double advance) {
+        return (vec3) new vec3.DoubleVec(this.onPoint, false).addToThis(new vec3.DoubleVec(this.vec, false).mulToThis(advance));
     }
 
-    private final vec3.Double onPointV = new vec3.Double();
-    private final vec3.Double vec1V = new vec3.Double();
-
-    public RayTrace3D(vec3.Double onPoint, vec3.Double vec1, boolean isEndless) {
-        this.onPointV.update(onPoint);
-        this.vec1V.update(vec1);
-    }
-
-    public RayTrace3D updateOnPoint(vec3.Double onPoint) {
-        this.onPointV.update(onPoint);
+    @Override
+    public Line3D updateOnPoint(vec3 onPoint) {
+        this.onPoint.update(onPoint, false);
         return this;
     }
 
-    public void updateVec(vec3.Double vec1) {
-        this.vec1V.update(vec1);
+    @Override
+    public void updateEndPoint(vec3 end) {
+        this.endPoint.update(end, false);
+        this.vec.update(this.endPoint, false).subFromThis(this.onPoint);
     }
 
-    public RayTrace3D update(vec3.Double onPoint, @Nonnull vec3.Double vec1) {
-        this.onPointV.update(onPoint);
-        this.vec1V.update(vec1);
+    public void updateVec(vec3.DoubleVec vec) {
+        this.vec.update(vec, false);
+        this.endPoint.update(this.onPoint.addToThis(vec), false);
+        this.onPoint.update(this.endPoint.subFromThis(vec), false);
+    }
+
+    @Override
+    public Line3D update(vec3 onPoint, @Nonnull vec3 end) {
+        this.onPoint.update(onPoint, false);
+        this.endPoint.update(end, false);
+        this.vec.update(this.endPoint, false).subFromThis(this.onPoint);
         return this;
+    }
+
+    public vec3.DoubleVec getVec() {
+        return this.vec;
+    }
+
+    public boolean isEndless() {
+        return this.isEndless;
+    }
+
+    public float getLimit() {
+        return this.limit;
     }
 }

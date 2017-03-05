@@ -7058,7 +7058,7 @@ Build 1.6.2-9.10.1.850:
 	claire.alexandria: fixed logic error
 	ohai.iChun:
 		Fix player push out of blocks clientside being hardcoded and not based on entity size.
-		Added player eyeHeight field to allow changeable eye heights of players rather than being hardcoded per player class as well as add a getDefaultEyeHeight function.
+		Added player eyeHeight field to allow canChangePosition eye heights of players rather than being hardcoded per player class as well as add a getDefaultEyeHeight function.
 	Christian: Reduce patch size significantly
 	Christian: Fix patch for new MCP naming.
 	Christian: Add a bit of javadoc
