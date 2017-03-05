@@ -18,7 +18,7 @@ public class Main_BlockHeroes
     @SidedProxy(clientSide="com.enbecko.modcreator.minecraft.ClientProxy", serverSide="com.enbecko.modcreator.minecraft.ServerProxy")
     public static CommonProxy proxy;
 
-    public static int contentCubesPerCube = 4;
+    public static int contentCubesPerCube = 2;
 
     public static BlockEditor editorBlock;
 

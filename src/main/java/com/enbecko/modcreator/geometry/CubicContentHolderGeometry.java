@@ -19,8 +19,9 @@ public abstract class CubicContentHolderGeometry extends Content.CubicContent {
         this.isMaxOrder = isMaxOrder;
     }
 
-    public void setMaxOrder(boolean order) {
+    public CubicContentHolderGeometry setMaxOrder(boolean order) {
         this.isMaxOrder = order;
+        return this;
     }
 
     public byte getOrder() {
@@ -34,29 +35,30 @@ public abstract class CubicContentHolderGeometry extends Content.CubicContent {
 
     @Override
     public vec3.IntVec getCorner(int pos) {
-        return (vec3.IntVec) this.cornersInBoneCoords[pos];
+        return (vec3.IntVec) this.boundingCornersInBoneCoords[pos];
     }
 
     @Override
-    public void createGeometry() {
+    public CubicContentHolderGeometry createBoundingGeometry() {
         this.makeCorners(false);
         this.makeCubicEdgesAndFacesNoUpdate();
+        return this;
     }
 
     @Override
     public void makeCorners(boolean changeable) {
         vec3.IntVec vec = this.getPositionInBoneCoords();
         //FRONT FACE COUNTERCLOCKWISE (CCW)
-        this.cornersInBoneCoords[0] = new vec3.IntVec(vec.getX(), vec.getY(), vec.getZ(), false).setChangeable(changeable);
-        this.cornersInBoneCoords[1] = new vec3.IntVec(vec.getX(), vec.getY(), vec.getZ() + zSize, false).setChangeable(changeable);
-        this.cornersInBoneCoords[2] = new vec3.IntVec(vec.getX(), vec.getY() + ySize, vec.getZ() + zSize, false).setChangeable(changeable);
-        this.cornersInBoneCoords[3] = new vec3.IntVec(vec.getX(), vec.getY() + ySize, vec.getZ(), false).setChangeable(changeable);
+        this.boundingCornersInBoneCoords[0] = new vec3.IntVec(vec.getX(), vec.getY(), vec.getZ(), false).setChangeable(changeable);
+        this.boundingCornersInBoneCoords[1] = new vec3.IntVec(vec.getX(), vec.getY(), vec.getZ() + zSize, false).setChangeable(changeable);
+        this.boundingCornersInBoneCoords[2] = new vec3.IntVec(vec.getX(), vec.getY() + ySize, vec.getZ() + zSize, false).setChangeable(changeable);
+        this.boundingCornersInBoneCoords[3] = new vec3.IntVec(vec.getX(), vec.getY() + ySize, vec.getZ(), false).setChangeable(changeable);
 
         //BACK FACE CLOCKWISE (CW)
-        this.cornersInBoneCoords[4] = new vec3.IntVec(vec.getX() + xSize, vec.getY(), vec.getZ() + zSize, false).setChangeable(changeable);
-        this.cornersInBoneCoords[5] = new vec3.IntVec(vec.getX() + xSize, vec.getY(), vec.getZ(), false).setChangeable(changeable);
-        this.cornersInBoneCoords[6] = new vec3.IntVec(vec.getX() + xSize, vec.getY() + ySize, vec.getZ(), false).setChangeable(changeable);
-        this.cornersInBoneCoords[7] = new vec3.IntVec(vec.getX() + xSize, vec.getY() + ySize, vec.getZ() + zSize, false).setChangeable(changeable);
+        this.boundingCornersInBoneCoords[4] = new vec3.IntVec(vec.getX() + xSize, vec.getY(), vec.getZ() + zSize, false).setChangeable(changeable);
+        this.boundingCornersInBoneCoords[5] = new vec3.IntVec(vec.getX() + xSize, vec.getY(), vec.getZ(), false).setChangeable(changeable);
+        this.boundingCornersInBoneCoords[6] = new vec3.IntVec(vec.getX() + xSize, vec.getY() + ySize, vec.getZ(), false).setChangeable(changeable);
+        this.boundingCornersInBoneCoords[7] = new vec3.IntVec(vec.getX() + xSize, vec.getY() + ySize, vec.getZ() + zSize, false).setChangeable(changeable);
     }
 
     public int getSize() {

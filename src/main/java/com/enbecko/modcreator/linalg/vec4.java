@@ -11,7 +11,7 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
     }
 
     public vec4(double r, double g, double b, double a, boolean floor) {
-        super(floor, r, g, b);
+        super(floor, r, g, b, a);
     }
 
     public vec4(vec4 other, boolean floor) {
@@ -291,14 +291,14 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
 
         @Override
         public void setVec(boolean floor, double... content) {
-            if (content.length == 3) {
-                for (int k = 0; k < 3; k++)
+            if (content.length == 4) {
+                for (int k = 0; k < 4; k++)
                     if (floor)
                         this.vec[k] = (int) Math.floor(content[k]);
                     else
                         this.vec[k] = (int) content[k];
             } else {
-                throw new RuntimeException("Can't create vec4 from content with not 3 components.");
+                throw new RuntimeException("Can't create vec4 from content with not 4 components.");
             }
         }
     }
@@ -413,14 +413,14 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
 
         @Override
         public void setVec(boolean floor, double... content) {
-            if (content.length == 3) {
-                for (int k = 0; k < 3; k++)
+            if (content.length == 4) {
+                for (int k = 0; k < 4; k++)
                     if (floor)
                         this.vec[k] = (long) Math.floor(content[k]);
                     else
                         this.vec[k] = (long) content[k];
             } else {
-                throw new RuntimeException("Can't create vec4 from content with not 3 components.");
+                throw new RuntimeException("Can't create vec4 from content with not 4 components.");
             }
         }
     }
@@ -521,10 +521,10 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
 
         @Override
         public void setVec(boolean floor, double... content) {
-            if (content.length == 3) {
-                System.arraycopy(content, 0, this.vec, 0, 3);
+            if (content.length == 4) {
+                System.arraycopy(content, 0, this.vec, 0, 4);
             } else {
-                throw new RuntimeException("Can't create vec4 from content with not 3 components.");
+                throw new RuntimeException("Can't create vec4 from content with not 4 components.");
             }
         }
     }
@@ -611,7 +611,7 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
         }
 
         public float getA() {
-            return (float) this.vec[2];
+            return (float) this.vec[3];
         }
 
         @Override
@@ -627,11 +627,11 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
 
         @Override
         public void setVec(boolean floor, double... content) {
-            if (content.length == 3) {
-                for (int k = 0; k < 3; k++)
+            if (content.length == 4) {
+                for (int k = 0; k < 4; k++)
                     this.vec[k] = (float) content[k];
             } else {
-                throw new RuntimeException("Can't create vec4 from content with not 3 components.");
+                throw new RuntimeException("Can't create vec4 from content with not 4 components.");
             }
         }
     }
@@ -741,14 +741,14 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
 
         @Override
         public void setVec(boolean floor, double... content) {
-            if (content.length == 3) {
-                for (int k = 0; k < 3; k++)
+            if (content.length == 4) {
+                for (int k = 0; k < 4; k++)
                     if (floor)
                         this.vec[k] = (short) Math.floor(content[k]);
                     else
                         this.vec[k] = (short) content[k];
             } else {
-                throw new RuntimeException("Can't create vec4 from content with not 3 components.");
+                throw new RuntimeException("Can't create vec4 from content with not 4 components.");
             }
         }
     }
@@ -862,15 +862,15 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
 
         @Override
         public void setVec(boolean floor, double... content) {
-            if (content.length == 3) {
-                for (int k = 0; k < 3; k++) {
+            if (content.length == 4) {
+                for (int k = 0; k < 4; k++) {
                     if (floor)
                         this.vec[k] = (byte) Math.floor(content[k]);
                     else
                         this.vec[k] = (byte) content[k];
                 }
             } else {
-                throw new RuntimeException("Can't create vec4 from content with not 3 components.");
+                throw new RuntimeException("Can't create vec4 from content with not 4 components.");
             }
         }
     }

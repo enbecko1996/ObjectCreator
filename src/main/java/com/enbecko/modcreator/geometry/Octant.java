@@ -1,7 +1,12 @@
 package com.enbecko.modcreator.geometry;
 
+import com.enbecko.modcreator.GlobalRenderSetting;
+import com.enbecko.modcreator.OpenGLHelperEnbecko;
+import com.enbecko.modcreator.linalg.Line3D;
 import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
 import com.enbecko.modcreator.linalg.vec3;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -20,13 +25,16 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
     public Octant(Bone parentBone, vec3 positonInBoneCoords, double xSize, double ySize, double zSize, OCTANTS type) {
         super(parentBone, positonInBoneCoords, xSize, ySize, zSize);
         this.type = type;
+        this.setActive(false);
+        this.createBoundingGeometry();
     }
 
     @Override
-    public void createGeometry() {
+    public Octant createBoundingGeometry() {
         vec3 pos = this.getPositionInBoneCoords();
         this.makeCorners(true);
         this.makeCubicEdgesAndFacesAutoUpdate();
+        return this;
     }
 
     @Override
@@ -47,10 +55,44 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
             if (tmp.size() == 1) {
                 tmp.remove(asker);
                 tmp.add(degradeTo);
+                degradeTo.addParent(this);
                 int size = degradeTo.getSize();
                 this.canCreateOctantOrThrowRuntimeExc(degradeTo.getPositionInBoneCoords(), size, size, size);
                 this.update(degradeTo.getPositionInBoneCoords(), size, size, size);
                 this.highestOrder = degradeTo.getOrder();
+            } else {
+                List<CubicContentHolderGeometry> tmpContent = new ArrayList<CubicContentHolderGeometry>();
+                boolean degrade = false;
+                List<CubicContentHolderGeometry> tmpContent2 = new ArrayList<CubicContentHolderGeometry>();
+                maxDegrade:
+                while (this.highestOrder > degradeTo.getOrder()) {
+                    for (CubicContentHolderGeometry holder : tmp) {
+                        if (holder instanceof HigherOrderHolder) {
+                            List<CubicContentHolderGeometry> childs = ((HigherOrderHolder) holder).getContent();
+                            if (childs.size() == 1) {
+                                tmpContent2.add(childs.get(0));
+                            } else {
+                                break maxDegrade;
+                            }
+                        }
+                    }
+                    degrade = true;
+                    tmpContent.addAll(tmpContent2);
+                    tmpContent2.clear();
+                    tmp = tmpContent;
+                    this.highestOrder--;
+                }
+                if (degrade) {
+                    synchronized (this.content) {
+                        this.content.clear();
+                        this.content.addAll(tmpContent);
+                        this.makeSizeFromNewContentList();
+                        for (CubicContentHolderGeometry holder : this.content)
+                            holder.setMaxOrder(true).addParent(this);
+                        tmpContent.clear();
+                        tmpContent2.clear();
+                    }
+                }
             }
         } else {
             throw new RuntimeException("Someone asking for Degrade which is none of my childs. " + this + ", " + asker);
@@ -73,9 +115,13 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
     @Override
     public boolean addContent(@Nonnull vec3 decisiveVec, @Nonnull Content toAdd) {
         if (this.isVecInHere(decisiveVec)) {
+            if (toAdd instanceof CubicContentHolderGeometry && ((CubicContentHolderGeometry)toAdd).getOrder() >= this.highestOrder)
+                throw new RuntimeException("Can't add CubicContentHolder with higher order than this's highest order");
             for (CubicContentHolderGeometry aContent : this.content) {
                 if (aContent.isInside(decisiveVec)) {
                     if (aContent instanceof ContentHolder) {
+                        System.out.println(aContent + " " + decisiveVec);
+                        System.out.println("add in already existing");
                         return ((ContentHolder) aContent).addContent(decisiveVec, toAdd);
                     }
                 }
@@ -85,11 +131,17 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
             vec3.IntVec pos1 = (vec3.IntVec) new vec3.IntVec(pos, true).mulToThis(size);
             switch (this.highestOrder) {
                 case 1:
-                    this.addNewChild(new FirstOrderHolder(this.getParentBone(), pos1, true));
+                    FirstOrderHolder firstOrderHolder = (FirstOrderHolder) new FirstOrderHolder(this.getParentBone(), pos1, true).createBoundingGeometry();
+                    firstOrderHolder.addContent(decisiveVec, toAdd);
+                    firstOrderHolder.addParent(this);
+                    this.addNewChild(firstOrderHolder);
+                    break;
                 default:
-                    HigherOrderHolder higherOrderHolder = new HigherOrderHolder(this.getParentBone(), pos1, this.highestOrder, true);
+                    HigherOrderHolder higherOrderHolder = (HigherOrderHolder) new HigherOrderHolder(this.getParentBone(), pos1, this.highestOrder, true).createBoundingGeometry();
                     higherOrderHolder.addContent(decisiveVec, toAdd);
+                    higherOrderHolder.addParent(this);
                     this.addNewChild(higherOrderHolder);
+                    break;
             }
         } else
             throw new RuntimeException("Vec is not in this Octant " + this.type + ", vec = " + decisiveVec);
@@ -103,12 +155,13 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
         if (content.getOrder() != this.highestOrder)
             throw new RuntimeException("Can't add content to Octant with wrong order " + this.highestOrder + ", " + content.getOrder());
         if (!this.content.contains(content)) {
+            System.out.println("add new Child " + content);
             boolean increaseOrder = false;
             if (this.content.size() > 0) {
                 int size = (int) Math.pow(Main_BlockHeroes.contentCubesPerCube, this.highestOrder + 1);
                 vec3 pos = (vec3) new vec3.DoubleVec(content.getPositionInBoneCoords()).divToThis(size);
                 vec3.IntVec pos1 = (vec3.IntVec) new vec3.IntVec(pos, true).mulToThis(size);
-                HigherOrderHolder test = new HigherOrderHolder(this.getParentBone(), pos1, (byte) (this.highestOrder + 1), true);
+                HigherOrderHolder test = (HigherOrderHolder) new HigherOrderHolder(this.getParentBone(), pos1, (byte) (this.highestOrder + 1), true).createBoundingGeometry();
                 List<HigherOrderHolder> tmpContent = new ArrayList<HigherOrderHolder>();
                 boolean oneOutside = false, oneInside = false;
                 for (CubicContentHolderGeometry tmp : this.content) {
@@ -118,11 +171,9 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
                         oneOutside = true;
                     }
                     if (oneInside && oneOutside) {
-                        test.addNewChild(tmp);
                         test.addNewChild(content);
-                        tmp.addParent(test);
+                        test.addParent(this);
                         content.addParent(test);
-                        tmp.setMaxOrder(false);
                         content.setMaxOrder(false);
                         tmpContent.add(test);
                         increaseOrder = true;
@@ -130,6 +181,7 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
                     }
                 }
                 if (increaseOrder) {
+                    System.out.println("increase order " + Arrays.toString(this.content.toArray()));
                     this.highestOrder++;
                     double xMin = test.getMinX(), yMin = test.getMinY(), zMin = test.getMinZ(),
                             xMax = test.getMaxX(), yMax = test.getMaxY(), zMax = test.getMaxZ();
@@ -137,6 +189,7 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
                         boolean hasParent = false;
                         for (HigherOrderHolder newCont : tmpContent) {
                             if (newCont.isInside(tmp.getPositionInBoneCoords())) {
+                                System.out.println((newCont == test) +"  "+ tmp +", "+ content+" "+ Arrays.toString(newCont.getContent().toArray()));
                                 newCont.addNewChild(tmp);
                                 tmp.addParent(newCont);
                                 hasParent = true;
@@ -146,9 +199,10 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
                         if (!hasParent) {
                             pos.update(tmp.getPositionInBoneCoords()).divToThis(size);
                             pos1.update(pos, true).mulToThis(size);
-                            HigherOrderHolder newHolder = new HigherOrderHolder(this.getParentBone(), pos1, this.highestOrder, true);
+                            HigherOrderHolder newHolder = (HigherOrderHolder) new HigherOrderHolder(this.getParentBone(), pos1, this.highestOrder, true).createBoundingGeometry();
                             tmpContent.add(newHolder);
                             newHolder.addNewChild(tmp);
+                            newHolder.addParent(this);
                             tmp.addParent(newHolder);
                         }
                     }
@@ -189,8 +243,10 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
                     synchronized (this.content) {
                         this.content.clear();
                         this.content.addAll(higherOrderHolder.getContent());
+                        for (CubicContentHolderGeometry holder : this.content)
+                            holder.setMaxOrder(true).addParent(this);
+                        this.makeSizeFromNewContentList();
                     }
-
                 }
             } else if (content.getMinX() == this.getMinX() || content.getMinY() == this.getMinY() || content.getMinZ() == this.getMinZ() ||
                     content.getMaxX() == this.getMaxX() || content.getMaxY() == this.getMaxY() || content.getMaxZ() == this.getMaxZ()) {
@@ -375,6 +431,17 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
 
     public String toString() {
         return "Octant " + this.type + ": " + this.getGeometryInfo() + "\nContent: " + Arrays.toString(this.content.toArray());
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void render(GlobalRenderSetting renderPass) {
+        if (renderPass.getRenderMode() == GlobalRenderSetting.RenderMode.DEBUG) {
+            for (Line3D line : this.boundingEdgesInBoneCoords)
+                OpenGLHelperEnbecko.drawLine(line, this.isActive() ? OpenGLHelperEnbecko.GREEN : OpenGLHelperEnbecko.RED, 4);
+        }
+        for (CubicContentHolderGeometry child : this.content)
+            child.render(renderPass);
     }
 
     public enum OCTANTS {

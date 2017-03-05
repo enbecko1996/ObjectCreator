@@ -11,6 +11,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * Created by enbec on 03.03.2017.
  */
 public abstract class Polygon <T extends vec3Vert> {
+    /**
+     * TODO
+     */
     private final T[] vertexPositions;
     int nVertices;
     protected boolean invertNormals;

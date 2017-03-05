@@ -1,8 +1,10 @@
 package com.enbecko.modcreator.geometry;
 
+import com.enbecko.modcreator.GlobalRenderSetting;
 import com.enbecko.modcreator.linalg.Matrix;
 import com.enbecko.modcreator.linalg.vec3;
-import com.enbecko.modcreator.linalg.vec_n;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static com.enbecko.modcreator.linalg.vec_n.vecPrec.INT;
 
@@ -69,7 +71,7 @@ public class Bone {
                 base.setMaxOrder(false);
                 base.setParent(order2);
                 order2.addNewChild(base);
-                for (int k = 0; k < content.getCornerCount(); k++) {
+                for (int k = 0; k < content.getBoundingCornerCount(); k++) {
                     vec3 cur = content.getCorner(k);
                     if (!base.isInside(cur)) {
                         tmpDouble.update(cur, false);
@@ -107,8 +109,22 @@ public class Bone {
     }
     */
 
-    public void addContent(Content content, Content ... adjacent) {
+    @SideOnly(Side.CLIENT)
+    public void render(GlobalRenderSetting renderPass) {
+        for (Octant octant : this.octants)
+            octant.render(renderPass);
+    }
 
+    public void addContent(Content content, Content ... adjacent) {
+        if (!this.I.isActive())
+            this.I.setActive(true);
+        Visible_Cube cube1 = new Visible_Cube(this, new vec3.IntVec(6, 12, 6), 1).createBoundingGeometry();
+        Visible_Cube cube2 = new Visible_Cube(this, new vec3.IntVec(4, 4, 4), 1).createBoundingGeometry();
+        this.I.addContent(new vec3.IntVec(3, 1, 1), cube1);
+        this.I.addContent(new vec3.IntVec(1, 9, 1), cube2);
+        this.I.addContent(new vec3.IntVec(1, 1, 1), cube1);
+        this.I.addContent(new vec3.IntVec(1, 4, 1), cube2);
+        this.I.addContent(new vec3.IntVec(6, 12, 6), cube2);
     }
 
     public void octantEmpty(Octant octant) {

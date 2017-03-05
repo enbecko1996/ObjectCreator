@@ -1,11 +1,14 @@
 package com.enbecko.modcreator.geometry;
 
+import com.enbecko.modcreator.GlobalRenderSetting;
 import com.enbecko.modcreator.linalg.vec3;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * Created by enbec on 24.02.2017.
  */
-public class Visible_Cube extends Content.CubicContent implements Visible3D {
+public class Visible_Cube extends Content.CubicContent implements ITextured {
     private final int dimension;
 
     public Visible_Cube(Bone parentBone, vec3.IntVec positionInBone, int dimension) {
@@ -14,9 +17,10 @@ public class Visible_Cube extends Content.CubicContent implements Visible3D {
     }
 
     @Override
-    public void createGeometry() {
-        this.makeCorners(true);
-        this.makeCubicEdgesAndFacesAutoUpdate();
+    public Visible_Cube createBoundingGeometry() {
+        this.makeCorners(false);
+        this.makeCubicEdgesAndFacesNoUpdate();
+        return this;
     }
 
     @Override
@@ -26,6 +30,12 @@ public class Visible_Cube extends Content.CubicContent implements Visible3D {
 
     @Override
     public vec3.IntVec getCorner(int pos) {
-        return (vec3.IntVec) this.cornersInBoneCoords[pos];
+        return (vec3.IntVec) this.boundingCornersInBoneCoords[pos];
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void render(GlobalRenderSetting renderPass) {
+        super.render(renderPass);
     }
 }

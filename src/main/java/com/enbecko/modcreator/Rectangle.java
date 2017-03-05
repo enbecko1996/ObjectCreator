@@ -1,14 +1,21 @@
 package com.enbecko.modcreator;
 
 import com.enbecko.modcreator.linalg.*;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import org.lwjgl.opengl.GL20;
+
+import java.util.Arrays;
 
 /**
  * Created by enbec on 03.03.2017.
  */
 public abstract class Rectangle {
+    /**
+     * TODO
+     */
     public static class Textured extends Polygon <vec3Vert.PosTex> {
         public Textured(vec3Vert.PosTex LOW_LEFT, vec3Vert.PosTex LOW_RIGHT, vec3Vert.PosTex TOP_RIGHT, vec3Vert.PosTex TOP_LEFT) {
             super(LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT);
@@ -70,7 +77,7 @@ public abstract class Rectangle {
             vec3.FloatVec sec = (vec3.FloatVec) this.getVertexAt(1).position.subAndMakeNew(vec_n.vecPrec.FLOAT, this.getVertexAt(0).position,false);
             vec3.FloatVec normal = first.cross(sec, false);
 
-            vertexBuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
+            vertexBuffer.begin(7, OpenGLHelperEnbecko.POSITION_COLOR_NORMAL);
 
             for(int i = 0; i < nVertices; ++i) {
                 vec3Vert.PosCol posCol = this.getVertexAt(i);
