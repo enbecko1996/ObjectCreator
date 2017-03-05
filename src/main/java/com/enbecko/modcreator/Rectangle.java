@@ -56,6 +56,7 @@ public abstract class Rectangle {
             super(first, sec, third);
         }
 
+        @Deprecated
         public Colored(Face3D face, vec4.FloatVec rgb_LOW_LEFT, vec4.FloatVec rgb_LOW_RIGHT, vec4.FloatVec rgb_TOP_RIGHT, vec4.FloatVec rgb_TOP_LEFT, boolean autoUpdate) {
             super(autoUpdate ? new vec3Vert.PosCol.AllUpdate(face.LOW_LEFT, rgb_LOW_LEFT) : new vec3Vert.PosCol.NoUpdate(face.LOW_LEFT, rgb_LOW_LEFT),
                     autoUpdate ? new vec3Vert.PosCol.AllUpdate(face.LOW_RIGHT, rgb_LOW_RIGHT) : new vec3Vert.PosCol.NoUpdate(face.LOW_RIGHT, rgb_LOW_RIGHT),
@@ -75,7 +76,7 @@ public abstract class Rectangle {
         public void draw(VertexBuffer vertexBuffer, float scale) {
             vec3.FloatVec first = (vec3.FloatVec) this.getVertexAt(3).position.subAndMakeNew(vec_n.vecPrec.FLOAT, this.getVertexAt(0).position,false);
             vec3.FloatVec sec = (vec3.FloatVec) this.getVertexAt(1).position.subAndMakeNew(vec_n.vecPrec.FLOAT, this.getVertexAt(0).position,false);
-            vec3.FloatVec normal = first.cross(sec, false);
+            vec3.FloatVec normal = sec.cross(first, false);
 
             vertexBuffer.begin(7, OpenGLHelperEnbecko.POSITION_COLOR_NORMAL);
 
@@ -86,6 +87,7 @@ public abstract class Rectangle {
                 this.putNormal(vertexBuffer, normal);
                 vertexBuffer.endVertex();
             }
+            System.out.println(Arrays.toString(vertexBuffer.getByteBuffer().asFloatBuffer().asReadOnlyBuffer().array()));
             Tessellator.getInstance().draw();
         }
     }

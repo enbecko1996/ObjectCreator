@@ -1,4 +1,4 @@
-package com.enbecko.modcreator.geometry;
+package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
 import com.enbecko.modcreator.OpenGLHelperEnbecko;
@@ -17,7 +17,7 @@ import java.util.List;
  */
 public abstract class Content {
     protected final vec3[] boundingCornersInBoneCoords;
-    final vec3 positionInBoneCoords;
+    protected final vec3 positionInBoneCoords;
     private final List<ContentHolder> parents = new ArrayList<ContentHolder>();
     @Nonnull
     private final Bone parentBone;
@@ -150,7 +150,7 @@ public abstract class Content {
 
     /**
      * TODO
-     * Just a Reminder-Method to create geometry for every content.
+     * Just a Reminder-Method to create contentholder for every content.
      * Get's called automatically
      */
     public abstract Content createBoundingGeometry();
@@ -181,7 +181,28 @@ public abstract class Content {
         return this.parents.get(pos);
     }
 
-    public abstract static class CuboidContent extends Content {
+    public abstract static class PolyhedralContent extends Content {
+        public PolyhedralContent(Bone parentBone, vec3 positionInBoneCoords, boolean canChangePos,  vec3 ... vec3s) {
+            super(parentBone, positionInBoneCoords, vec3s.length, canChangePos);
+        }
+
+        public PolyhedralContent(Bone parentBone, vec3 positionInBoneCoords, vec3 ... vec3s) {
+            super(parentBone, positionInBoneCoords, vec3s.length);
+        }
+    }
+
+    public abstract static class HexahedralContent extends PolyhedralContent {
+        vec3 v1, v2, v3, v4, v5, v6, v7, v8;
+        public HexahedralContent(Bone parentBone, vec3 positionInBoneCoords, boolean canChangePos, vec3 v1, vec3 v2, vec3 v3, vec3 v4, vec3 v5, vec3 v6, vec3 v7, vec3 v8) {
+            super(parentBone, positionInBoneCoords, canChangePos, v1, v2, v3, v4, v5, v6, v7);
+        }
+
+        public HexahedralContent(Bone parentBone, vec3 positionInBoneCoords, int size) {
+            super(parentBone, positionInBoneCoords, size);
+        }
+    }
+
+    public abstract static class CuboidContent extends HexahedralContent {
         double xSize, ySize, zSize;
 
         protected CuboidContent(Bone parentBone, vec3 positionInBoneCoords, double xSize, double ySize, double zSize) {
@@ -227,13 +248,13 @@ public abstract class Content {
         @Override
         public void updateBoundingGeometry() {
             vec3 pos = this.getPositionInBoneCoords();
-            //FRONT FACE COUNTERCLOCKWISE (CCW)
+            //FRONT_X FACE COUNTERCLOCKWISE (CCW)
             this.boundingCornersInBoneCoords[0].update(pos.getXD(), pos.getYD(), pos.getZD(), false);
             this.boundingCornersInBoneCoords[1].update(pos.getXD(), pos.getYD(), pos.getZD() + zSize, false);
             this.boundingCornersInBoneCoords[2].update(pos.getXD(), pos.getYD() + ySize, pos.getZD() + zSize, false);
             this.boundingCornersInBoneCoords[3].update(pos.getXD(), pos.getYD() + ySize, pos.getZD(), false);
 
-            //BACK FACE CLOCKWISE (CW)
+            //BACK_X FACE CLOCKWISE (CW)
             this.boundingCornersInBoneCoords[4].update(pos.getXD() + xSize, pos.getYD(), pos.getZD() + zSize, false);
             this.boundingCornersInBoneCoords[5].update(pos.getXD() + xSize, pos.getYD(), pos.getZD(), false);
             this.boundingCornersInBoneCoords[6].update(pos.getXD() + xSize, pos.getYD() + ySize, pos.getZD(), false);
@@ -242,13 +263,13 @@ public abstract class Content {
 
         public void makeCorners(boolean changeable) {
             vec3 pos = this.getPositionInBoneCoords();
-            //FRONT FACE COUNTERCLOCKWISE (CCW)
+            //FRONT_X FACE COUNTERCLOCKWISE (CCW)
             this.boundingCornersInBoneCoords[0] = new vec3.DoubleVec(pos.getXD(), pos.getYD(), pos.getZD(), false);
             this.boundingCornersInBoneCoords[1] = new vec3.DoubleVec(pos.getXD(), pos.getYD(), pos.getZD() + zSize, false);
             this.boundingCornersInBoneCoords[2] = new vec3.DoubleVec(pos.getXD(), pos.getYD() + ySize, pos.getZD() + zSize, false);
             this.boundingCornersInBoneCoords[3] = new vec3.DoubleVec(pos.getXD(), pos.getYD() + ySize, pos.getZD(), false);
 
-            //BACK FACE CLOCKWISE (CW)
+            //BACK_X FACE CLOCKWISE (CW)
             this.boundingCornersInBoneCoords[4] = new vec3.DoubleVec(pos.getXD() + xSize, pos.getYD(), pos.getZD() + zSize, false);
             this.boundingCornersInBoneCoords[5] = new vec3.DoubleVec(pos.getXD() + xSize, pos.getYD(), pos.getZD(), false);
             this.boundingCornersInBoneCoords[6] = new vec3.DoubleVec(pos.getXD() + xSize, pos.getYD() + ySize, pos.getZD(), false);
@@ -260,26 +281,26 @@ public abstract class Content {
         public void makeCubicEdgesAndFacesNoUpdate() {
             this.boundingEdgesInBoneCoords = new Line3D[12];
             this.boundingFacesInBoneCoords = new Face3D[6];
-            //FRONT FACE FROM LOW_LEFT CCW TO LOW_LEFT
+            //FRONT_X FACE FROM LOW_LEFT CCW TO LOW_LEFT
             this.boundingEdgesInBoneCoords[0] = new Line3D.Line3DNoUpdate(this.boundingCornersInBoneCoords[0], this.boundingCornersInBoneCoords[1]);
             this.boundingEdgesInBoneCoords[1] = new Line3D.Line3DNoUpdate(this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[2]);
             this.boundingEdgesInBoneCoords[2] = new Line3D.Line3DNoUpdate(this.boundingCornersInBoneCoords[2], this.boundingCornersInBoneCoords[3]);
             this.boundingEdgesInBoneCoords[3] = new Line3D.Line3DNoUpdate(this.boundingCornersInBoneCoords[3], this.boundingCornersInBoneCoords[0]);
 
-            //BACK FACE FROM LOW_LEFT CW TO LOW_LEFT
+            //BACK_X FACE FROM LOW_LEFT CW TO LOW_LEFT
             this.boundingEdgesInBoneCoords[4] = new Line3D.Line3DNoUpdate(this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[5]);
             this.boundingEdgesInBoneCoords[5] = new Line3D.Line3DNoUpdate(this.boundingCornersInBoneCoords[5], this.boundingCornersInBoneCoords[6]);
             this.boundingEdgesInBoneCoords[6] = new Line3D.Line3DNoUpdate(this.boundingCornersInBoneCoords[6], this.boundingCornersInBoneCoords[7]);
             this.boundingEdgesInBoneCoords[7] = new Line3D.Line3DNoUpdate(this.boundingCornersInBoneCoords[7], this.boundingCornersInBoneCoords[4]);
 
-            //EDGE FROM FRONT TO BACK BEGINNING IN FRONT LOW LEFT
-            //GOING CCW BACK TO LOW LEFT
+            //EDGE FROM FRONT_X TO BACK_X BEGINNING IN FRONT_X LOW LEFT
+            //GOING CCW BACK_X TO LOW LEFT
             this.boundingEdgesInBoneCoords[8] = new Line3D.Line3DNoUpdate(this.boundingCornersInBoneCoords[0], this.boundingCornersInBoneCoords[5]);
             this.boundingEdgesInBoneCoords[9] = new Line3D.Line3DNoUpdate(this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[4]);
             this.boundingEdgesInBoneCoords[10] = new Line3D.Line3DNoUpdate(this.boundingCornersInBoneCoords[2], this.boundingCornersInBoneCoords[7]);
             this.boundingEdgesInBoneCoords[11] = new Line3D.Line3DNoUpdate(this.boundingCornersInBoneCoords[3], this.boundingCornersInBoneCoords[6]);
 
-            //FRONT, RIGHT, BACK, LEFT, TOP, BOTTOM
+            //FRONT_X, RIGHT_Z, BACK_X, LEFT, TOP_Y, BOTTOM
             this.boundingFacesInBoneCoords[0] = new Face3D.FaceNoUpdate(this.boundingCornersInBoneCoords[0], this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[2], this.boundingCornersInBoneCoords[3]);
             this.boundingFacesInBoneCoords[1] = new Face3D.FaceNoUpdate(this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[7], this.boundingCornersInBoneCoords[2]);
             this.boundingFacesInBoneCoords[2] = new Face3D.FaceNoUpdate(this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[5], this.boundingCornersInBoneCoords[6], this.boundingCornersInBoneCoords[7]);
@@ -292,26 +313,26 @@ public abstract class Content {
         public void makeCubicEdgesAndFacesAutoUpdate() {
             this.boundingEdgesInBoneCoords = new Line3D[12];
             this.boundingFacesInBoneCoords = new Face3D[6];
-            //FRONT FACE FROM LOW_LEFT CCW TO LOW_LEFT
+            //FRONT_X FACE FROM LOW_LEFT CCW TO LOW_LEFT
             this.boundingEdgesInBoneCoords[0] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[0], this.boundingCornersInBoneCoords[1]);
             this.boundingEdgesInBoneCoords[1] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[2]);
             this.boundingEdgesInBoneCoords[2] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[2], this.boundingCornersInBoneCoords[3]);
             this.boundingEdgesInBoneCoords[3] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[3], this.boundingCornersInBoneCoords[0]);
 
-            //BACK FACE FROM LOW_LEFT CW TO LOW_LEFT
+            //BACK_X FACE FROM LOW_LEFT CW TO LOW_LEFT
             this.boundingEdgesInBoneCoords[4] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[5]);
             this.boundingEdgesInBoneCoords[5] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[5], this.boundingCornersInBoneCoords[6]);
             this.boundingEdgesInBoneCoords[6] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[6], this.boundingCornersInBoneCoords[7]);
             this.boundingEdgesInBoneCoords[7] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[7], this.boundingCornersInBoneCoords[4]);
 
-            //EDGE FROM FRONT TO BACK BEGINNING IN FRONT LOW LEFT
-            //GOING CCW BACK TO LOW LEFT
+            //EDGE FROM FRONT_X TO BACK_X BEGINNING IN FRONT_X LOW LEFT
+            //GOING CCW BACK_X TO LOW LEFT
             this.boundingEdgesInBoneCoords[8] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[0], this.boundingCornersInBoneCoords[5]);
             this.boundingEdgesInBoneCoords[9] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[4]);
             this.boundingEdgesInBoneCoords[10] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[2], this.boundingCornersInBoneCoords[7]);
             this.boundingEdgesInBoneCoords[11] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[3], this.boundingCornersInBoneCoords[6]);
 
-            //FRONT, RIGHT, BACK, LEFT, TOP, BOTTOM
+            //FRONT_X, RIGHT_Z, BACK_X, LEFT, TOP_Y, BOTTOM
             //ALL CCW if viewed as Front
             this.boundingFacesInBoneCoords[0] = new Face3D.FaceAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[0], this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[2], this.boundingCornersInBoneCoords[3]);
             this.boundingFacesInBoneCoords[1] = new Face3D.FaceAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[7], this.boundingCornersInBoneCoords[2]);
@@ -383,6 +404,28 @@ public abstract class Content {
                     ", ySize = " + this.ySize + ", zSize = " + this.zSize +"}";
         }
 
+        public Face3D getBoundingFace(Faces face) {
+            switch (face) {
+                case BACK_X:
+                    return this.boundingFacesInBoneCoords[2];
+                case TOP_Y:
+                    return this.boundingFacesInBoneCoords[4];
+                case RIGHT_Z:
+                    return this.boundingFacesInBoneCoords[1];
+                case FRONT_X:
+                    return this.boundingFacesInBoneCoords[0];
+                case BOTTOM_Y:
+                    return this.boundingFacesInBoneCoords[5];
+                case LEFT_Z:
+                    return this.boundingFacesInBoneCoords[3];
+            }
+            throw new RuntimeException("no such face: " + face);
+        }
+
+        public Face3D getBoundingFace(int pos) {
+            return this.boundingFacesInBoneCoords[pos];
+        }
+
         public String toString() {
             return "CuboidContent: " + this.getGeometryInfo();
         }
@@ -392,6 +435,10 @@ public abstract class Content {
         public void render(GlobalRenderSetting renderPass) {
             for (Line3D line : this.boundingEdgesInBoneCoords)
                 OpenGLHelperEnbecko.drawLine(line, 4);
+        }
+
+        public enum Faces {
+            BACK_X, TOP_Y, RIGHT_Z, FRONT_X, BOTTOM_Y, LEFT_Z;
         }
     }
 

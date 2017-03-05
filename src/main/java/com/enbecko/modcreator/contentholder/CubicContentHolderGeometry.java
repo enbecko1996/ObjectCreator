@@ -1,4 +1,4 @@
-package com.enbecko.modcreator.geometry;
+package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
 import com.enbecko.modcreator.linalg.vec3;
@@ -48,13 +48,13 @@ public abstract class CubicContentHolderGeometry extends Content.CubicContent {
     @Override
     public void makeCorners(boolean changeable) {
         vec3.IntVec vec = this.getPositionInBoneCoords();
-        //FRONT FACE COUNTERCLOCKWISE (CCW)
+        //FRONT_X FACE COUNTERCLOCKWISE (CCW)
         this.boundingCornersInBoneCoords[0] = new vec3.IntVec(vec.getX(), vec.getY(), vec.getZ(), false).setChangeable(changeable);
         this.boundingCornersInBoneCoords[1] = new vec3.IntVec(vec.getX(), vec.getY(), vec.getZ() + zSize, false).setChangeable(changeable);
         this.boundingCornersInBoneCoords[2] = new vec3.IntVec(vec.getX(), vec.getY() + ySize, vec.getZ() + zSize, false).setChangeable(changeable);
         this.boundingCornersInBoneCoords[3] = new vec3.IntVec(vec.getX(), vec.getY() + ySize, vec.getZ(), false).setChangeable(changeable);
 
-        //BACK FACE CLOCKWISE (CW)
+        //BACK_X FACE CLOCKWISE (CW)
         this.boundingCornersInBoneCoords[4] = new vec3.IntVec(vec.getX() + xSize, vec.getY(), vec.getZ() + zSize, false).setChangeable(changeable);
         this.boundingCornersInBoneCoords[5] = new vec3.IntVec(vec.getX() + xSize, vec.getY(), vec.getZ(), false).setChangeable(changeable);
         this.boundingCornersInBoneCoords[6] = new vec3.IntVec(vec.getX() + xSize, vec.getY() + ySize, vec.getZ(), false).setChangeable(changeable);

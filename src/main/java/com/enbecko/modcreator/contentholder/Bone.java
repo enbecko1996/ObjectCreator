@@ -1,6 +1,7 @@
-package com.enbecko.modcreator.geometry;
+package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
+import com.enbecko.modcreator.Visible.Visible_Cube;
 import com.enbecko.modcreator.linalg.Matrix;
 import com.enbecko.modcreator.linalg.vec3;
 import net.minecraftforge.fml.relauncher.Side;

@@ -1,4 +1,4 @@
-package com.enbecko.modcreator.geometry;
+package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
 import com.enbecko.modcreator.linalg.vec3;
