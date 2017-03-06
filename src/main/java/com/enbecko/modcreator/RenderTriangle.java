@@ -9,8 +9,8 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 /**
  * Created by enbec on 03.03.2017.
  */
-public abstract class Triangle {
-    public static class Textured extends Polygon <vec3Vert.PosTex> {
+public abstract class RenderTriangle {
+    public static class Textured extends RenderPolygon<vec3Vert.PosTex> {
         public Textured(vec3Vert.PosTex first, vec3Vert.PosTex sec, vec3Vert.PosTex third) {
             super(first, sec, third);
         }
@@ -34,7 +34,7 @@ public abstract class Triangle {
         }
     }
 
-    public static class Colored extends Polygon <vec3Vert.PosCol> {
+    public static class Colored extends RenderPolygon<vec3Vert.PosCol> {
         public Colored(vec3Vert.PosCol first, vec3Vert.PosCol sec, vec3Vert.PosCol third) {
             super(first, sec, third);
         }

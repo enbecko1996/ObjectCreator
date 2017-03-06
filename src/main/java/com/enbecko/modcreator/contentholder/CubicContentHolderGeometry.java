@@ -1,5 +1,6 @@
 package com.enbecko.modcreator.contentholder;
 
+import com.enbecko.modcreator.linalg.vec_n;
 import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
 import com.enbecko.modcreator.linalg.vec3;
 
@@ -12,7 +13,7 @@ public abstract class CubicContentHolderGeometry extends Content.CubicContent {
     private int size;
 
     protected CubicContentHolderGeometry(Bone parentBone, vec3.IntVec positionInBoneCoords, byte order, boolean isMaxOrder) {
-        super(parentBone, positionInBoneCoords, (int) Math.pow(Main_BlockHeroes.contentCubesPerCube, order));
+        super(parentBone, positionInBoneCoords, (int) Math.pow(Main_BlockHeroes.contentCubesPerCube, order), vec_n.vecPrec.INT);
         this.setCanChangePosition(false);
         this.size = (int) Math.pow(Main_BlockHeroes.contentCubesPerCube, order);
         this.order = order;
@@ -40,12 +41,11 @@ public abstract class CubicContentHolderGeometry extends Content.CubicContent {
 
     @Override
     public CubicContentHolderGeometry createBoundingGeometry() {
-        this.makeCorners(false);
-        this.makeCubicEdgesAndFacesNoUpdate();
+        this.makeHexahedralEdgesAndFacesNoUpdate();
         return this;
     }
 
-    @Override
+   /** @Override
     public void makeCorners(boolean changeable) {
         vec3.IntVec vec = this.getPositionInBoneCoords();
         //FRONT_X FACE COUNTERCLOCKWISE (CCW)
@@ -59,7 +59,7 @@ public abstract class CubicContentHolderGeometry extends Content.CubicContent {
         this.boundingCornersInBoneCoords[5] = new vec3.IntVec(vec.getX() + xSize, vec.getY(), vec.getZ(), false).setChangeable(changeable);
         this.boundingCornersInBoneCoords[6] = new vec3.IntVec(vec.getX() + xSize, vec.getY() + ySize, vec.getZ(), false).setChangeable(changeable);
         this.boundingCornersInBoneCoords[7] = new vec3.IntVec(vec.getX() + xSize, vec.getY() + ySize, vec.getZ() + zSize, false).setChangeable(changeable);
-    }
+    }*/
 
     public int getSize() {
         return this.size;

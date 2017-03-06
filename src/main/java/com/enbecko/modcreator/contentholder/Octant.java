@@ -3,6 +3,7 @@ package com.enbecko.modcreator.contentholder;
 import com.enbecko.modcreator.GlobalRenderSetting;
 import com.enbecko.modcreator.OpenGLHelperEnbecko;
 import com.enbecko.modcreator.linalg.Line3D;
+import com.enbecko.modcreator.linalg.vec_n;
 import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
 import com.enbecko.modcreator.linalg.vec3;
 import net.minecraftforge.fml.relauncher.Side;
@@ -23,7 +24,7 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
     private byte highestOrder = 1;
 
     public Octant(Bone parentBone, vec3 positonInBoneCoords, double xSize, double ySize, double zSize, OCTANTS type) {
-        super(parentBone, positonInBoneCoords, xSize, ySize, zSize);
+        super(parentBone, positonInBoneCoords, xSize, ySize, zSize, vec_n.vecPrec.INT);
         this.type = type;
         this.setActive(false);
         this.createBoundingGeometry();
@@ -32,8 +33,7 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
     @Override
     public Octant createBoundingGeometry() {
         vec3 pos = this.getPositionInBoneCoords();
-        this.makeCorners(true);
-        this.makeCubicEdgesAndFacesAutoUpdate();
+        this.makeHexahedralEdgesAndFacesAutoUpdate();
         return this;
     }
 

@@ -523,9 +523,8 @@ public class Matrix {
                 vec_n_DOUBLE tmpCol = LU_rhs.getColumnAt(k);
                 double[] col = tmpCol.getVecD();
                 //PIVOTING
-                boolean foundPivot = true;
                 if (col[k] == 0) {
-                    foundPivot = false;
+                    boolean foundPivot = false;
                     double biggest = 0;
                     int swapRow = k;
                     for (int l = 0; k + l < size; l++) {
@@ -533,6 +532,7 @@ public class Matrix {
                         if (col[k + l] != 0) {
                             swapRow = k + l;
                             foundPivot = true;
+                            break;
                         }
                         //take biggest Pivot
                         /**
@@ -554,7 +554,7 @@ public class Matrix {
                     vec_n_DOUBLE row = LU_rhs.getRowAt(p);
                     if (row.getVecD()[k] != 0) {
                         double fac = topRowCopy.getVecD()[k] != 0 ? -(row.getVecD()[k] / topRowCopy.getVecD()[k]) : 0;
-                        row.addToThis(topRowCopy.mulToThis(fac));
+                        LU_rhs.setRow(p, row.addToThis(topRowCopy.mulToThis(fac)));
                         topRowCopy.mulToThis(fac != 0 && !Double.isInfinite(fac) && !Double.isNaN(fac) ? 1 / fac : 1);
                         LU_lhs.set(p, k, -fac);
                     }

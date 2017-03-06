@@ -1,10 +1,6 @@
 package com.enbecko.modcreator.minecraft;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
-import com.enbecko.modcreator.Rectangle;
-import com.enbecko.modcreator.linalg.Face3D;
-import com.enbecko.modcreator.linalg.vec3;
-import com.enbecko.modcreator.linalg.vec4;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 

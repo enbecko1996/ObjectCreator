@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
  */
 
 @Deprecated
-public abstract class Parallelogram3D extends Face3D {
+public abstract class Parallelogram3D extends Quadrilateral3D {
     final vec3 onPoint;
     final vec3 vec1;
     final vec3 vec2;

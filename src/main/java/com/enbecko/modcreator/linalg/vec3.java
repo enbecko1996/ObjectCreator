@@ -1,5 +1,7 @@
 package com.enbecko.modcreator.linalg;
 
+import org.lwjgl.util.vector.Quaternion;
+
 import javax.annotation.Nullable;
 
 /**
@@ -16,6 +18,13 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
 
     public vec3(vec3 other, boolean floor) {
         super(other, floor);
+    }
+
+    public double angleTo360(vec3 other, vec3 normal) {
+        vec3 cross = this.cross(other, false);
+        double det = normal.dot(cross);
+        double dot = this.dot(other);
+        return Math.atan2(det, dot) + Math.PI;
     }
 
     @Override
@@ -71,6 +80,23 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
                 return new vec3.FloatVec(old, floor);
             default:
                 return new vec3.DoubleVec(old, floor);
+        }
+    }
+
+    public static vec3 newVecWithPrecision(vecPrec prec, double x, double y, double z, boolean floor) {
+        switch (prec) {
+            case BYTE:
+                return new vec3.ByteVec(x, y, z, floor);
+            case SHORT:
+                return new vec3.ShortVec(x, y, z, floor);
+            case INT:
+                return new vec3.IntVec(x, y, z, floor);
+            case LONG:
+                return new vec3.LongVec(x, y, z, floor);
+            case FLOAT:
+                return new vec3.FloatVec(x, y, z, floor);
+            default:
+                return new vec3.DoubleVec(x, y, z, floor);
         }
     }
 
