@@ -2,6 +2,7 @@ package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
 import com.enbecko.modcreator.LocalRenderSetting;
+import com.enbecko.modcreator.linalg.RayTrace3D;
 import com.enbecko.modcreator.linalg.vec_n;
 import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
 import com.enbecko.modcreator.linalg.vec3;
@@ -18,9 +19,49 @@ import java.util.List;
 public class HigherOrderHolder extends CubicContentHolderGeometry implements ContentHolder <CubicContentHolderGeometry>{
     private CubicContentHolderGeometry[][][] content = new CubicContentHolderGeometry[Main_BlockHeroes.contentCubesPerCube][Main_BlockHeroes.contentCubesPerCube][Main_BlockHeroes.contentCubesPerCube];
     ContentHolder parent;
+    protected final List<CubicContentHolderGeometry> rayTraceResult = new ArrayList<CubicContentHolderGeometry>();
+    protected double[] distance = new double[Main_BlockHeroes.contentCubesPerCube];
 
     public HigherOrderHolder(Bone parentBone, vec3.IntVec positionInBoneCoords, byte order, boolean isMaxOrder) {
         super(parentBone, positionInBoneCoords, order, isMaxOrder);
+    }
+
+    @Override
+    public Content getRayTraceResult(RayTrace3D rayTrace3D) {
+        List<CubicContentHolderGeometry> holders = this.getContent();
+        this.rayTraceResult.clear();
+        for (int l = 0; l < distance.length; l++) {
+            if (distance[l] != 0)
+                distance[l] = 0;
+            else
+                break;
+        }
+        vec3 pos;
+        for (CubicContentHolderGeometry holder : holders) {
+            if ((pos = holder.checkIfCrosses(rayTrace3D)) != null) {
+                double d = pos.subFromThis(rayTrace3D.getOnPoint()).length();
+                int k = 0;
+                for (; k < distance.length; k++) {
+                    if (distance[k] == 0 || distance[k] < d) {
+                        for (int l = k; l < distance.length; l++) {
+                            if (distance[l-1] != 0)
+                                distance[l] = distance[l-1];
+                            else
+                                break;
+                        }
+                        distance[k] = d;
+                        break;
+                    }
+                }
+                this.rayTraceResult.add(k, holder);
+            }
+        }
+        for (CubicContentHolderGeometry holder : this.rayTraceResult) {
+            Content result;
+            if ((result = holder.getRayTraceResult(rayTrace3D)) != null)
+                return result;
+        }
+        return null;
     }
 
     @Override
@@ -161,14 +202,14 @@ public class HigherOrderHolder extends CubicContentHolderGeometry implements Con
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void render(GlobalRenderSetting renderPass, LocalRenderSetting... localRenderSettings) {
-        if (renderPass.getRenderMode() == GlobalRenderSetting.RenderMode.DEBUG)
-            super.render(renderPass);
+    public void render(LocalRenderSetting... localRenderSettings) {
+        if (GlobalRenderSetting.getRenderMode() == GlobalRenderSetting.RenderMode.DEBUG)
+            super.render();
         for (int k = 0; k < Main_BlockHeroes.contentCubesPerCube; k++) {
             for (int l = 0; l < Main_BlockHeroes.contentCubesPerCube; l++) {
                 for (int m = 0; m < Main_BlockHeroes.contentCubesPerCube; m++) {
                     if (this.content[k][l][m] != null)
-                        this.content[k][l][m].render(renderPass);
+                        this.content[k][l][m].render();
                 }
             }
         }

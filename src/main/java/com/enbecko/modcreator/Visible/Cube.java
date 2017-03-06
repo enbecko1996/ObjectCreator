@@ -1,6 +1,5 @@
 package com.enbecko.modcreator.Visible;
 
-import com.enbecko.modcreator.GlobalRenderSetting;
 import com.enbecko.modcreator.LocalRenderSetting;
 import com.enbecko.modcreator.LocalRenderSetting.CrossedByRayTrace;
 import com.enbecko.modcreator.RenderQuadrilateral;
@@ -18,7 +17,7 @@ import java.util.List;
 /**
  * Created by enbec on 24.02.2017.
  */
-public class Cube extends Content.CubicContent implements ITextured<RenderQuadrilateral.Colored> {
+public class Cube extends Content.CubicContent implements ITextured <RenderQuadrilateral.Colored> {
     private final int dimension;
     private List<RenderQuadrilateral.Colored> rectangles = new ArrayList<RenderQuadrilateral.Colored>();
 
@@ -32,12 +31,13 @@ public class Cube extends Content.CubicContent implements ITextured<RenderQuadri
     @Override
     public Cube createBoundingGeometry() {
         this.makeHexahedralEdgesAndFacesNoUpdate();
-        this.rectangles.add(new RenderQuadrilateral.Colored(this.getBoundingFace(Faces.FRONT_X), new vec4.FloatVec(1, 0, 0, 1), true));
-        this.rectangles.add(new RenderQuadrilateral.Colored(this.getBoundingFace(Faces.BACK_X), new vec4.FloatVec(1, 0, 0, 1), true));
-        this.rectangles.add(new RenderQuadrilateral.Colored(this.getBoundingFace(Faces.RIGHT_Z), new vec4.FloatVec(1, 0, 0, 1), true));
-        this.rectangles.add(new RenderQuadrilateral.Colored(this.getBoundingFace(Faces.LEFT_Z), new vec4.FloatVec(1, 0, 0, 1), true));
-        this.rectangles.add(new RenderQuadrilateral.Colored(this.getBoundingFace(Faces.TOP_Y), new vec4.FloatVec(1, 0, 0, 1), true));
-        this.rectangles.add(new RenderQuadrilateral.Colored(this.getBoundingFace(Faces.BOTTOM_Y), new vec4.FloatVec(1, 0, 0, 1), true));
+        Quadrilateral3D face;
+        this.rectangles.add((RenderQuadrilateral.Colored) (face = this.getBoundingFace(Faces.FRONT_X)).setRenderer(new RenderQuadrilateral.Colored(face, new vec4.FloatVec(1, 0, 0, 1), true)));
+        this.rectangles.add((RenderQuadrilateral.Colored) (face = this.getBoundingFace(Faces.BACK_X)).setRenderer(new RenderQuadrilateral.Colored(face, new vec4.FloatVec(1, 0, 0, 1), true)));
+        this.rectangles.add((RenderQuadrilateral.Colored) (face = this.getBoundingFace(Faces.RIGHT_Z)).setRenderer(new RenderQuadrilateral.Colored(face, new vec4.FloatVec(1, 0, 0, 1), true)));
+        this.rectangles.add((RenderQuadrilateral.Colored) (face = this.getBoundingFace(Faces.LEFT_Z)).setRenderer(new RenderQuadrilateral.Colored(face, new vec4.FloatVec(1, 0, 0, 1), true)));
+        this.rectangles.add((RenderQuadrilateral.Colored) (face = this.getBoundingFace(Faces.TOP_Y)).setRenderer(new RenderQuadrilateral.Colored(face, new vec4.FloatVec(1, 0, 0, 1), true)));
+        this.rectangles.add((RenderQuadrilateral.Colored) (face = this.getBoundingFace(Faces.BOTTOM_Y)).setRenderer(new RenderQuadrilateral.Colored(face, new vec4.FloatVec(1, 0, 0, 1), true)));
         return this;
     }
 
@@ -54,22 +54,26 @@ public class Cube extends Content.CubicContent implements ITextured<RenderQuadri
     @Override
     @SideOnly(Side.CLIENT)
     public void manipulateMe(ManipulatingEvent event, RayTrace3D rayTrace3D) {
+
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void render(GlobalRenderSetting renderPass, LocalRenderSetting... localRenderSettings) {
-        Quadrilateral3D crossed = null;
+    public void render(LocalRenderSetting... localRenderSettings) {
+        for (Quadrilateral3D face : this.boundingFacesInBoneCoords) {
+            if(face != null) {
+                if (face.getRenderer() != null)
+                    face.getRenderer().draw(Tessellator.getInstance().getBuffer(), 1);
+            }
+        }
         for (LocalRenderSetting localRenderSetting : localRenderSettings) {
             switch (localRenderSetting.getType()) {
                 case CROSSED_BY_RAYTRACE:
-                    crossed = this.checkIfCrosses(((CrossedByRayTrace)localRenderSetting).getTheRayTrace());
+                    Quadrilateral3D crossed = this.getCrossedFace(((CrossedByRayTrace)localRenderSetting).getTheRayTrace());
+                    if (crossed != null && crossed.getRenderer() != null)
+                        crossed.getRenderer().draw(Tessellator.getInstance().getBuffer(), 1, localRenderSetting);
                     break;
             }
-        }
-        for (RenderQuadrilateral.Colored rectangle : this.rectangles) {
-            if ()
-            rectangle.draw(Tessellator.getInstance().getBuffer(), 1);
         }
     }
 

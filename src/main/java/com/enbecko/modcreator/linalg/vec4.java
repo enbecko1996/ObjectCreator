@@ -55,8 +55,9 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
         return (float) this.vec[3];
     }
 
-    public void update(double r, double g, double b, double a) {
+    public vec4 update(double r, double g, double b, double a) {
         this.update(r, g, b, a, false);
+        return this;
     }
     public abstract void update(double r, double g, double b, double a, boolean floor);
     public abstract void setR(double r);

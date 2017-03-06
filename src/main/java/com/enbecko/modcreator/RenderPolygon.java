@@ -24,7 +24,7 @@ public abstract class RenderPolygon <T extends vec3Vert> {
     }
 
     @SideOnly(Side.CLIENT)
-    public abstract void draw(VertexBuffer vertexBuffer, float scale);
+    public abstract void draw(VertexBuffer vertexBuffer, float scale, LocalRenderSetting... localRenderSettings);
 
     public T getVertexAt(int pos) {
         return this.vertexPositions[pos];
@@ -60,7 +60,7 @@ public abstract class RenderPolygon <T extends vec3Vert> {
 
         @Override
         @SideOnly(Side.CLIENT)
-        public void draw(VertexBuffer vertexBuffer, float scale) {
+        public void draw(VertexBuffer vertexBuffer, float scale, LocalRenderSetting... localRenderSettings) {
             vertexBuffer.begin(7, DefaultVertexFormats.POSITION_TEX_NORMAL);
 
             for(int i = 0; i < nVertices; ++i) {
@@ -86,7 +86,7 @@ public abstract class RenderPolygon <T extends vec3Vert> {
 
         @Override
         @SideOnly(Side.CLIENT)
-        public void draw(VertexBuffer vertexBuffer, float scale) {
+        public void draw(VertexBuffer vertexBuffer, float scale, LocalRenderSetting... localRenderSettings) {
             vertexBuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
 
             for(int i = 0; i < nVertices; ++i) {

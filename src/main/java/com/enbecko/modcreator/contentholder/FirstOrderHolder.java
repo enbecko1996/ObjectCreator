@@ -2,6 +2,7 @@ package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
 import com.enbecko.modcreator.LocalRenderSetting;
+import com.enbecko.modcreator.linalg.RayTrace3D;
 import com.enbecko.modcreator.linalg.vec3;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -97,11 +98,26 @@ public class FirstOrderHolder extends CubicContentHolderGeometry implements Cont
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void render(GlobalRenderSetting renderPass, LocalRenderSetting... localRenderSettings) {
-        if (renderPass.getRenderMode() == GlobalRenderSetting.RenderMode.DEBUG)
-            super.render(renderPass);
+    public void render(LocalRenderSetting... localRenderSettings) {
+        if (GlobalRenderSetting.getRenderMode() == GlobalRenderSetting.RenderMode.DEBUG)
+            super.render();
         for (Content child : this.content) {
-            child.render(renderPass);
+            child.render();
         }
+    }
+
+    @Override
+    public Content getRayTraceResult(RayTrace3D rayTrace3D) {
+        double smallestDist = Double.POSITIVE_INFINITY;
+        Content tmpResult = null;
+        for (Content content : this.content) {
+            vec3 pos;
+            if ((pos = content.checkIfCrosses(rayTrace3D)) != null) {
+                double d = pos.subFromThis(rayTrace3D.getOnPoint()).length();
+                if (d < smallestDist)
+                    tmpResult = content;
+            }
+        }
+        return tmpResult;
     }
 }

@@ -1,6 +1,7 @@
 package com.enbecko.modcreator.minecraft;
 
 import com.enbecko.modcreator.contentholder.Bone;
+import com.enbecko.modcreator.linalg.vec3;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.relauncher.Side;
@@ -16,12 +17,15 @@ public class TE_Editor extends TileEntity implements ITickable{
     private final List<Bone> bones = new ArrayList<Bone>();
 
     public TE_Editor() {
-        this.bones.add(new Bone());
-        this.bones.get(0).addContent(null);
     }
 
     @Override
     public void update() {
+        if (this.bones.size() == 0) {
+            System.out.println(this.getPos());
+            this.bones.add(new Bone(new vec3.IntVec(this.getPos())));
+            this.bones.get(0).addContent(null);
+        }
     }
 
     @SideOnly(Side.CLIENT)

@@ -1,5 +1,6 @@
 package com.enbecko.modcreator.minecraft;
 
+import com.enbecko.modcreator.GlobalRenderSetting;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.Mod;
@@ -34,6 +35,7 @@ public class Main_BlockHeroes
     public void init(FMLInitializationEvent event) {
         proxy.init(event);
         editorBlock = (BlockEditor) new BlockEditor().setUnlocalizedName("editorblock").setCreativeTab(modMakerTab);
+        GlobalRenderSetting.putRenderMode(GlobalRenderSetting.RenderMode.DEBUG);
 
         GameRegistry.registerTileEntity(TE_Editor.class, "te_editorblock");
 

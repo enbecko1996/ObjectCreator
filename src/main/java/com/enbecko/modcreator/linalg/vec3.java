@@ -1,5 +1,6 @@
 package com.enbecko.modcreator.linalg;
 
+import net.minecraft.util.math.BlockPos;
 import org.lwjgl.util.vector.Quaternion;
 
 import javax.annotation.Nullable;
@@ -220,6 +221,10 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
 
         public IntVec(int x, int y, int z) {
             super(x, y, z, false);
+        }
+
+        public IntVec(BlockPos pos) {
+            super(pos.getX(), pos.getY(), pos.getZ(), false);
         }
 
         @Override

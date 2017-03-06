@@ -1,6 +1,5 @@
 package com.enbecko.modcreator.contentholder;
 
-import com.enbecko.modcreator.GlobalRenderSetting;
 import com.enbecko.modcreator.LocalRenderSetting;
 import com.enbecko.modcreator.OpenGLHelperEnbecko;
 import com.enbecko.modcreator.events.ManipulatingEvent;
@@ -92,13 +91,13 @@ public abstract class Content {
 
     public abstract boolean isInside(vec3 vec);
 
-    public abstract Polygon3D checkIfCrosses(RayTrace3D rayTrace3D);
+    public abstract vec3 checkIfCrosses(RayTrace3D rayTrace3D);
 
     @SideOnly(Side.CLIENT)
     public abstract void manipulateMe(ManipulatingEvent event, RayTrace3D rayTrace3D);
 
     @SideOnly(Side.CLIENT)
-    public abstract void render(GlobalRenderSetting renderPass, LocalRenderSetting ... localRenderSettings);
+    public abstract void render(LocalRenderSetting... localRenderSettings);
 
     public double getMaxX() {
         double max = Double.NEGATIVE_INFINITY, tmp;
@@ -323,8 +322,8 @@ public abstract class Content {
                     //BACK_X FACE CLOCKWISE (CW)
                     vec3.newVecWithPrecision(prec, pos.getXD() + xSize, pos.getYD(), pos.getZD() + zSize, false),
                     vec3.newVecWithPrecision(prec, pos.getXD() + xSize, pos.getYD(), pos.getZD(), false),
-                    vec3.newVecWithPrecision(prec,pos.getXD(), pos.getYD() + ySize, pos.getZD() + zSize, false),
-                    vec3.newVecWithPrecision(prec, pos.getXD(), pos.getYD() + ySize, pos.getZD(), false));
+                    vec3.newVecWithPrecision(prec,pos.getXD() + xSize, pos.getYD() + ySize, pos.getZD(), false),
+                    vec3.newVecWithPrecision(prec, pos.getXD() + xSize, pos.getYD() + ySize, pos.getZD() + zSize, false));
             if (xSize > 0 && ySize > 0 && zSize > 0) {
                 this.xSize = xSize;
                 this.ySize = ySize;
@@ -411,7 +410,31 @@ public abstract class Content {
 
         @Override
         @Nullable
-        public Quadrilateral3D checkIfCrosses(RayTrace3D rayTrace3D) {
+        public vec3 checkIfCrosses(RayTrace3D rayTrace3D) {
+            vec3 vec = rayTrace3D.getVec();
+            vec3 out;
+            if (vec.getXD() > 0) {
+                if ((out = this.getBoundingFace(Faces.FRONT_X).checkIfCrosses(rayTrace3D)) != null)
+                    return out;
+            } else if (vec.getXD() < 0)
+                if ((out = this.getBoundingFace(Faces.BACK_X).checkIfCrosses(rayTrace3D)) != null)
+                    return out;
+            if (vec.getYD() > 0) {
+                if ((out = this.getBoundingFace(Faces.BOTTOM_Y).checkIfCrosses(rayTrace3D)) != null)
+                    return out;
+            } else if (vec.getYD() < 0)
+                if ((out = this.getBoundingFace(Faces.TOP_Y).checkIfCrosses(rayTrace3D)) != null)
+                    return out;
+            if (vec.getZD() > 0) {
+                if ((out = this.getBoundingFace(Faces.LEFT_Z).checkIfCrosses(rayTrace3D)) != null)
+                    return out;
+            } else if (vec.getZD() < 0)
+                if ((out = this.getBoundingFace(Faces.RIGHT_Z).checkIfCrosses(rayTrace3D)) != null)
+                    return out;
+            return null;
+        }
+
+        public Quadrilateral3D getCrossedFace(RayTrace3D rayTrace3D) {
             vec3 vec = rayTrace3D.getVec();
             if (vec.getXD() > 0) {
                 if (this.getBoundingFace(Faces.FRONT_X).checkIfCrosses(rayTrace3D) != null)
@@ -467,7 +490,7 @@ public abstract class Content {
 
         @Override
         @SideOnly(Side.CLIENT)
-        public void render(GlobalRenderSetting renderPass, LocalRenderSetting... localRenderSettings) {
+        public void render(LocalRenderSetting... localRenderSettings) {
             for (Line3D line : this.boundingEdgesInBoneCoords)
                 OpenGLHelperEnbecko.drawLine(line, 4);
         }

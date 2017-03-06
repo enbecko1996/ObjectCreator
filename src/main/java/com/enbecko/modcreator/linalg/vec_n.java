@@ -121,6 +121,16 @@ public abstract class vec_n<T extends Number> {
         return this;
     }
 
+    public vec_n addToThis(double add) {
+        if (!this.isChangeable) {
+            throw new RuntimeException("you can't change unchangeable vecs" + this);
+        } else {
+            for (int k = 0; k < vec.length; k++)
+                vec[k] += add;
+        }
+        return this;
+    }
+
     @Nullable
     public abstract vec_n mulAndMakeNew(vecPrec precision, double length, boolean floor);
 

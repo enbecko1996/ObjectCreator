@@ -10,11 +10,14 @@ import java.util.Arrays;
 /**
  * Created by enbec on 03.03.2017.
  */
-public abstract class RenderQuadrilateral extends RenderPolygon {
+public abstract class RenderQuadrilateral <T extends vec3Vert> extends RenderPolygon <T> {
+    public RenderQuadrilateral(T v1, T v2, T v3, T v4) {
+        super(v1, v2, v3, v4);
+    }
     /**
      * TODO
      */
-    public static class Textured extends RenderPolygon <vec3Vert.PosTex> {
+    public static class Textured extends RenderQuadrilateral <vec3Vert.PosTex> {
         public Textured(vec3Vert.PosTex LOW_LEFT, vec3Vert.PosTex LOW_RIGHT, vec3Vert.PosTex TOP_RIGHT, vec3Vert.PosTex TOP_LEFT) {
             super(LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT);
         }
@@ -31,7 +34,7 @@ public abstract class RenderQuadrilateral extends RenderPolygon {
         }
 
         @Override
-        public void draw(VertexBuffer vertexBuffer, float scale) {
+        public void draw(VertexBuffer vertexBuffer, float scale, LocalRenderSetting... localRenderSettings) {
             vec3.FloatVec first = (vec3.FloatVec) this.getVertexAt(3).position.subAndMakeNew(vec_n.vecPrec.FLOAT, this.getVertexAt(0).position,false);
             vec3.FloatVec sec = (vec3.FloatVec) this.getVertexAt(1).position.subAndMakeNew(vec_n.vecPrec.FLOAT, this.getVertexAt(0).position,false);
             vec3.FloatVec normal = first.cross(sec, false);
@@ -49,9 +52,9 @@ public abstract class RenderQuadrilateral extends RenderPolygon {
         }
     }
 
-    public static class Colored extends RenderPolygon<vec3Vert.PosCol> {
-        public Colored(vec3Vert.PosCol first, vec3Vert.PosCol sec, vec3Vert.PosCol third) {
-            super(first, sec, third);
+    public static class Colored extends RenderQuadrilateral <vec3Vert.PosCol> {
+        public Colored(vec3Vert.PosCol LOW_LEFT, vec3Vert.PosCol LOW_RIGHT, vec3Vert.PosCol TOP_RIGHT, vec3Vert.PosCol TOP_LEFT) {
+            super(LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT);
         }
 
         @Deprecated
@@ -71,7 +74,7 @@ public abstract class RenderQuadrilateral extends RenderPolygon {
         }
         
         @Override
-        public void draw(VertexBuffer vertexBuffer, float scale) {
+        public void draw(VertexBuffer vertexBuffer, float scale, LocalRenderSetting... localRenderSettings) {
             vec3.FloatVec first = (vec3.FloatVec) this.getVertexAt(3).position.subAndMakeNew(vec_n.vecPrec.FLOAT, this.getVertexAt(0).position,false);
             vec3.FloatVec sec = (vec3.FloatVec) this.getVertexAt(1).position.subAndMakeNew(vec_n.vecPrec.FLOAT, this.getVertexAt(0).position,false);
             vec3.FloatVec normal = sec.cross(first, false);
@@ -85,7 +88,6 @@ public abstract class RenderQuadrilateral extends RenderPolygon {
                 this.putNormal(vertexBuffer, normal);
                 vertexBuffer.endVertex();
             }
-            System.out.println(Arrays.toString(vertexBuffer.getByteBuffer().asFloatBuffer().asReadOnlyBuffer().array()));
             Tessellator.getInstance().draw();
         }
     }

@@ -19,8 +19,9 @@ public abstract class Polygon3D <T extends RenderPolygon> {
         return this.renderer;
     }
 
-    public void setRenderer(T renderer) {
+    public T setRenderer(T renderer) {
         this.renderer = renderer;
+        return renderer;
     }
 
     public abstract vec3 checkIfCrosses(RayTrace3D rayTrace3D);

@@ -3,9 +3,14 @@ package com.enbecko.modcreator.contentholder;
 import com.enbecko.modcreator.GlobalRenderSetting;
 import com.enbecko.modcreator.Visible.Cube;
 import com.enbecko.modcreator.linalg.Matrix;
+import com.enbecko.modcreator.linalg.RayTrace3D;
 import com.enbecko.modcreator.linalg.vec3;
+import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.enbecko.modcreator.linalg.vec_n.vecPrec.INT;
 
@@ -15,14 +20,22 @@ import static com.enbecko.modcreator.linalg.vec_n.vecPrec.INT;
 public class Bone {
     @Deprecated
     private CubicContentHolderGeometry boneContent = null;
-    private vec3.DoubleVec rotPoint_global;
+    private vec3 center_global;
     private vec3.DoubleVec offset;
     private final Matrix.Matrix_NxN transform = Matrix.NxN_FACTORY.makeIdent(4);
     private final Matrix.Matrix_NxN inverseTransform = Matrix.NxN_FACTORY.makeIdent(4);
     private final Octant I, II, III, IV, V, VI, VII, VIII;
     private final Octant[] octants = new Octant[8];
+    protected final List<Octant> rayTraceResult = new ArrayList<Octant>();
+    protected double[] distance = new double[8];
 
-    public Bone() {
+    @SideOnly(Side.CLIENT)
+    public Bone(vec3 center_global) {
+        this.center_global = center_global;
+        System.out.println(this.center_global);
+        this.transform.translate(this.center_global.getVecD());
+        ((Matrix.Matrix_NxN)this.inverseTransform.update(transform)).invert();
+        System.out.println(transform + " " + this.inverseTransform);
         vec3.IntVec center = new vec3.IntVec();
         this.I = new Octant(this, center, 1, 1, 1, Octant.OCTANTS.I);
         this.II = new Octant(this, (vec3.IntVec) center.addAndMakeNew(INT, false, -1, 0, 0), 1, 1, 1, Octant.OCTANTS.II);
@@ -110,22 +123,57 @@ public class Bone {
     }
     */
 
+    public Content getRayTraceResult(RayTrace3D rayTrace_WORLDCOORDINATES) {
+        this.rayTraceResult.clear();
+        for (int l = 0; l < distance.length; l++) {
+            if (distance[l] != 0)
+                distance[l] = 0;
+            else
+                break;
+        }
+        vec3 pos;
+        for (Octant octant : this.octants) {
+            if ((pos = octant.checkIfCrosses(rayTrace_WORLDCOORDINATES)) != null) {
+                double d = pos.subFromThis(rayTrace_WORLDCOORDINATES.getOnPoint()).length();
+                int k = 0;
+                for (; k < distance.length; k++) {
+                    if (distance[k] == 0 || distance[k] < d) {
+                        for (int l = k; l < distance.length; l++) {
+                            if (distance[l-1] != 0)
+                                distance[l] = distance[l-1];
+                            else
+                                break;
+                        }
+                        distance[k] = d;
+                        break;
+                    }
+                }
+                this.rayTraceResult.add(k, octant);
+            }
+        }
+        for (Octant octant : this.rayTraceResult) {
+            Content result;
+            if ((result = octant.getRayTraceResult(rayTrace_WORLDCOORDINATES)) != null)
+                return result;
+        }
+        return null;
+    }
+
     @SideOnly(Side.CLIENT)
-    public void render(GlobalRenderSetting renderPass) {
+    public void render() {
         for (Octant octant : this.octants)
-            octant.render(renderPass);
+            octant.render();
     }
 
     public void addContent(Content content, Content ... adjacent) {
         if (!this.I.isActive())
             this.I.setActive(true);
-        Cube cube1 = new Cube(this, new vec3.IntVec(6, 12, 6), 1).createBoundingGeometry();
-        Cube cube2 = new Cube(this, new vec3.IntVec(4, 4, 4), 1).createBoundingGeometry();
-        this.I.addContent(new vec3.IntVec(3, 1, 1), cube1);
-        this.I.addContent(new vec3.IntVec(1, 9, 1), cube2);
-        this.I.addContent(new vec3.IntVec(1, 1, 1), cube1);
-        this.I.addContent(new vec3.IntVec(1, 4, 1), cube2);
-        this.I.addContent(new vec3.IntVec(6, 12, 6), cube2);
+        if (!this.II.isActive())
+            this.II.setActive(true);
+        Cube cube1 = new Cube(this, new vec3.IntVec(0, 0, 0), 1).createBoundingGeometry();
+        this.I.addContent(new vec3.IntVec(0, 0, 0), cube1);
+        Cube cube2 = new Cube(this, new vec3.IntVec(-1, 0, 0), 1).createBoundingGeometry();
+        this.II.addContent(new vec3.IntVec(-1, 0, 0), cube2);
     }
 
     public void octantEmpty(Octant octant) {
@@ -136,7 +184,5 @@ public class Bone {
     }
 
     public static void main(String[] args) {
-        Bone b;
-        (b = new Bone()).addContent(new Cube(b, new vec3.IntVec(16, 4, 2, false), 2));
     }
 }

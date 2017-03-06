@@ -37,7 +37,6 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
         this.updateIsFlat();
         this.updateIsSymmetric();
         this.updateIsConvex();
-        System.out.println(this.isConvex() + " " + this.isSymmetric() +" " + this.isFlat());
     }
 
     /**

@@ -264,11 +264,12 @@ public class Matrix {
             return this.columns;
         }
 
-        public void update(Matrix_MxN other) {
+        public Matrix_MxN update(Matrix_MxN other) {
             if (this.isSameSize(other)) {
                 for (int mm = 0; mm < this.getRowCount(); mm++)
                     this.setRow(mm, other.getRowAt(mm));
             }
+            return this;
         }
 
         public void updateRows(int off, vec_n_DOUBLE ... rows) {
@@ -429,6 +430,14 @@ public class Matrix {
                 throw new RuntimeException("Tried to create NxN matrix with MxN components (row) " + this);
         }
 
+        public Matrix_NxN translate(double ... comp) {
+            if (comp.length <= this.m) {
+                this.setColumn(this.n - 1, this.getColumnAt(this.n - 1).addToThis(comp));
+                return this;
+            } else
+                throw new RuntimeException("Translate component is too big " + this +" "+comp);
+        }
+
         @Deprecated
         public Matrix_NxN getInverse_Gaussian() {
             vec_n_DOUBLE[] tmpColumns = new vec_n_DOUBLE[2 * this.getSize()];
@@ -564,7 +573,17 @@ public class Matrix {
             //System.out.println("lhs: "+this.LU_lhs+" rhs: "+this.LU_rhs+" permut: "+this.LU_permutation);
         }
 
+        public Matrix_NxN invert() {
+            this.doLUDecomposition();
+            vec_n_DOUBLE[] outColumns = new vec_n_DOUBLE[this.getSize()];
+            for (int k = 0; k < outColumns.length; k++)
+                outColumns[k] = this.solveLGS_fromLU(new vec_n_DOUBLE(true, this.getSize(), k));
+            this.updateColumns(0, outColumns);
+            return this;
+        }
+
         public Matrix_NxN getInverse_fromLU() {
+            this.doLUDecomposition();
             vec_n_DOUBLE[] outColumns = new vec_n_DOUBLE[this.getSize()];
             for (int k = 0; k < outColumns.length; k++)
                 outColumns[k] = this.solveLGS_fromLU(new vec_n_DOUBLE(true, this.getSize(), k));

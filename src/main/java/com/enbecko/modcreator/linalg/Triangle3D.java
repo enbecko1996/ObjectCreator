@@ -1,11 +1,13 @@
 package com.enbecko.modcreator.linalg;
 
+import com.enbecko.modcreator.RenderTriangle;
+
 import javax.annotation.Nullable;
 
 /**
  * Created by Niclas on 06.03.2017.
  */
-public abstract class Triangle3D extends Polygon3D{
+public abstract class Triangle3D extends Polygon3D <RenderTriangle> {
     private final vec3 first, sec, third;
     private final vec3 tmp1 = new vec3.DoubleVec(), tmp2 = new vec3.DoubleVec(), tmpRhs = new vec3.DoubleVec();
 

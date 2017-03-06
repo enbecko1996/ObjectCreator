@@ -9,6 +9,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by enbec on 25.02.2017.
@@ -30,6 +32,8 @@ public abstract class CubicContentHolderGeometry extends Content.CubicContent {
         this.isMaxOrder = order;
         return this;
     }
+
+    public abstract Content getRayTraceResult(RayTrace3D rayTrace3D);
 
     public byte getOrder() {
         return this.order;
