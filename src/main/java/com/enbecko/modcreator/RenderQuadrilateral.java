@@ -10,11 +10,11 @@ import java.util.Arrays;
 /**
  * Created by enbec on 03.03.2017.
  */
-public abstract class RenderRectangle {
+public abstract class RenderQuadrilateral extends RenderPolygon {
     /**
      * TODO
      */
-    public static class Textured extends RenderPolygon<vec3Vert.PosTex> {
+    public static class Textured extends RenderPolygon <vec3Vert.PosTex> {
         public Textured(vec3Vert.PosTex LOW_LEFT, vec3Vert.PosTex LOW_RIGHT, vec3Vert.PosTex TOP_RIGHT, vec3Vert.PosTex TOP_LEFT) {
             super(LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT);
         }

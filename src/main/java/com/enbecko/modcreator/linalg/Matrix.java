@@ -271,7 +271,7 @@ public class Matrix {
             }
         }
 
-        public void updateRows(vec_n_DOUBLE[] rows, int off) {
+        public void updateRows(int off, vec_n_DOUBLE ... rows) {
             if (off + rows.length <= this.getRowCount()) {
                 for (int k = off; k < rows.length; k++) {
                     this.setRow(k, rows[k - off]);
@@ -280,7 +280,7 @@ public class Matrix {
                 throw new RuntimeException("Can't update " + rows.length + " rows from " + off + ". this.rowCount: " + this.getRowCount());
         }
 
-        public void updateColumns(vec_n_DOUBLE[] columns, int off) {
+        public void updateColumns(int off, vec_n_DOUBLE ... columns) {
             if (off + columns.length <= this.getColumncount()) {
                 for (int k = off; k < columns.length; k++) {
                     this.setColumn(k, columns[k - off]);

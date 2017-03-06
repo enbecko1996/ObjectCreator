@@ -5,16 +5,18 @@ import javax.annotation.Nullable;
 /**
  * Created by Niclas on 06.03.2017.
  */
-public abstract class Triangle3D {
+public abstract class Triangle3D extends Polygon3D{
     private final vec3 first, sec, third;
     private final vec3 tmp1 = new vec3.DoubleVec(), tmp2 = new vec3.DoubleVec(), tmpRhs = new vec3.DoubleVec();
 
     public Triangle3D(vec3 first, vec3 sec, vec3 third) {
+        super(first, sec, third);
         this.first = first;
         this.sec = sec;
         this.third = third;
     }
 
+    @Override
     @Nullable
     public vec3 checkIfCrosses(RayTrace3D rayTrace3D) {
         synchronized (rayTrace3D) {
@@ -31,6 +33,21 @@ public abstract class Triangle3D {
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean isFlat() {
+        return true;
+    }
+
+    @Override
+    public boolean isSymmetric() {
+        return true;
+    }
+
+    @Override
+    public boolean isConvex() {
+        return true;
     }
 
     public void update(vec3 first, vec3 sec, vec3 third) {

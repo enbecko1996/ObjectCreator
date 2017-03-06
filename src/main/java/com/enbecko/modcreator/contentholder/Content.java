@@ -1,15 +1,15 @@
 package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
+import com.enbecko.modcreator.LocalRenderSetting;
 import com.enbecko.modcreator.OpenGLHelperEnbecko;
-import com.enbecko.modcreator.linalg.Quadrilateral3D;
-import com.enbecko.modcreator.linalg.Line3D;
-import com.enbecko.modcreator.linalg.vec3;
-import com.enbecko.modcreator.linalg.vec_n;
+import com.enbecko.modcreator.events.ManipulatingEvent;
+import com.enbecko.modcreator.linalg.*;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,8 +92,13 @@ public abstract class Content {
 
     public abstract boolean isInside(vec3 vec);
 
+    public abstract Polygon3D checkIfCrosses(RayTrace3D rayTrace3D);
+
     @SideOnly(Side.CLIENT)
-    public abstract void render(GlobalRenderSetting renderPass);
+    public abstract void manipulateMe(ManipulatingEvent event, RayTrace3D rayTrace3D);
+
+    @SideOnly(Side.CLIENT)
+    public abstract void render(GlobalRenderSetting renderPass, LocalRenderSetting ... localRenderSettings);
 
     public double getMaxX() {
         double max = Double.NEGATIVE_INFINITY, tmp;
@@ -195,10 +200,6 @@ public abstract class Content {
             for (int k = 0; k < this.boundingCornersInBoneCoords.length; k++)
                 this.boundingCornersInBoneCoords[k] = vec3s[k];
         }
-
-        public void makePolyhedralEdgesAndFaces() {
-
-        }
     }
 
     public abstract static class HexahedralContent extends PolyhedralContent {
@@ -278,6 +279,33 @@ public abstract class Content {
             this.boundingFacesInBoneCoords[3] = new Quadrilateral3D.AutoUpdateOnVecChange(this.boundingCornersInBoneCoords[5], this.boundingCornersInBoneCoords[0], this.boundingCornersInBoneCoords[3], this.boundingCornersInBoneCoords[6]);
             this.boundingFacesInBoneCoords[4] = new Quadrilateral3D.AutoUpdateOnVecChange(this.boundingCornersInBoneCoords[3], this.boundingCornersInBoneCoords[2], this.boundingCornersInBoneCoords[7], this.boundingCornersInBoneCoords[6]);
             this.boundingFacesInBoneCoords[5] = new Quadrilateral3D.AutoUpdateOnVecChange(this.boundingCornersInBoneCoords[5], this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[0]);
+        }
+
+        @Override
+        public boolean isColliding(Content content) {
+            for (int k = 0; k < content.getBoundingCornerCount(); k++) {
+                vec3 act = content.getCorner(k);
+                if (this.isInside(act))
+                    return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean isFullInside(Content content) {
+            for (int k = 0; k < content.getBoundingCornerCount(); k++) {
+                vec3 act = content.getCorner(k);
+                if (!this.isInside(act))
+                    return false;
+            }
+            return true;
+        }
+
+        @Override
+        public boolean isInside(vec3 vec) {
+            if ((vec.getYD() < this.getMaxY() && vec.getYD() >= this.getMinY() && vec.getXD() < this.getMaxX() && vec.getXD() >= this.getMinX() && vec.getZD() < this.getMaxZ() && vec.getZD() >= this.getMinZ()))
+                return true;
+            return false;
         }
     }
 
@@ -382,30 +410,28 @@ public abstract class Content {
         }
 
         @Override
-        public boolean isColliding(Content content) {
-            for (int k = 0; k < content.getBoundingCornerCount(); k++) {
-                vec3 act = content.getCorner(k);
-                if (this.isInside(act))
-                    return true;
-            }
-            return false;
-        }
-
-        @Override
-        public boolean isFullInside(Content content) {
-            for (int k = 0; k < content.getBoundingCornerCount(); k++) {
-                vec3 act = content.getCorner(k);
-                if (!this.isInside(act))
-                    return false;
-            }
-            return true;
-        }
-
-        @Override
-        public boolean isInside(vec3 vec) {
-            if ((vec.getYD() < this.getMaxY() && vec.getYD() >= this.getMinY() && vec.getXD() < this.getMaxX() && vec.getXD() >= this.getMinX() && vec.getZD() < this.getMaxZ() && vec.getZD() >= this.getMinZ()))
-                return true;
-            return false;
+        @Nullable
+        public Quadrilateral3D checkIfCrosses(RayTrace3D rayTrace3D) {
+            vec3 vec = rayTrace3D.getVec();
+            if (vec.getXD() > 0) {
+                if (this.getBoundingFace(Faces.FRONT_X).checkIfCrosses(rayTrace3D) != null)
+                    return this.getBoundingFace(Faces.FRONT_X);
+            } else if (vec.getXD() < 0)
+                if (this.getBoundingFace(Faces.BACK_X).checkIfCrosses(rayTrace3D) != null)
+                    return this.getBoundingFace(Faces.BACK_X);
+            if (vec.getYD() > 0) {
+                if (this.getBoundingFace(Faces.BOTTOM_Y).checkIfCrosses(rayTrace3D) != null)
+                    return this.getBoundingFace(Faces.BOTTOM_Y);
+            } else if (vec.getYD() < 0)
+                if (this.getBoundingFace(Faces.TOP_Y).checkIfCrosses(rayTrace3D) != null)
+                    return this.getBoundingFace(Faces.TOP_Y);
+            if (vec.getZD() > 0) {
+                if (this.getBoundingFace(Faces.LEFT_Z).checkIfCrosses(rayTrace3D) != null)
+                    return this.getBoundingFace(Faces.LEFT_Z);
+            } else if (vec.getZD() < 0)
+                if (this.getBoundingFace(Faces.RIGHT_Z).checkIfCrosses(rayTrace3D) != null)
+                    return this.getBoundingFace(Faces.RIGHT_Z);
+            return null;
         }
 
         public String getGeometryInfo() {
@@ -441,7 +467,7 @@ public abstract class Content {
 
         @Override
         @SideOnly(Side.CLIENT)
-        public void render(GlobalRenderSetting renderPass) {
+        public void render(GlobalRenderSetting renderPass, LocalRenderSetting... localRenderSettings) {
             for (Line3D line : this.boundingEdgesInBoneCoords)
                 OpenGLHelperEnbecko.drawLine(line, 4);
         }

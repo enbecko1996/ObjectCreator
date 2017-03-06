@@ -1,6 +1,7 @@
 package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
+import com.enbecko.modcreator.LocalRenderSetting;
 import com.enbecko.modcreator.linalg.vec_n;
 import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
 import com.enbecko.modcreator.linalg.vec3;
@@ -160,7 +161,7 @@ public class HigherOrderHolder extends CubicContentHolderGeometry implements Con
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void render(GlobalRenderSetting renderPass) {
+    public void render(GlobalRenderSetting renderPass, LocalRenderSetting... localRenderSettings) {
         if (renderPass.getRenderMode() == GlobalRenderSetting.RenderMode.DEBUG)
             super.render(renderPass);
         for (int k = 0; k < Main_BlockHeroes.contentCubesPerCube; k++) {

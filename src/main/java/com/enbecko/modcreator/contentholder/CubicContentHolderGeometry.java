@@ -1,8 +1,14 @@
 package com.enbecko.modcreator.contentholder;
 
+import com.enbecko.modcreator.events.ManipulatingEvent;
+import com.enbecko.modcreator.linalg.RayTrace3D;
 import com.enbecko.modcreator.linalg.vec_n;
 import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
 import com.enbecko.modcreator.linalg.vec3;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+import javax.annotation.Nullable;
 
 /**
  * Created by enbec on 25.02.2017.
@@ -45,21 +51,28 @@ public abstract class CubicContentHolderGeometry extends Content.CubicContent {
         return this;
     }
 
-   /** @Override
-    public void makeCorners(boolean changeable) {
-        vec3.IntVec vec = this.getPositionInBoneCoords();
-        //FRONT_X FACE COUNTERCLOCKWISE (CCW)
-        this.boundingCornersInBoneCoords[0] = new vec3.IntVec(vec.getX(), vec.getY(), vec.getZ(), false).setChangeable(changeable);
-        this.boundingCornersInBoneCoords[1] = new vec3.IntVec(vec.getX(), vec.getY(), vec.getZ() + zSize, false).setChangeable(changeable);
-        this.boundingCornersInBoneCoords[2] = new vec3.IntVec(vec.getX(), vec.getY() + ySize, vec.getZ() + zSize, false).setChangeable(changeable);
-        this.boundingCornersInBoneCoords[3] = new vec3.IntVec(vec.getX(), vec.getY() + ySize, vec.getZ(), false).setChangeable(changeable);
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void manipulateMe(ManipulatingEvent event, RayTrace3D rayTrace3D) {
 
-        //BACK_X FACE CLOCKWISE (CW)
-        this.boundingCornersInBoneCoords[4] = new vec3.IntVec(vec.getX() + xSize, vec.getY(), vec.getZ() + zSize, false).setChangeable(changeable);
-        this.boundingCornersInBoneCoords[5] = new vec3.IntVec(vec.getX() + xSize, vec.getY(), vec.getZ(), false).setChangeable(changeable);
-        this.boundingCornersInBoneCoords[6] = new vec3.IntVec(vec.getX() + xSize, vec.getY() + ySize, vec.getZ(), false).setChangeable(changeable);
-        this.boundingCornersInBoneCoords[7] = new vec3.IntVec(vec.getX() + xSize, vec.getY() + ySize, vec.getZ() + zSize, false).setChangeable(changeable);
-    }*/
+    }
+
+    /**
+     * @Override public void makeCorners(boolean changeable) {
+     * vec3.IntVec vec = this.getPositionInBoneCoords();
+     * //FRONT_X FACE COUNTERCLOCKWISE (CCW)
+     * this.boundingCornersInBoneCoords[0] = new vec3.IntVec(vec.getX(), vec.getY(), vec.getZ(), false).setChangeable(changeable);
+     * this.boundingCornersInBoneCoords[1] = new vec3.IntVec(vec.getX(), vec.getY(), vec.getZ() + zSize, false).setChangeable(changeable);
+     * this.boundingCornersInBoneCoords[2] = new vec3.IntVec(vec.getX(), vec.getY() + ySize, vec.getZ() + zSize, false).setChangeable(changeable);
+     * this.boundingCornersInBoneCoords[3] = new vec3.IntVec(vec.getX(), vec.getY() + ySize, vec.getZ(), false).setChangeable(changeable);
+     * <p>
+     * //BACK_X FACE CLOCKWISE (CW)
+     * this.boundingCornersInBoneCoords[4] = new vec3.IntVec(vec.getX() + xSize, vec.getY(), vec.getZ() + zSize, false).setChangeable(changeable);
+     * this.boundingCornersInBoneCoords[5] = new vec3.IntVec(vec.getX() + xSize, vec.getY(), vec.getZ(), false).setChangeable(changeable);
+     * this.boundingCornersInBoneCoords[6] = new vec3.IntVec(vec.getX() + xSize, vec.getY() + ySize, vec.getZ(), false).setChangeable(changeable);
+     * this.boundingCornersInBoneCoords[7] = new vec3.IntVec(vec.getX() + xSize, vec.getY() + ySize, vec.getZ() + zSize, false).setChangeable(changeable);
+     * }
+     */
 
     public int getSize() {
         return this.size;

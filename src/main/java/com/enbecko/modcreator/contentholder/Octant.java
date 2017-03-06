@@ -1,6 +1,7 @@
 package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
+import com.enbecko.modcreator.LocalRenderSetting;
 import com.enbecko.modcreator.OpenGLHelperEnbecko;
 import com.enbecko.modcreator.linalg.Line3D;
 import com.enbecko.modcreator.linalg.vec_n;
@@ -436,7 +437,7 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void render(GlobalRenderSetting renderPass) {
+    public void render(GlobalRenderSetting renderPass, LocalRenderSetting... localRenderSettings) {
         if (renderPass.getRenderMode() == GlobalRenderSetting.RenderMode.DEBUG) {
             for (Line3D line : this.boundingEdgesInBoneCoords)
                 OpenGLHelperEnbecko.drawLine(line, this.isActive() ? OpenGLHelperEnbecko.GREEN : OpenGLHelperEnbecko.RED, 4);

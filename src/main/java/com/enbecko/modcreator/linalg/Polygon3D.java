@@ -1,26 +1,33 @@
 package com.enbecko.modcreator.linalg;
 
+import com.enbecko.modcreator.RenderPolygon;
+import com.sun.istack.internal.Nullable;
+
 /**
  * Created by Niclas on 06.03.2017.
  */
-public class Polygon3D {
-    private final PolygonDrawStyle drawStyle;
+public abstract class Polygon3D <T extends RenderPolygon> {
     private final vec3[] corners;
-    public Polygon3D(PolygonDrawStyle drawStyle, vec3 ... corners) {
-        this.drawStyle = drawStyle;
+    private T renderer;
+
+    public Polygon3D(vec3 ... corners) {
         this.corners = corners;
-        switch (drawStyle) {
-            case TRIANGLES:
-                if (this.corners.length == 3) {
-
-                }
-                throw new RuntimeException("Please create multiple Triangles instead");
-            case QUADS:
-                throw new RuntimeException("Please create multiple Triangles instead");
-        }
     }
 
-    public enum  PolygonDrawStyle {
-        TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUAD_STRIP, QUADS, POLYGON;
+    @Nullable
+    public T getRenderer() {
+        return this.renderer;
     }
+
+    public void setRenderer(T renderer) {
+        this.renderer = renderer;
+    }
+
+    public abstract vec3 checkIfCrosses(RayTrace3D rayTrace3D);
+
+    public abstract boolean isFlat();
+
+    public abstract boolean isSymmetric();
+
+    public abstract boolean isConvex();
 }

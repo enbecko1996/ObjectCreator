@@ -1,12 +1,14 @@
 package com.enbecko.modcreator.linalg;
 
+import com.enbecko.modcreator.RenderQuadrilateral;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
  * Created by enbec on 21.02.2017.
  */
-public abstract class Quadrilateral3D extends Polygon3D{
+public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
 
     public final vec3 LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT;
     //For example if objects should bounce of this surface.
@@ -27,6 +29,7 @@ public abstract class Quadrilateral3D extends Polygon3D{
     boolean isConvex;
 
     public Quadrilateral3D(vec3 LOW_LEFT, vec3 LOW_RIGHT, vec3 TOP_RIGHT, vec3 TOP_LEFT) {
+        super(LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT);
         this.LOW_LEFT = LOW_LEFT;
         this.LOW_RIGHT = LOW_RIGHT;
         this.TOP_RIGHT = TOP_RIGHT;
@@ -42,6 +45,7 @@ public abstract class Quadrilateral3D extends Polygon3D{
      * @param rayTrace3D's vecs are changed during the process. Should be made back to normal afterwards.
      * @return null if no cross. crossposition as vec3 otherwise.
      */
+    @Override
     @Nullable
     public vec3 checkIfCrosses(RayTrace3D rayTrace3D) {
         synchronized (rayTrace3D) {

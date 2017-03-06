@@ -10,7 +10,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 /**
  * Created by enbec on 03.03.2017.
  */
-public abstract class RenderPolygon<T extends vec3Vert> {
+public abstract class RenderPolygon <T extends vec3Vert> {
     /**
      * TODO
      */

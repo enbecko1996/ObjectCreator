@@ -1,7 +1,7 @@
 package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
-import com.enbecko.modcreator.Visible.Visible_Cube;
+import com.enbecko.modcreator.Visible.Cube;
 import com.enbecko.modcreator.linalg.Matrix;
 import com.enbecko.modcreator.linalg.vec3;
 import net.minecraftforge.fml.relauncher.Side;
@@ -119,8 +119,8 @@ public class Bone {
     public void addContent(Content content, Content ... adjacent) {
         if (!this.I.isActive())
             this.I.setActive(true);
-        Visible_Cube cube1 = new Visible_Cube(this, new vec3.IntVec(6, 12, 6), 1).createBoundingGeometry();
-        Visible_Cube cube2 = new Visible_Cube(this, new vec3.IntVec(4, 4, 4), 1).createBoundingGeometry();
+        Cube cube1 = new Cube(this, new vec3.IntVec(6, 12, 6), 1).createBoundingGeometry();
+        Cube cube2 = new Cube(this, new vec3.IntVec(4, 4, 4), 1).createBoundingGeometry();
         this.I.addContent(new vec3.IntVec(3, 1, 1), cube1);
         this.I.addContent(new vec3.IntVec(1, 9, 1), cube2);
         this.I.addContent(new vec3.IntVec(1, 1, 1), cube1);
@@ -137,6 +137,6 @@ public class Bone {
 
     public static void main(String[] args) {
         Bone b;
-        (b = new Bone()).addContent(new Visible_Cube(b, new vec3.IntVec(16, 4, 2, false), 2));
+        (b = new Bone()).addContent(new Cube(b, new vec3.IntVec(16, 4, 2, false), 2));
     }
 }

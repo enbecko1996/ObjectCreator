@@ -1,6 +1,7 @@
 package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
+import com.enbecko.modcreator.LocalRenderSetting;
 import com.enbecko.modcreator.linalg.vec3;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -96,7 +97,7 @@ public class FirstOrderHolder extends CubicContentHolderGeometry implements Cont
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void render(GlobalRenderSetting renderPass) {
+    public void render(GlobalRenderSetting renderPass, LocalRenderSetting... localRenderSettings) {
         if (renderPass.getRenderMode() == GlobalRenderSetting.RenderMode.DEBUG)
             super.render(renderPass);
         for (Content child : this.content) {
