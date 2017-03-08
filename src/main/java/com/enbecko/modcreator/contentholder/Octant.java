@@ -1,8 +1,12 @@
-package com.enbecko.modcreator.geometry;
+package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
+import com.enbecko.modcreator.LocalRenderSetting;
 import com.enbecko.modcreator.OpenGLHelperEnbecko;
+import com.enbecko.modcreator.events.ManipulatingEvent;
 import com.enbecko.modcreator.linalg.Line3D;
+import com.enbecko.modcreator.linalg.RayTrace3D;
+import com.enbecko.modcreator.linalg.vec_n;
 import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
 import com.enbecko.modcreator.linalg.vec3;
 import net.minecraftforge.fml.relauncher.Side;
@@ -21,9 +25,11 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
     private final List<CubicContentHolderGeometry> content = new ArrayList<CubicContentHolderGeometry>();
     private boolean isActive = false;
     private byte highestOrder = 1;
+    protected final List<CubicContentHolderGeometry> rayTraceResult = new ArrayList<CubicContentHolderGeometry>();
+    protected double[] distance = new double[Main_BlockHeroes.contentCubesPerCube];
 
     public Octant(Bone parentBone, vec3 positonInBoneCoords, double xSize, double ySize, double zSize, OCTANTS type) {
-        super(parentBone, positonInBoneCoords, xSize, ySize, zSize);
+        super(parentBone, positonInBoneCoords, xSize, ySize, zSize, vec_n.vecPrec.INT);
         this.type = type;
         this.setActive(false);
         this.createBoundingGeometry();
@@ -31,10 +37,62 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
 
     @Override
     public Octant createBoundingGeometry() {
-        vec3 pos = this.getPositionInBoneCoords();
-        this.makeCorners(true);
-        this.makeCubicEdgesAndFacesAutoUpdate();
+        this.makeHexahedralEdgesAndFacesAutoUpdate();
         return this;
+    }
+
+    public Content getRayTraceResult(RayTrace3D rayTrace3D) {
+        List<CubicContentHolderGeometry> holders = this.getContent();
+        this.rayTraceResult.clear();
+        for (int l = 0; l < distance.length; l++) {
+            if (distance[l] != 0)
+                distance[l] = 0;
+            else
+                break;
+        }
+        vec3 pos;
+        for (CubicContentHolderGeometry holder : holders) {
+            if (holder.isInside(rayTrace3D.getOnPoint())) {
+                this.rayTraceResult.add(0, holder);
+                double tmp = distance[0];
+                for (int l = 1; l < distance.length; l++) {
+                    if (l > 0 && distance[l - 1] != 0) {
+                        double tt = distance[l];
+                        distance[l] = tmp;
+                        tmp = tt;
+                    } else
+                        break;
+                }
+            }
+            if ((pos = holder.checkIfCrosses(rayTrace3D)) != null) {
+                double d = pos.subFromThis(rayTrace3D.getOnPoint()).length();
+                int k = 0;
+                for (; k < distance.length; k++) {
+                    if (distance[k] == 0 || distance[k] > d) {
+                        if (distance[k] != 0) {
+                            double tmp = distance[k];
+                            for (int l = k + 1; l < distance.length; l++) {
+                                if (l > 0 && distance[l - 1] != 0) {
+                                    double tt = distance[l];
+                                    distance[l] = tmp;
+                                    tmp = tt;
+                                } else
+                                    break;
+                            }
+                        }
+                        distance[k] = d;
+                        break;
+                    }
+                }
+                this.rayTraceResult.add(k, holder);
+            }
+        }
+        for (CubicContentHolderGeometry holder : this.rayTraceResult) {
+            Content result;
+            if ((result = holder.getRayTraceResult(rayTrace3D)) != null)
+                return result;
+        }
+        return null;
     }
 
     @Override
@@ -45,6 +103,10 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
     @Override
     public int getContentCount() {
         return this.content.size();
+    }
+
+    public OCTANTS getType() {
+        return type;
     }
 
     @Override
@@ -114,14 +176,14 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
 
     @Override
     public boolean addContent(@Nonnull vec3 decisiveVec, @Nonnull Content toAdd) {
+        if (!toAdd.isInside(decisiveVec))
+            throw new RuntimeException("The decisiveVec " +decisiveVec+ " with which you want to add " + toAdd + " is not even in the content");
         if (this.isVecInHere(decisiveVec)) {
             if (toAdd instanceof CubicContentHolderGeometry && ((CubicContentHolderGeometry)toAdd).getOrder() >= this.highestOrder)
                 throw new RuntimeException("Can't add CubicContentHolder with higher order than this's highest order");
             for (CubicContentHolderGeometry aContent : this.content) {
                 if (aContent.isInside(decisiveVec)) {
                     if (aContent instanceof ContentHolder) {
-                        System.out.println(aContent + " " + decisiveVec);
-                        System.out.println("add in already existing");
                         return ((ContentHolder) aContent).addContent(decisiveVec, toAdd);
                     }
                 }
@@ -434,14 +496,18 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
     }
 
     @Override
+    public void manipulateMe(ManipulatingEvent event, RayTrace3D rayTrace3D) {
+    }
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void render(GlobalRenderSetting renderPass) {
-        if (renderPass.getRenderMode() == GlobalRenderSetting.RenderMode.DEBUG) {
+    public void render(LocalRenderSetting... localRenderSettings) {
+        if (GlobalRenderSetting.getRenderMode() == GlobalRenderSetting.RenderMode.DEBUG) {
             for (Line3D line : this.boundingEdgesInBoneCoords)
                 OpenGLHelperEnbecko.drawLine(line, this.isActive() ? OpenGLHelperEnbecko.GREEN : OpenGLHelperEnbecko.RED, 4);
         }
         for (CubicContentHolderGeometry child : this.content)
-            child.render(renderPass);
+            child.render();
     }
 
     public enum OCTANTS {

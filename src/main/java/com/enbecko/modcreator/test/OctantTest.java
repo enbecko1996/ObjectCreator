@@ -1,8 +1,5 @@
 package com.enbecko.modcreator.test;
 
-import com.enbecko.modcreator.geometry.Bone;
-import com.enbecko.modcreator.geometry.FirstOrderHolder;
-import com.enbecko.modcreator.geometry.Octant;
 import com.enbecko.modcreator.linalg.vec3;
 
 /**

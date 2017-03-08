@@ -1,10 +1,15 @@
-package com.enbecko.modcreator.geometry;
+package com.enbecko.modcreator.contentholder;
 
-import com.enbecko.modcreator.GlobalRenderSetting;
+import com.enbecko.modcreator.Visible.Gridded_CUBE;
+import com.enbecko.modcreator.events.BlockSetModes.BlockSetMode;
 import com.enbecko.modcreator.linalg.Matrix;
+import com.enbecko.modcreator.linalg.RayTrace3D;
 import com.enbecko.modcreator.linalg.vec3;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.enbecko.modcreator.linalg.vec_n.vecPrec.INT;
 
@@ -14,14 +19,22 @@ import static com.enbecko.modcreator.linalg.vec_n.vecPrec.INT;
 public class Bone {
     @Deprecated
     private CubicContentHolderGeometry boneContent = null;
-    private vec3.DoubleVec rotPoint_global;
+    private vec3 center_global;
     private vec3.DoubleVec offset;
     private final Matrix.Matrix_NxN transform = Matrix.NxN_FACTORY.makeIdent(4);
     private final Matrix.Matrix_NxN inverseTransform = Matrix.NxN_FACTORY.makeIdent(4);
     private final Octant I, II, III, IV, V, VI, VII, VIII;
     private final Octant[] octants = new Octant[8];
+    protected final List<Octant> rayTraceResult = new ArrayList<Octant>();
+    protected double[] distance = new double[8];
 
-    public Bone() {
+    @SideOnly(Side.CLIENT)
+    public Bone(vec3 center_global) {
+        this.center_global = center_global;
+        System.out.println(this.center_global);
+        this.transform.translate(this.center_global.getVecD());
+        ((Matrix.Matrix_NxN)this.inverseTransform.update(transform)).invert();
+        System.out.println(transform + " " + this.inverseTransform);
         vec3.IntVec center = new vec3.IntVec();
         this.I = new Octant(this, center, 1, 1, 1, Octant.OCTANTS.I);
         this.II = new Octant(this, (vec3.IntVec) center.addAndMakeNew(INT, false, -1, 0, 0), 1, 1, 1, Octant.OCTANTS.II);
@@ -109,22 +122,78 @@ public class Bone {
     }
     */
 
+    public RayTraceResult getRayTraceResult(RayTrace3D rayTrace_GLOBAL, BlockSetMode editMode) {
+        RayTrace3D rayTrace_BONE = new RayTrace3D(rayTrace_GLOBAL);
+        rayTrace_BONE.transform(this.inverseTransform);
+        this.rayTraceResult.clear();
+        for (int l = 0; l < distance.length; l++) {
+            if (distance[l] != 0)
+                distance[l] = 0;
+            else
+                break;
+        }
+        vec3 pos;
+        for (Octant octant : this.octants) {
+            if (octant.isActive()) {
+                if (octant.isInside(rayTrace_BONE.getOnPoint())) {
+                    this.rayTraceResult.add(0, octant);
+                    double tmp = distance[0];
+                    for (int l = 1; l < distance.length; l++) {
+                        if (l > 0 && distance[l - 1] != 0) {
+                            double tt = distance[l];
+                            distance[l] = tmp;
+                            tmp = tt;
+                        } else
+                            break;
+                    }
+                }
+                if ((pos = octant.checkIfCrosses(rayTrace_BONE)) != null) {
+                    double d = pos.subFromThis(rayTrace_BONE.getOnPoint()).length();
+                    int k = 0;
+                    for (; k < distance.length; k++) {
+                        if (distance[k] == 0 || distance[k] > d) {
+                            if (distance[k] != 0) {
+                                double tmp = distance[k];
+                                for (int l = k + 1; l < distance.length; l++) {
+                                    if (l > 0 && distance[l - 1] != 0) {
+                                        double tt = distance[l];
+                                        distance[l] = tmp;
+                                        tmp = tt;
+                                    } else
+                                        break;
+                                }
+                            }
+                            distance[k] = d;
+                            break;
+                        }
+                    }
+                    this.rayTraceResult.add(k, octant);
+                }
+            }
+        }
+        for (Octant octant : this.rayTraceResult) {
+            Content result;
+            if ((result = octant.getRayTraceResult(rayTrace_BONE)) != null)
+                return new RayTraceResult(this, rayTrace_BONE, result, result.getCrossedFaceVecAndAngle(rayTrace_BONE, editMode));
+        }
+        return null;
+    }
+
     @SideOnly(Side.CLIENT)
-    public void render(GlobalRenderSetting renderPass) {
+    public void render() {
         for (Octant octant : this.octants)
-            octant.render(renderPass);
+            octant.render();
     }
 
     public void addContent(Content content, Content ... adjacent) {
         if (!this.I.isActive())
             this.I.setActive(true);
-        Visible_Cube cube1 = new Visible_Cube(this, new vec3.IntVec(6, 12, 6), 1).createBoundingGeometry();
-        Visible_Cube cube2 = new Visible_Cube(this, new vec3.IntVec(4, 4, 4), 1).createBoundingGeometry();
-        this.I.addContent(new vec3.IntVec(3, 1, 1), cube1);
-        this.I.addContent(new vec3.IntVec(1, 9, 1), cube2);
-        this.I.addContent(new vec3.IntVec(1, 1, 1), cube1);
-        this.I.addContent(new vec3.IntVec(1, 4, 1), cube2);
-        this.I.addContent(new vec3.IntVec(6, 12, 6), cube2);
+        if (!this.II.isActive())
+            this.II.setActive(true);
+        Gridded_CUBE griddedCUBE1 = new Gridded_CUBE(this, new vec3.IntVec(0, 0, 0), 1).createBoundingGeometry();
+        this.I.addContent(new vec3.IntVec(0, 0, 0), griddedCUBE1);
+        Gridded_CUBE griddedCUBE2 = new Gridded_CUBE(this, new vec3.IntVec(-1, 0, 0), 1).createBoundingGeometry();
+        this.II.addContent(new vec3.IntVec(-1, 0, 0), griddedCUBE2);
     }
 
     public void octantEmpty(Octant octant) {
@@ -134,8 +203,14 @@ public class Bone {
         }
     }
 
+    private static final vec3.DoubleVec eye = new vec3.DoubleVec(39, 100.5, 123.5), look = new vec3.DoubleVec(-1, 0, 0);
+    private static final RayTrace3D theRayTrace = new RayTrace3D(eye, look, 100, true);
+
     public static void main(String[] args) {
-        Bone b;
-        (b = new Bone()).addContent(new Visible_Cube(b, new vec3.IntVec(16, 4, 2, false), 2));
+        Bone b = new Bone(new vec3.IntVec(30, 100, 123));
+        b.addContent(null);
+        theRayTrace.update(eye, look);
+        long time = System.currentTimeMillis();
+        System.out.println(System.currentTimeMillis() - time);
     }
 }

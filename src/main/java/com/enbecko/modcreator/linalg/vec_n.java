@@ -41,6 +41,15 @@ public abstract class vec_n<T extends Number> {
         this.setVec(false, vec);
     }
 
+    public vec_n set(int pos, double val) {
+        this.vec[pos] = val;
+        return this;
+    }
+
+    public double get(int pos) {
+        return this.vec[pos];
+    }
+
     public vec_n invert() {
         this.mulToThis(-1);
         return this;
@@ -121,6 +130,16 @@ public abstract class vec_n<T extends Number> {
         return this;
     }
 
+    public vec_n addToThis(double add) {
+        if (!this.isChangeable) {
+            throw new RuntimeException("you can't change unchangeable vecs" + this);
+        } else {
+            for (int k = 0; k < vec.length; k++)
+                vec[k] += add;
+        }
+        return this;
+    }
+
     @Nullable
     public abstract vec_n mulAndMakeNew(vecPrec precision, double length, boolean floor);
 
@@ -149,6 +168,8 @@ public abstract class vec_n<T extends Number> {
     public vec_n update(int off, boolean floor, double... cont) {
         if (cont.length + off <= this.vec.length)
             System.arraycopy(cont, 0, this.vec, off, cont.length);
+        else
+            throw new RuntimeException("cant update vec_n with wrong content");
         this.applyPrecision(floor);
         return this;
     }
@@ -160,16 +181,19 @@ public abstract class vec_n<T extends Number> {
     }
 
     public double dot(vec_n other) {
-        double[] otherVec = other.getVecD();
+        return this.dot(other.getVecD());
+    }
+
+    public double dot(double ... comp) {
         double[] vec = this.getVecD();
-        if (otherVec.length == vec.length) {
+        if (comp.length == vec.length) {
             double out = 0;
             for (int k = 0; k < vec.length; k++) {
-                out += vec[k] * otherVec[k];
+                out += vec[k] * comp[k];
             }
             return out;
         } else
-            throw new RuntimeException("cannot do dot on different sized vectors" + this + " " + other);
+            throw new RuntimeException("cannot do dot on different sized vectors" + this + " " + comp);
     }
 
     public String toString() {

@@ -1,19 +1,24 @@
 package com.enbecko.modcreator.minecraft;
 
+import com.enbecko.modcreator.events.EventDispatcher;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.Item;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import org.lwjgl.input.Keyboard;
 
 /**
  * Created by enbec on 03.03.2017.
  */
 public class ClientProxy extends CommonProxy {
     public static String modid = Main_BlockHeroes.MODID;
+    public static KeyBinding KEY_X, KEY_Y, KEY_Z;
 
     @Override
     public void preInit(FMLPreInitializationEvent e) {
@@ -23,6 +28,17 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void init(FMLInitializationEvent e) {
         this.bindRenderers();
+        this.registerKeyBindings();
+        MinecraftForge.EVENT_BUS.register(EventDispatcher.getTheEventDispatcher());
+    }
+
+    public void registerKeyBindings() {
+        KEY_X = new KeyBinding("key.x", Keyboard.KEY_X, "key.categories.MercenaryMod");
+        KEY_Y = new KeyBinding("key.y", Keyboard.KEY_Y, "key.categories.MercenaryMod");
+        KEY_Z = new KeyBinding("key.Z", Keyboard.KEY_Z, "key.categories.MercenaryMod");
+        ClientRegistry.registerKeyBinding(KEY_X);
+        ClientRegistry.registerKeyBinding(KEY_Y);
+        ClientRegistry.registerKeyBinding(KEY_Z);
     }
 
     @Override

@@ -1,5 +1,8 @@
 package com.enbecko.modcreator.minecraft;
 
+import com.enbecko.modcreator.GlobalRenderSetting;
+import com.enbecko.modcreator.events.BlockSetModes.BlockSetModes;
+import com.enbecko.modcreator.events.BlockSetModes.BlockSetMode;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.Mod;
@@ -19,6 +22,8 @@ public class Main_BlockHeroes
     public static CommonProxy proxy;
 
     public static int contentCubesPerCube = 2;
+    public static TE_Editor active_Editor_Block = null;
+    public static BlockSetMode current_BlockSetMode = BlockSetModes.SINGLE_GRIDDED_MODE;
 
     public static BlockEditor editorBlock;
 
@@ -34,6 +39,7 @@ public class Main_BlockHeroes
     public void init(FMLInitializationEvent event) {
         proxy.init(event);
         editorBlock = (BlockEditor) new BlockEditor().setUnlocalizedName("editorblock").setCreativeTab(modMakerTab);
+        GlobalRenderSetting.putRenderMode(GlobalRenderSetting.RenderMode.DEBUG);
 
         GameRegistry.registerTileEntity(TE_Editor.class, "te_editorblock");
 

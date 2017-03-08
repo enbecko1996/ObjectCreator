@@ -22,6 +22,14 @@ public class Line3D {
         return endPoint;
     }
 
+    public vec3 getVec() {
+        return (vec3) this.endPoint.subAndMakeNew(this.endPoint.getPrecision(), this.onPoint, false);
+    }
+
+    public String toString() {
+        return "LINE3D: onpoint = " + this.onPoint + ", endpoint = " + this.endPoint;
+    }
+
     public static class Line3DAutoUpdateOnVecChange extends Line3D{
         public Line3DAutoUpdateOnVecChange(vec3 onPoint, vec3 end) {
             super(onPoint, end);

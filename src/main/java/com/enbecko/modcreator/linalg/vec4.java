@@ -18,6 +18,10 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
         super(other, floor);
     }
 
+    public vec4(vec3 other, boolean floor) {
+        super(floor, other.getXD(), other.getYD(), other.getZD(), 1);
+    }
+
     @Override
     public int getSize() {
         return 4;
@@ -55,15 +59,53 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
         return (float) this.vec[3];
     }
 
-    public void update(double r, double g, double b, double a) {
+    public double getXD() {
+        return this.vec[0];
+    }
+
+    public double getYD() {
+        return this.vec[1];
+    }
+
+    public double getZD() {
+        return this.vec[2];
+    }
+
+    public double getWD() {
+        return this.vec[3];
+    }
+
+    public float getXF() {
+        return (float) this.vec[0];
+    }
+
+    public float getYF() {
+        return (float) this.vec[1];
+    }
+
+    public float getZF() {
+        return (float) this.vec[2];
+    }
+
+    public float getWF() {
+        return (float) this.vec[3];
+    }
+
+    public vec4 update(double r, double g, double b, double a) {
         this.update(r, g, b, a, false);
+        return this;
     }
     public abstract void update(double r, double g, double b, double a, boolean floor);
     public abstract void setR(double r);
     public abstract void setG(double g);
     public abstract void setB(double b);
     public abstract void setA(double a);
-
+    
+    public void setX(double r) {this.setR(r);}
+    public void setY(double g) {this.setG(g);}
+    public void setZ(double b) {this.setB(b);}
+    public void setW(double a) {this.setA(a);}
+    
     public static vec4 newVecWithPrecision(vecPrec prec, vec4 old, boolean floor) {
         switch (prec) {
             case BYTE:
@@ -199,6 +241,14 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
             super(other, false);
         }
 
+        public IntVec(vec3 other, boolean floor) {
+            super(other, floor);
+        }
+
+        public IntVec(vec3 other) {
+            super(other, false);
+        }
+
         public IntVec(int r, int g, int b, int a) {
             super(r, g, b, a, false);
         }
@@ -274,6 +324,22 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
             return (int) this.vec[3];
         }
 
+        public int getX() {
+            return (int) this.vec[0];
+        }
+
+        public int getY() {
+            return (int) this.vec[1];
+        }
+
+        public int getZ() {
+            return (int) this.vec[2];
+        }
+
+        public int getW() {
+            return (int) this.vec[3];
+        }
+
         @Override
         public vecPrec getPrecision() {
             return vecPrec.INT;
@@ -317,6 +383,14 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
         }
 
         public LongVec(vec4 other) {
+            super(other, false);
+        }
+
+        public LongVec(vec3 other, boolean floor) {
+            super(other, floor);
+        }
+
+        public LongVec(vec3 other) {
             super(other, false);
         }
 
@@ -396,6 +470,22 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
             return (long) this.vec[3];
         }
 
+        public long getX() {
+            return (long) this.vec[0];
+        }
+
+        public long getY() {
+            return (long) this.vec[1];
+        }
+
+        public long getZ() {
+            return (long) this.vec[2];
+        }
+
+        public long getW() {
+            return (long) this.vec[3];
+        }
+
         @Override
         public vecPrec getPrecision() {
             return vecPrec.LONG;
@@ -438,6 +528,10 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
             super(other, false);
         }
 
+        public DoubleVec(vec3 other) {
+            super(other, false);
+        }
+
         public DoubleVec(double r, double g, double b, double a) {
             super(r, g, b, a, false);
         }
@@ -445,7 +539,11 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
         public DoubleVec(vec4 other, boolean floor) {
             super(other, floor);
         }
-        
+
+        public DoubleVec(vec3 other, boolean floor) {
+            super(other, floor);
+        }
+
         @Override
         public void update(double r, double g, double b, double a, boolean floor) {
             if(this.isChangeable) {
@@ -510,6 +608,22 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
             return this.vec[3];
         }
 
+        public double getX() {
+            return this.vec[0];
+        }
+
+        public double getY() {
+            return this.vec[1];
+        }
+
+        public double getZ() {
+            return this.vec[2];
+        }
+
+        public double getW() {
+            return this.vec[3];
+        }
+
         @Override
         public vecPrec getPrecision() {
             return vecPrec.DOUBLE;
@@ -543,6 +657,14 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
         }
 
         public FloatVec(vec4 other) {
+            super(other, false);
+        }
+
+        public FloatVec(vec3 other, boolean floor) {
+            super(other, floor);
+        }
+
+        public FloatVec(vec3 other) {
             super(other, false);
         }
 
@@ -614,6 +736,22 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
             return (float) this.vec[3];
         }
 
+        public float getX() {
+            return (float) this.vec[0];
+        }
+
+        public float getY() {
+            return (float) this.vec[1];
+        }
+
+        public float getZ() {
+            return (float) this.vec[2];
+        }
+
+        public float getW() {
+            return (float) this.vec[3];
+        }
+
         @Override
         public vecPrec getPrecision() {
             return vecPrec.FLOAT;
@@ -650,6 +788,14 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
         }
 
         public ShortVec(vec4 other) {
+            super(other, false);
+        }
+
+        public ShortVec(vec3 other, boolean floor) {
+            super(other, floor);
+        }
+
+        public ShortVec(vec3 other) {
             super(other, false);
         }
 
@@ -724,6 +870,26 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
             return (short) this.vec[2];
         }
 
+        public short getA() {
+            return (short) this.vec[3];
+        }
+
+        public short getX() {
+            return (short) this.vec[0];
+        }
+
+        public short getY() {
+            return (short) this.vec[1];
+        }
+
+        public short getZ() {
+            return (short) this.vec[2];
+        }
+       
+        public short getW() {
+            return (short) this.vec[3];
+        }
+
         @Override
         public vecPrec getPrecision() {
             return vecPrec.SHORT;
@@ -767,6 +933,14 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
         }
 
         public ByteVec(vec4 other) {
+            super(other, false);
+        }
+
+        public ByteVec(vec3 other, boolean floor) {
+            super(other, floor);
+        }
+
+        public ByteVec(vec3 other) {
             super(other, false);
         }
 
@@ -845,6 +1019,22 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
             return (byte) this.vec[3];
         }
 
+        public byte getX() {
+            return (byte) this.vec[0];
+        }
+
+        public byte getY() {
+            return (byte) this.vec[1];
+        }
+
+        public byte getZ() {
+            return (byte) this.vec[2];
+        }
+
+        public byte getW() {
+            return (byte) this.vec[3];
+        }
+        
         @Override
         public vecPrec getPrecision() {
             return vecPrec.BYTE;

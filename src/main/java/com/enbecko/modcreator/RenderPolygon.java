@@ -10,7 +10,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 /**
  * Created by enbec on 03.03.2017.
  */
-public abstract class Polygon <T extends vec3Vert> {
+public abstract class RenderPolygon <T extends vec3Vert> {
     /**
      * TODO
      */
@@ -18,13 +18,13 @@ public abstract class Polygon <T extends vec3Vert> {
     int nVertices;
     protected boolean invertNormals;
 
-    public Polygon(T ... textureVertices) {
+    public RenderPolygon(T ... textureVertices) {
         this.vertexPositions = textureVertices;
         this.nVertices = textureVertices.length;
     }
 
     @SideOnly(Side.CLIENT)
-    public abstract void draw(VertexBuffer vertexBuffer, float scale);
+    public abstract void draw(VertexBuffer vertexBuffer, float scale, LocalRenderSetting... localRenderSettings);
 
     public T getVertexAt(int pos) {
         return this.vertexPositions[pos];
@@ -51,7 +51,7 @@ public abstract class Polygon <T extends vec3Vert> {
     /**
      * Created by enbec on 03.03.2017.
      */
-    public static class Textured extends Polygon <vec3Vert.PosTexNorm> {
+    public static class Textured extends RenderPolygon<vec3Vert.PosTexNorm> {
         private boolean invertNormal;
 
         public Textured(vec3Vert.PosTexNorm ... vertices) {
@@ -60,7 +60,7 @@ public abstract class Polygon <T extends vec3Vert> {
 
         @Override
         @SideOnly(Side.CLIENT)
-        public void draw(VertexBuffer vertexBuffer, float scale) {
+        public void draw(VertexBuffer vertexBuffer, float scale, LocalRenderSetting... localRenderSettings) {
             vertexBuffer.begin(7, DefaultVertexFormats.POSITION_TEX_NORMAL);
 
             for(int i = 0; i < nVertices; ++i) {
@@ -77,7 +77,7 @@ public abstract class Polygon <T extends vec3Vert> {
     /**
      * Created by enbec on 03.03.2017.
      */
-    public static class Colored extends Polygon <vec3Vert.PosColNorm> {
+    public static class Colored extends RenderPolygon<vec3Vert.PosColNorm> {
         private boolean invertNormal;
 
         public Colored(vec3Vert.PosColNorm ... vertices) {
@@ -86,7 +86,7 @@ public abstract class Polygon <T extends vec3Vert> {
 
         @Override
         @SideOnly(Side.CLIENT)
-        public void draw(VertexBuffer vertexBuffer, float scale) {
+        public void draw(VertexBuffer vertexBuffer, float scale, LocalRenderSetting... localRenderSettings) {
             vertexBuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
 
             for(int i = 0; i < nVertices; ++i) {

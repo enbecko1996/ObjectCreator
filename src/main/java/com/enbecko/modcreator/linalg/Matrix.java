@@ -264,14 +264,15 @@ public class Matrix {
             return this.columns;
         }
 
-        public void update(Matrix_MxN other) {
+        public Matrix_MxN update(Matrix_MxN other) {
             if (this.isSameSize(other)) {
                 for (int mm = 0; mm < this.getRowCount(); mm++)
                     this.setRow(mm, other.getRowAt(mm));
             }
+            return this;
         }
 
-        public void updateRows(vec_n_DOUBLE[] rows, int off) {
+        public void updateRows(int off, vec_n_DOUBLE ... rows) {
             if (off + rows.length <= this.getRowCount()) {
                 for (int k = off; k < rows.length; k++) {
                     this.setRow(k, rows[k - off]);
@@ -280,7 +281,7 @@ public class Matrix {
                 throw new RuntimeException("Can't update " + rows.length + " rows from " + off + ". this.rowCount: " + this.getRowCount());
         }
 
-        public void updateColumns(vec_n_DOUBLE[] columns, int off) {
+        public void updateColumns(int off, vec_n_DOUBLE ... columns) {
             if (off + columns.length <= this.getColumncount()) {
                 for (int k = off; k < columns.length; k++) {
                     this.setColumn(k, columns[k - off]);
@@ -370,14 +371,25 @@ public class Matrix {
         }
 
         public vec_n_DOUBLE multiplyWithVector(vec_n rhs) {
-            if (this.getColumncount() == rhs.getSize()) {
+            if (this.getRowCount() == rhs.getSize()) {
                 vec_n_DOUBLE out = new vec_n_DOUBLE(rhs.getSize());
                 double[] vec = out.getVecD();
                 for (int k = 0; k < vec.length; k++)
-                    vec[k] = this.getColumnAt(k).dot(rhs);
+                    vec[k] = this.getRowAt(k).dot(rhs);
                 return out;
             } else {
                 throw new RuntimeException("Can't multiply this matrix with vector: lhs = " + this.getRowCount() + "x" + this.getColumncount() + " rhs = " + rhs.getSize());
+            }
+        }
+
+        public vec_n multiplyWithVector(vec_n toFill, double ... comp) {
+            if (this.getRowCount() == comp.length && toFill.getSize() == comp.length) {
+                for (int k = 0; k < comp.length; k++) {
+                    toFill.set(k, this.getRowAt(k).dot(comp));
+                }
+                return toFill;
+            } else {
+                throw new RuntimeException("Can't multiply this matrix with vector: lhs = " + this.getRowCount() + "x" + this.getColumncount() + " rhs = " + Arrays.toString(comp));
             }
         }
 
@@ -427,6 +439,14 @@ public class Matrix {
             super(stub, columns);
             if (this.getRowCount() != this.getColumncount())
                 throw new RuntimeException("Tried to create NxN matrix with MxN components (row) " + this);
+        }
+
+        public Matrix_NxN translate(double ... comp) {
+            if (comp.length <= this.m) {
+                this.setColumn(this.n - 1, this.getColumnAt(this.n - 1).addToThis(comp));
+                return this;
+            } else
+                throw new RuntimeException("Translate component is too big " + this +" "+comp);
         }
 
         @Deprecated
@@ -523,9 +543,8 @@ public class Matrix {
                 vec_n_DOUBLE tmpCol = LU_rhs.getColumnAt(k);
                 double[] col = tmpCol.getVecD();
                 //PIVOTING
-                boolean foundPivot = true;
                 if (col[k] == 0) {
-                    foundPivot = false;
+                    boolean foundPivot = false;
                     double biggest = 0;
                     int swapRow = k;
                     for (int l = 0; k + l < size; l++) {
@@ -533,6 +552,7 @@ public class Matrix {
                         if (col[k + l] != 0) {
                             swapRow = k + l;
                             foundPivot = true;
+                            break;
                         }
                         //take biggest Pivot
                         /**
@@ -554,7 +574,7 @@ public class Matrix {
                     vec_n_DOUBLE row = LU_rhs.getRowAt(p);
                     if (row.getVecD()[k] != 0) {
                         double fac = topRowCopy.getVecD()[k] != 0 ? -(row.getVecD()[k] / topRowCopy.getVecD()[k]) : 0;
-                        row.addToThis(topRowCopy.mulToThis(fac));
+                        LU_rhs.setRow(p, row.addToThis(topRowCopy.mulToThis(fac)));
                         topRowCopy.mulToThis(fac != 0 && !Double.isInfinite(fac) && !Double.isNaN(fac) ? 1 / fac : 1);
                         LU_lhs.set(p, k, -fac);
                     }
@@ -564,7 +584,17 @@ public class Matrix {
             //System.out.println("lhs: "+this.LU_lhs+" rhs: "+this.LU_rhs+" permut: "+this.LU_permutation);
         }
 
+        public Matrix_NxN invert() {
+            this.doLUDecomposition();
+            vec_n_DOUBLE[] outColumns = new vec_n_DOUBLE[this.getSize()];
+            for (int k = 0; k < outColumns.length; k++)
+                outColumns[k] = this.solveLGS_fromLU(new vec_n_DOUBLE(true, this.getSize(), k));
+            this.updateColumns(0, outColumns);
+            return this;
+        }
+
         public Matrix_NxN getInverse_fromLU() {
+            this.doLUDecomposition();
             vec_n_DOUBLE[] outColumns = new vec_n_DOUBLE[this.getSize()];
             for (int k = 0; k < outColumns.length; k++)
                 outColumns[k] = this.solveLGS_fromLU(new vec_n_DOUBLE(true, this.getSize(), k));
