@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 public abstract class Triangle3D extends Polygon3D <RenderTriangle> {
     private final vec3 first, sec, third;
     private final vec3 tmp1 = new vec3.DoubleVec(), tmp2 = new vec3.DoubleVec(), tmpRhs = new vec3.DoubleVec();
+    private final vec3 normal = new vec3.DoubleVec();
 
     public Triangle3D(vec3 first, vec3 sec, vec3 third) {
         super(first, sec, third);
@@ -37,6 +38,30 @@ public abstract class Triangle3D extends Polygon3D <RenderTriangle> {
         return null;
     }
 
+    public void updateNormal() {
+        tmp1.update(third).subFromThis(first);
+        tmp2.update(sec).subFromThis(first);
+        this.normal.update(tmp1.cross(tmp2, false));
+    }
+
+    public vec3 getNormal() {
+        return this.normal;
+    }
+
+    public double getAngle(RayTrace3D rayTrace3D, vec3 normal) {
+        if (this.isFlat())
+            return this.getNormal().angleTo360(rayTrace3D.getVec(), normal);
+        else
+            return 0;
+    }
+
+    @Nullable
+    public vec4 getAngleAndAngleNormal(RayTrace3D rayTrace3D) {
+        if (this.isFlat())
+            return this.getNormal().angleTo360(rayTrace3D.getVec());
+        return null;
+    }
+
     @Override
     public boolean isFlat() {
         return true;
@@ -56,11 +81,17 @@ public abstract class Triangle3D extends Polygon3D <RenderTriangle> {
         this.first.update(first);
         this.sec.update(sec);
         this.third.update(third);
+        this.updateNormal();
     }
 
     public static class AutoUpdate extends Triangle3D{
         public AutoUpdate(vec3 first, vec3 sec, vec3 third) {
             super(first, sec, third);
+        }
+
+        public vec3 getNormal() {
+            this.updateNormal();
+            return super.getNormal();
         }
     }
 

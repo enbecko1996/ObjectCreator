@@ -2,6 +2,7 @@ package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.LocalRenderSetting;
 import com.enbecko.modcreator.OpenGLHelperEnbecko;
+import com.enbecko.modcreator.events.BlockSetModes.BlockSetMode;
 import com.enbecko.modcreator.events.ManipulatingEvent;
 import com.enbecko.modcreator.linalg.*;
 import net.minecraftforge.fml.relauncher.Side;
@@ -92,6 +93,8 @@ public abstract class Content {
     public abstract boolean isInside(vec3 vec);
 
     public abstract vec3 checkIfCrosses(RayTrace3D rayTrace3D);
+
+    public abstract FaceCrossposAngle getCrossedFaceVecAndAngle(RayTrace3D rayTrace3D, BlockSetMode editMode);
 
     @SideOnly(Side.CLIENT)
     public abstract void manipulateMe(ManipulatingEvent event, RayTrace3D rayTrace3D);
@@ -272,12 +275,12 @@ public abstract class Content {
 
             //FRONT_X, RIGHT_Z, BACK_X, LEFT, TOP_Y, BOTTOM
             //ALL CCW if viewed as Front
-            this.boundingFacesInBoneCoords[0] = new Quadrilateral3D.AutoUpdateOnVecChange(this.boundingCornersInBoneCoords[0], this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[2], this.boundingCornersInBoneCoords[3]);
-            this.boundingFacesInBoneCoords[1] = new Quadrilateral3D.AutoUpdateOnVecChange(this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[7], this.boundingCornersInBoneCoords[2]);
-            this.boundingFacesInBoneCoords[2] = new Quadrilateral3D.AutoUpdateOnVecChange(this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[5], this.boundingCornersInBoneCoords[6], this.boundingCornersInBoneCoords[7]);
-            this.boundingFacesInBoneCoords[3] = new Quadrilateral3D.AutoUpdateOnVecChange(this.boundingCornersInBoneCoords[5], this.boundingCornersInBoneCoords[0], this.boundingCornersInBoneCoords[3], this.boundingCornersInBoneCoords[6]);
-            this.boundingFacesInBoneCoords[4] = new Quadrilateral3D.AutoUpdateOnVecChange(this.boundingCornersInBoneCoords[3], this.boundingCornersInBoneCoords[2], this.boundingCornersInBoneCoords[7], this.boundingCornersInBoneCoords[6]);
-            this.boundingFacesInBoneCoords[5] = new Quadrilateral3D.AutoUpdateOnVecChange(this.boundingCornersInBoneCoords[5], this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[0]);
+            this.boundingFacesInBoneCoords[0] = new Quadrilateral3D.AutoUpdate(this.boundingCornersInBoneCoords[0], this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[2], this.boundingCornersInBoneCoords[3]);
+            this.boundingFacesInBoneCoords[1] = new Quadrilateral3D.AutoUpdate(this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[7], this.boundingCornersInBoneCoords[2]);
+            this.boundingFacesInBoneCoords[2] = new Quadrilateral3D.AutoUpdate(this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[5], this.boundingCornersInBoneCoords[6], this.boundingCornersInBoneCoords[7]);
+            this.boundingFacesInBoneCoords[3] = new Quadrilateral3D.AutoUpdate(this.boundingCornersInBoneCoords[5], this.boundingCornersInBoneCoords[0], this.boundingCornersInBoneCoords[3], this.boundingCornersInBoneCoords[6]);
+            this.boundingFacesInBoneCoords[4] = new Quadrilateral3D.AutoUpdate(this.boundingCornersInBoneCoords[3], this.boundingCornersInBoneCoords[2], this.boundingCornersInBoneCoords[7], this.boundingCornersInBoneCoords[6]);
+            this.boundingFacesInBoneCoords[5] = new Quadrilateral3D.AutoUpdate(this.boundingCornersInBoneCoords[5], this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[0]);
         }
 
         @Override
@@ -331,6 +334,40 @@ public abstract class Content {
             } else {
                 throw new RuntimeException("This doesn't create a valid cuboid: xSize = " + xSize + ", ySize = " + ySize + ", zSize = " + zSize);
             }
+        }
+
+        @Override
+        @Deprecated
+        public void makeHexahedralEdgesAndFacesAutoUpdate() {
+            this.boundingEdgesInBoneCoords = new Line3D[12];
+            this.boundingFacesInBoneCoords = new Quadrilateral3D[6];
+            //FRONT_X FACE FROM LOW_LEFT CCW TO LOW_LEFT
+            this.boundingEdgesInBoneCoords[0] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[0], this.boundingCornersInBoneCoords[1]);
+            this.boundingEdgesInBoneCoords[1] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[2]);
+            this.boundingEdgesInBoneCoords[2] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[2], this.boundingCornersInBoneCoords[3]);
+            this.boundingEdgesInBoneCoords[3] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[3], this.boundingCornersInBoneCoords[0]);
+
+            //BACK_X FACE FROM LOW_LEFT CW TO LOW_LEFT
+            this.boundingEdgesInBoneCoords[4] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[5]);
+            this.boundingEdgesInBoneCoords[5] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[5], this.boundingCornersInBoneCoords[6]);
+            this.boundingEdgesInBoneCoords[6] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[6], this.boundingCornersInBoneCoords[7]);
+            this.boundingEdgesInBoneCoords[7] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[7], this.boundingCornersInBoneCoords[4]);
+
+            //EDGE FROM FRONT_X TO BACK_X BEGINNING IN FRONT_X LOW LEFT
+            //GOING CCW BACK_X TO LOW LEFT
+            this.boundingEdgesInBoneCoords[8] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[0], this.boundingCornersInBoneCoords[5]);
+            this.boundingEdgesInBoneCoords[9] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[4]);
+            this.boundingEdgesInBoneCoords[10] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[2], this.boundingCornersInBoneCoords[7]);
+            this.boundingEdgesInBoneCoords[11] = new Line3D.Line3DAutoUpdateOnVecChange(this.boundingCornersInBoneCoords[3], this.boundingCornersInBoneCoords[6]);
+
+            //FRONT_X, RIGHT_Z, BACK_X, LEFT, TOP_Y, BOTTOM
+            //ALL CCW if viewed as Front
+            this.boundingFacesInBoneCoords[0] = new Quadrilateral3D.AutoUpdate.Symmetrical(this.boundingCornersInBoneCoords[0], this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[2], this.boundingCornersInBoneCoords[3]);
+            this.boundingFacesInBoneCoords[1] = new Quadrilateral3D.AutoUpdate.Symmetrical(this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[7], this.boundingCornersInBoneCoords[2]);
+            this.boundingFacesInBoneCoords[2] = new Quadrilateral3D.AutoUpdate.Symmetrical(this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[5], this.boundingCornersInBoneCoords[6], this.boundingCornersInBoneCoords[7]);
+            this.boundingFacesInBoneCoords[3] = new Quadrilateral3D.AutoUpdate.Symmetrical(this.boundingCornersInBoneCoords[5], this.boundingCornersInBoneCoords[0], this.boundingCornersInBoneCoords[3], this.boundingCornersInBoneCoords[6]);
+            this.boundingFacesInBoneCoords[4] = new Quadrilateral3D.AutoUpdate.Symmetrical(this.boundingCornersInBoneCoords[3], this.boundingCornersInBoneCoords[2], this.boundingCornersInBoneCoords[7], this.boundingCornersInBoneCoords[6]);
+            this.boundingFacesInBoneCoords[5] = new Quadrilateral3D.AutoUpdate.Symmetrical(this.boundingCornersInBoneCoords[5], this.boundingCornersInBoneCoords[4], this.boundingCornersInBoneCoords[1], this.boundingCornersInBoneCoords[0]);
         }
 
         public void updateSize(double xSize, double ySize, double zSize) {
@@ -434,26 +471,29 @@ public abstract class Content {
             return null;
         }
 
-        public Quadrilateral3D getCrossedFace(RayTrace3D rayTrace3D) {
+        @Override
+        public FaceCrossposAngle getCrossedFaceVecAndAngle(RayTrace3D rayTrace3D, BlockSetMode editMode) {
             vec3 vec = rayTrace3D.getVec();
+            vec3 tmp;
+            Polygon3D tmp2;
             if (vec.getXD() > 0) {
-                if (this.getBoundingFace(Faces.FRONT_X).checkIfCrosses(rayTrace3D) != null)
-                    return this.getBoundingFace(Faces.FRONT_X);
+                if ((tmp = (tmp2 = this.getBoundingFace(Faces.FRONT_X)).checkIfCrosses(rayTrace3D)) != null)
+                    return new FaceCrossposAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
             } else if (vec.getXD() < 0)
-                if (this.getBoundingFace(Faces.BACK_X).checkIfCrosses(rayTrace3D) != null)
-                    return this.getBoundingFace(Faces.BACK_X);
+                if ((tmp = (tmp2 = this.getBoundingFace(Faces.BACK_X)).checkIfCrosses(rayTrace3D)) != null)
+                    return new FaceCrossposAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
             if (vec.getYD() > 0) {
-                if (this.getBoundingFace(Faces.BOTTOM_Y).checkIfCrosses(rayTrace3D) != null)
-                    return this.getBoundingFace(Faces.BOTTOM_Y);
+                if ((tmp = (tmp2 = this.getBoundingFace(Faces.BOTTOM_Y)).checkIfCrosses(rayTrace3D)) != null)
+                    return new FaceCrossposAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
             } else if (vec.getYD() < 0)
-                if (this.getBoundingFace(Faces.TOP_Y).checkIfCrosses(rayTrace3D) != null)
-                    return this.getBoundingFace(Faces.TOP_Y);
+                if ((tmp = (tmp2 = this.getBoundingFace(Faces.TOP_Y)).checkIfCrosses(rayTrace3D)) != null)
+                    return new FaceCrossposAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
             if (vec.getZD() > 0) {
-                if (this.getBoundingFace(Faces.LEFT_Z).checkIfCrosses(rayTrace3D) != null)
-                    return this.getBoundingFace(Faces.LEFT_Z);
+                if ((tmp = (tmp2 = this.getBoundingFace(Faces.LEFT_Z)).checkIfCrosses(rayTrace3D)) != null)
+                    return new FaceCrossposAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
             } else if (vec.getZD() < 0)
-                if (this.getBoundingFace(Faces.RIGHT_Z).checkIfCrosses(rayTrace3D) != null)
-                    return this.getBoundingFace(Faces.RIGHT_Z);
+                if ((tmp = (tmp2 = this.getBoundingFace(Faces.RIGHT_Z)).checkIfCrosses(rayTrace3D)) != null)
+                    return new FaceCrossposAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
             return null;
         }
 
@@ -504,7 +544,7 @@ public abstract class Content {
      * Created by enbec on 21.02.2017.
      */
     public abstract static class CubicContent extends CuboidContent {
-        protected CubicContent(Bone parentBone, vec3.IntVec positonInBoneCoords, int size, vec_n.vecPrec prec) {
+        protected CubicContent(Bone parentBone, vec3.IntVec positonInBoneCoords, double size, vec_n.vecPrec prec) {
             super(parentBone, positonInBoneCoords, size, size, size, prec);
         }
 

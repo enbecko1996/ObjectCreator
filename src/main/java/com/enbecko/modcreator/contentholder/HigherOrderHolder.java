@@ -38,16 +38,33 @@ public class HigherOrderHolder extends CubicContentHolderGeometry implements Con
         }
         vec3 pos;
         for (CubicContentHolderGeometry holder : holders) {
+            if (holder.isInside(rayTrace3D.getOnPoint())) {
+                this.rayTraceResult.add(0, holder);
+                double tmp = distance[0];
+                for (int l = 1; l < distance.length; l++) {
+                    if (l > 0 && distance[l - 1] != 0) {
+                        double tt = distance[l];
+                        distance[l] = tmp;
+                        tmp = tt;
+                    } else
+                        break;
+                }
+            }
             if ((pos = holder.checkIfCrosses(rayTrace3D)) != null) {
                 double d = pos.subFromThis(rayTrace3D.getOnPoint()).length();
                 int k = 0;
                 for (; k < distance.length; k++) {
-                    if (distance[k] == 0 || distance[k] < d) {
-                        for (int l = k; l < distance.length; l++) {
-                            if (distance[l-1] != 0)
-                                distance[l] = distance[l-1];
-                            else
-                                break;
+                    if (distance[k] == 0 || distance[k] > d) {
+                        if (distance[k] != 0) {
+                            double tmp = distance[k];
+                            for (int l = k + 1; l < distance.length; l++) {
+                                if (l > 0 && distance[l - 1] != 0) {
+                                    double tt = distance[l];
+                                    distance[l] = tmp;
+                                    tmp = tt;
+                                } else
+                                    break;
+                            }
                         }
                         distance[k] = d;
                         break;

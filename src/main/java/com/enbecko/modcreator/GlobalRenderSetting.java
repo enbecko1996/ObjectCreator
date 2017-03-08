@@ -1,8 +1,7 @@
 package com.enbecko.modcreator;
 
-import com.enbecko.modcreator.events.EditModeEnums;
+import com.enbecko.modcreator.events.BlockSetModes.BlockSetMode;
 import com.enbecko.modcreator.linalg.vec4;
-import com.sun.org.apache.regexp.internal.RE;
 
 import javax.annotation.Nonnull;
 
@@ -22,15 +21,8 @@ public class GlobalRenderSetting {
         return renderMode;
     }
 
-    public static RenderOption markRayTracedFaceWith(EditModeEnums editMode) {
-        switch (editMode) {
-            case BUILD:
-                return RenderOption.OVERLAY_GREEN;
-            case REMOVE:
-                return RenderOption.OVERLAY_RED;
-            default:
-                return markRayTracedFace;
-        }
+    public static RenderOption markRayTracedFaceWith(BlockSetMode editMode) {
+        return RenderOption.OVERLAY_GREEN;
     }
 
     public enum RenderMode {
@@ -38,17 +30,7 @@ public class GlobalRenderSetting {
     }
 
     public enum RenderOption {
-        OUTLINE, OVERLAY_RED {
-            private final vec4.FloatVec red = (vec4.FloatVec) new vec4.FloatVec(1, 0, 0, 1).normalize().mulToThis(overlayStrength).addToThis(1).normalize();
-            public vec4.FloatVec getColor() {
-                return red;
-            }
-        }, OVERLAY_GREEN {
-            private final vec4.FloatVec green = (vec4.FloatVec) new vec4.FloatVec(0, 1, 0, 1).normalize().mulToThis(overlayStrength).addToThis(1).normalize();
-            public vec4.FloatVec getColor() {
-                return green;
-            }
-        }, OVERLAY_CUSTOM {
+        OUTLINE {
             private final vec4.FloatVec color = (vec4.FloatVec) new vec4.FloatVec(1, 1, 1, 1).normalize().mulToThis(overlayStrength).addToThis(1).normalize();
             public vec4.FloatVec getColor() {
                 return color;
@@ -57,6 +39,27 @@ public class GlobalRenderSetting {
             public void setColor(float red, float green, float blue) {
                 color.update(red, green, blue, 1).normalize().mulToThis(overlayStrength).addToThis(1).normalize();
             }
-        }
+        }, OVERLAY_RED {
+            private final vec4.FloatVec red = (vec4.FloatVec) new vec4.FloatVec(1, 0, 0, 1);
+            public vec4.FloatVec getColor() {
+                return red;
+            }
+        }, OVERLAY_GREEN {
+            private final vec4.FloatVec green = (vec4.FloatVec) new vec4.FloatVec(0.3F, 1, 0.3F, 1);
+            public vec4.FloatVec getColor() {
+                return green;
+            }
+        }, OVERLAY_CUSTOM {
+            private final vec4.FloatVec color = (vec4.FloatVec) new vec4.FloatVec(1, 1, 1, 1);
+            public vec4.FloatVec getColor() {
+                return color;
+            }
+
+            public void setColor(float red, float green, float blue) {
+                color.update(red, green, blue, 1).normalize().mulToThis(overlayStrength).addToThis(1).normalize();
+            }
+        };
+
+        abstract vec4.FloatVec getColor();
     }
 }

@@ -1,6 +1,7 @@
 package com.enbecko.modcreator.linalg;
 
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import org.lwjgl.util.vector.Quaternion;
 
 import javax.annotation.Nullable;
@@ -21,11 +22,35 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         super(other, floor);
     }
 
+    public vec3(Vec3d other, boolean floor) {
+        super(floor, other.xCoord, other.yCoord, other.zCoord);
+    }
+
+    public vec3(vec4 other, boolean normalize, boolean floor) {
+        super(floor,
+                normalize ? other.getXD() / other.getWD() : other.getXD(),
+                normalize ? other.getYD() / other.getWD() : other.getYD(),
+                normalize ? other.getZD() / other.getWD() : other.getZD());
+    }
+
     public double angleTo360(vec3 other, vec3 normal) {
         vec3 cross = this.cross(other, false);
         double det = normal.dot(cross);
         double dot = this.dot(other);
         return Math.atan2(det, dot) + Math.PI;
+    }
+
+    public vec4 angleTo360(vec3 other) {
+        vec3 normal = (vec3) this.cross(other, false).normalize();
+        vec3 normalTmp = new vec3.DoubleVec(normal);
+        if (normal.getXD() < 0) {
+            normal.mulToThis(-1);
+        } else if (normal.getYD() < 0) {
+            normal.mulToThis(-1);
+        } else if (normal.getZD() < 0) {
+            normal.mulToThis(-1);
+        }
+        return new vec4.DoubleVec(normalTmp.getXD(), normalTmp.getYD(), normalTmp.getZD(), this.angleTo360(other, normal));
     }
 
     @Override
@@ -59,10 +84,24 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
 
     public abstract vec3 cross(vec3 other, boolean floor);
 
-    public void update(double x, double y, double z) {
-        this.update(x, y, z, false);
+    public vec3 update(double x, double y, double z) {
+        return this.update(x, y, z, false);
     }
-    public abstract void update(double x, double y, double z, boolean floor);
+    public vec3 update(double x, double y, double z, boolean floor) {
+        return (vec3) super.update(0, floor, x, y, z);
+    }
+
+    public vec3 update(vec4 other, boolean normalize, boolean floor) {
+        return (vec3) super.update(0, floor,
+                normalize ? other.getXD() / other.getWD() : other.getXD(),
+                normalize ? other.getYD() / other.getWD() : other.getYD(),
+                normalize ? other.getZD() / other.getWD() : other.getZD());
+    }
+
+    public vec3 update(Vec3d other, boolean floor) {
+        return (vec3) super.update(0, floor, other.xCoord, other.yCoord, other.zCoord);
+    }
+
     public abstract void setX(double x);
     public abstract void setY(double y);
     public abstract void setZ(double z);
@@ -219,6 +258,22 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super(other, false);
         }
 
+        public IntVec(Vec3d other, boolean floor) {
+            super(other, floor);
+        }
+
+        public IntVec(Vec3d other) {
+            super(other, false);
+        }
+
+        public IntVec(vec4 other, boolean normalize, boolean floor) {
+            super(other, normalize, floor);
+        }
+
+        public IntVec(vec4 other, boolean normalize) {
+            super(other, normalize, false);
+        }
+
         public IntVec(int x, int y, int z) {
             super(x, y, z, false);
         }
@@ -230,23 +285,6 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         @Override
         public vec3.IntVec cross(vec3 other, boolean floor) {
             return new vec3.IntVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD(), floor);
-        }
-
-        @Override
-        public void update(double x, double y, double z, boolean floor) {
-            if(this.isChangeable) {
-                if (floor) {
-                    this.vec[0] = (int) Math.floor(x);
-                    this.vec[1] = (int) Math.floor(y);
-                    this.vec[2] = (int) Math.floor(z);
-                } else {
-                    this.vec[0] = (int) x;
-                    this.vec[1] = (int) y;
-                    this.vec[2] = (int) z;
-                }
-            } else {
-                throw new RuntimeException("Can't change unchangeable vecs " + this);
-            }
         }
 
         @Override
@@ -334,6 +372,21 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super(other, false);
         }
 
+        public LongVec(Vec3d other, boolean floor) {
+            super(other, floor);
+        }
+
+        public LongVec(Vec3d other) {
+            super(other, false);
+        }
+
+        public LongVec(vec4 other, boolean normalize, boolean floor) {
+            super(other, normalize, floor);
+        }
+
+        public LongVec(vec4 other, boolean normalize) {
+            super(other, normalize, false);
+        }
         public LongVec(long x, long y, long z) {
             super(x, y, z, false);
         }
@@ -341,23 +394,6 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         @Override
         public vec3.LongVec cross(vec3 other, boolean floor) {
             return new vec3.LongVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD(), floor);
-        }
-        
-        @Override
-        public void update(double x, double y, double z, boolean floor) {
-            if(this.isChangeable) {
-                if (floor) {
-                    this.vec[0] = (long) Math.floor(x);
-                    this.vec[1] = (long) Math.floor(y);
-                    this.vec[2] = (long) Math.floor(z);
-                } else {
-                    this.vec[0] = (long) x;
-                    this.vec[1] = (long) y;
-                    this.vec[2] = (long) z;
-                }
-            } else {
-                throw new RuntimeException("Can't change unchangeable vecs " + this);
-            }
         }
 
         @Override
@@ -441,6 +477,22 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super(other, false);
         }
 
+        public DoubleVec(Vec3d other, boolean floor) {
+            super(other, floor);
+        }
+
+        public DoubleVec(Vec3d other) {
+            super(other, false);
+        }
+
+        public DoubleVec(vec4 other, boolean normalize, boolean floor) {
+            super(other, normalize, floor);
+        }
+
+        public DoubleVec(vec4 other, boolean normalize) {
+            super(other, normalize, false);
+        }
+
         public DoubleVec(double x, double y, double z) {
             super(x, y, z, false);
         }
@@ -453,17 +505,6 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         @Override
         public vec3.DoubleVec cross(vec3 other, boolean floor) {
             return new vec3.DoubleVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD(), floor);
-        }
-        
-        @Override
-        public void update(double x, double y, double z, boolean floor) {
-            if(this.isChangeable) {
-                this.vec[0] = x;
-                this.vec[1] = y;
-                this.vec[2] = z;
-            } else {
-                throw new RuntimeException("Can't change unchangeable vecs " + this);
-            }
         }
 
         @Override
@@ -533,12 +574,28 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super(x, y, z, floor);
         }
 
+        public FloatVec(Vec3d other, boolean floor) {
+            super(other, floor);
+        }
+
+        public FloatVec(Vec3d other) {
+            super(other, false);
+        }
+
         public FloatVec(vec3 other, boolean floor) {
             super(other, floor);
         }
 
         public FloatVec(vec3 other) {
             super(other, false);
+        }
+
+        public FloatVec(vec4 other, boolean normalize, boolean floor) {
+            super(other, normalize, floor);
+        }
+
+        public FloatVec(vec4 other, boolean normalize) {
+            super(other, normalize, false);
         }
 
         public FloatVec(float x, float y, float z) {
@@ -548,17 +605,6 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         @Override
         public vec3.FloatVec cross(vec3 other, boolean floor) {
             return new vec3.FloatVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD(), floor);
-        }
-        
-        @Override
-        public void update(double x, double y, double z, boolean floor) {
-            if(this.isChangeable) {
-                this.vec[0] = (float) x;
-                this.vec[1] = (float) y;
-                this.vec[2] = (float) z;
-            } else {
-                throw new RuntimeException("Can't change unchangeable vecs " + this);
-            }
         }
 
         @Override
@@ -631,12 +677,28 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super(x, y, z, floor);
         }
 
+        public ShortVec(Vec3d other, boolean floor) {
+            super(other, floor);
+        }
+
+        public ShortVec(Vec3d other) {
+            super(other, false);
+        }
+
         public ShortVec(vec3 other, boolean floor) {
             super(other, floor);
         }
 
         public ShortVec(vec3 other) {
             super(other, false);
+        }
+
+        public ShortVec(vec4 other, boolean normalize, boolean floor) {
+            super(other, normalize, floor);
+        }
+
+        public ShortVec(vec4 other, boolean normalize) {
+            super(other, normalize, false);
         }
 
         public ShortVec(short x, short y, short z) {
@@ -646,23 +708,6 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         @Override
         public vec3.ShortVec cross(vec3 other, boolean floor) {
             return new vec3.ShortVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD(), floor);
-        }
-        
-        @Override
-        public void update(double x, double y, double z, boolean floor) {
-            if(this.isChangeable) {
-                if (floor) {
-                    this.vec[0] = (short) Math.floor(x);
-                    this.vec[1] = (short) Math.floor(y);
-                    this.vec[2] = (short) Math.floor(z);
-                } else {
-                    this.vec[0] = (short) x;
-                    this.vec[1] = (short) y;
-                    this.vec[2] = (short) z;
-                }
-            } else {
-                throw new RuntimeException("Can't change unchangeable vecs " + this);
-            }
         }
 
         @Override
@@ -742,12 +787,28 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
             super(x, y, z, floor);
         }
 
+        public ByteVec(Vec3d other, boolean floor) {
+            super(other, floor);
+        }
+
+        public ByteVec(Vec3d other) {
+            super(other, false);
+        }
+
         public ByteVec(vec3 other, boolean floor) {
             super(other, floor);
         }
 
         public ByteVec(vec3 other) {
             super(other, false);
+        }
+
+        public ByteVec(vec4 other, boolean normalize, boolean floor) {
+            super(other, normalize, floor);
+        }
+
+        public ByteVec(vec4 other, boolean normalize) {
+            super(other, normalize, false);
         }
 
         public ByteVec(byte x, byte y, byte z) {
@@ -757,23 +818,6 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         @Override
         public vec3.ByteVec cross(vec3 other, boolean floor) {
             return new vec3.ByteVec((this.vec[1] * other.getZD() - this.vec[2] * other.getYD()), this.vec[2] * other.getXD() - this.vec[0] * other.getZD(), this.vec[0] * other.getYD() - this.vec[1] * other.getXD(), floor);
-        }
-        
-        @Override
-        public void update(double x, double y, double z, boolean floor) {
-            if(this.isChangeable) {
-                if (floor) {
-                    this.vec[0] = (byte) Math.floor(x);
-                    this.vec[1] = (byte) Math.floor(y);
-                    this.vec[2] = (byte) Math.floor(z);
-                } else {
-                    this.vec[0] = (byte) x;
-                    this.vec[1] = (byte) y;
-                    this.vec[2] = (byte) z;
-                }
-            } else {
-                throw new RuntimeException("Can't change unchangeable vecs " + this);
-            }
         }
 
         @Override

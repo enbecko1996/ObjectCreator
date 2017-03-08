@@ -1,11 +1,16 @@
 package com.enbecko.modcreator;
 
 import com.enbecko.modcreator.linalg.*;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import org.lwjgl.opengl.GL11;
 
 import java.util.Arrays;
+
+import static com.enbecko.modcreator.GlobalRenderSetting.RenderOption.OUTLINE;
+import static com.enbecko.modcreator.GlobalRenderSetting.RenderOption.OVERLAY_GREEN;
 
 /**
  * Created by enbec on 03.03.2017.
@@ -79,9 +84,41 @@ public abstract class RenderQuadrilateral <T extends vec3Vert> extends RenderPol
             vec3.FloatVec sec = (vec3.FloatVec) this.getVertexAt(1).position.subAndMakeNew(vec_n.vecPrec.FLOAT, this.getVertexAt(0).position,false);
             vec3.FloatVec normal = sec.cross(first, false);
 
-            vertexBuffer.begin(7, OpenGLHelperEnbecko.POSITION_COLOR_NORMAL);
+            if (localRenderSettings.length > 0) {
+                for (LocalRenderSetting setting : localRenderSettings) {
+                    switch (setting.getOption()) {
+                        case OUTLINE:
+                            OpenGLHelperEnbecko.drawLine(this.getVertexAt(0).position, this.getVertexAt(1).position, GlobalRenderSetting.RenderOption.OUTLINE.getColor(), 5);
+                            OpenGLHelperEnbecko.drawLine(this.getVertexAt(1).position, this.getVertexAt(2).position, GlobalRenderSetting.RenderOption.OUTLINE.getColor(), 5);
+                            OpenGLHelperEnbecko.drawLine(this.getVertexAt(2).position, this.getVertexAt(3).position, GlobalRenderSetting.RenderOption.OUTLINE.getColor(), 5);
+                            OpenGLHelperEnbecko.drawLine(this.getVertexAt(3).position, this.getVertexAt(0).position, GlobalRenderSetting.RenderOption.OUTLINE.getColor(), 5);
+                            break;
+                        case OVERLAY_GREEN:
+                            vertexBuffer.begin(7, DefaultVertexFormats.POSITION_NORMAL);
+                            vec4.FloatVec col = OVERLAY_GREEN.getColor();
+                            GlStateManager.color(col.getR(), col.getG(), col.getB(), 0.55F);
+                            GL11.glEnable(GL11.GL_BLEND);
+                            GL11.glDisable(GL11.GL_LIGHTING);
+                            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                            for (int i = 0; i < nVertices; ++i) {
+                                vec3Vert.PosCol posCol = this.getVertexAt(i);
+                                this.putPosition(vertexBuffer, posCol.position, scale);
+                                this.putNormal(vertexBuffer, normal);
+                                vertexBuffer.endVertex();
+                            }
+                            Tessellator.getInstance().draw();
+                            GL11.glDisable(GL11.GL_BLEND);
+                            GL11.glEnable(GL11.GL_LIGHTING);
+                    }
+                }
+            } else {
+                vertexBuffer.begin(7, OpenGLHelperEnbecko.POSITION_COLOR_NORMAL);
+                this.drawVerts(vertexBuffer, normal, scale);
+            }
+        }
 
-            for(int i = 0; i < nVertices; ++i) {
+        public void drawVerts(VertexBuffer vertexBuffer, vec3.FloatVec normal, float scale) {
+            for (int i = 0; i < nVertices; ++i) {
                 vec3Vert.PosCol posCol = this.getVertexAt(i);
                 this.putPosition(vertexBuffer, posCol.position, scale);
                 this.putColor(vertexBuffer, posCol.color);

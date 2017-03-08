@@ -37,7 +37,6 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
 
     @Override
     public Octant createBoundingGeometry() {
-        vec3 pos = this.getPositionInBoneCoords();
         this.makeHexahedralEdgesAndFacesAutoUpdate();
         return this;
     }
@@ -53,16 +52,33 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
         }
         vec3 pos;
         for (CubicContentHolderGeometry holder : holders) {
+            if (holder.isInside(rayTrace3D.getOnPoint())) {
+                this.rayTraceResult.add(0, holder);
+                double tmp = distance[0];
+                for (int l = 1; l < distance.length; l++) {
+                    if (l > 0 && distance[l - 1] != 0) {
+                        double tt = distance[l];
+                        distance[l] = tmp;
+                        tmp = tt;
+                    } else
+                        break;
+                }
+            }
             if ((pos = holder.checkIfCrosses(rayTrace3D)) != null) {
                 double d = pos.subFromThis(rayTrace3D.getOnPoint()).length();
                 int k = 0;
                 for (; k < distance.length; k++) {
-                    if (distance[k] == 0 || distance[k] < d) {
-                        for (int l = k; l < distance.length; l++) {
-                            if (distance[l-1] != 0)
-                                distance[l] = distance[l-1];
-                            else
-                                break;
+                    if (distance[k] == 0 || distance[k] > d) {
+                        if (distance[k] != 0) {
+                            double tmp = distance[k];
+                            for (int l = k + 1; l < distance.length; l++) {
+                                if (l > 0 && distance[l - 1] != 0) {
+                                    double tt = distance[l];
+                                    distance[l] = tmp;
+                                    tmp = tt;
+                                } else
+                                    break;
+                            }
                         }
                         distance[k] = d;
                         break;
@@ -87,6 +103,10 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
     @Override
     public int getContentCount() {
         return this.content.size();
+    }
+
+    public OCTANTS getType() {
+        return type;
     }
 
     @Override
@@ -156,14 +176,14 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
 
     @Override
     public boolean addContent(@Nonnull vec3 decisiveVec, @Nonnull Content toAdd) {
+        if (!toAdd.isInside(decisiveVec))
+            throw new RuntimeException("The decisiveVec " +decisiveVec+ " with which you want to add " + toAdd + " is not even in the content");
         if (this.isVecInHere(decisiveVec)) {
             if (toAdd instanceof CubicContentHolderGeometry && ((CubicContentHolderGeometry)toAdd).getOrder() >= this.highestOrder)
                 throw new RuntimeException("Can't add CubicContentHolder with higher order than this's highest order");
             for (CubicContentHolderGeometry aContent : this.content) {
                 if (aContent.isInside(decisiveVec)) {
                     if (aContent instanceof ContentHolder) {
-                        System.out.println(aContent + " " + decisiveVec);
-                        System.out.println("add in already existing");
                         return ((ContentHolder) aContent).addContent(decisiveVec, toAdd);
                     }
                 }

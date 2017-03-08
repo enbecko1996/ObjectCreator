@@ -371,14 +371,25 @@ public class Matrix {
         }
 
         public vec_n_DOUBLE multiplyWithVector(vec_n rhs) {
-            if (this.getColumncount() == rhs.getSize()) {
+            if (this.getRowCount() == rhs.getSize()) {
                 vec_n_DOUBLE out = new vec_n_DOUBLE(rhs.getSize());
                 double[] vec = out.getVecD();
                 for (int k = 0; k < vec.length; k++)
-                    vec[k] = this.getColumnAt(k).dot(rhs);
+                    vec[k] = this.getRowAt(k).dot(rhs);
                 return out;
             } else {
                 throw new RuntimeException("Can't multiply this matrix with vector: lhs = " + this.getRowCount() + "x" + this.getColumncount() + " rhs = " + rhs.getSize());
+            }
+        }
+
+        public vec_n multiplyWithVector(vec_n toFill, double ... comp) {
+            if (this.getRowCount() == comp.length && toFill.getSize() == comp.length) {
+                for (int k = 0; k < comp.length; k++) {
+                    toFill.set(k, this.getRowAt(k).dot(comp));
+                }
+                return toFill;
+            } else {
+                throw new RuntimeException("Can't multiply this matrix with vector: lhs = " + this.getRowCount() + "x" + this.getColumncount() + " rhs = " + Arrays.toString(comp));
             }
         }
 

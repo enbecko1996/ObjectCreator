@@ -1,11 +1,10 @@
 package com.enbecko.modcreator.contentholder;
 
-import com.enbecko.modcreator.GlobalRenderSetting;
-import com.enbecko.modcreator.Visible.Cube;
+import com.enbecko.modcreator.Visible.Gridded_CUBE;
+import com.enbecko.modcreator.events.BlockSetModes.BlockSetMode;
 import com.enbecko.modcreator.linalg.Matrix;
 import com.enbecko.modcreator.linalg.RayTrace3D;
 import com.enbecko.modcreator.linalg.vec3;
-import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -123,7 +122,9 @@ public class Bone {
     }
     */
 
-    public Content getRayTraceResult(RayTrace3D rayTrace_WORLDCOORDINATES) {
+    public RayTraceResult getRayTraceResult(RayTrace3D rayTrace_GLOBAL, BlockSetMode editMode) {
+        RayTrace3D rayTrace_BONE = new RayTrace3D(rayTrace_GLOBAL);
+        rayTrace_BONE.transform(this.inverseTransform);
         this.rayTraceResult.clear();
         for (int l = 0; l < distance.length; l++) {
             if (distance[l] != 0)
@@ -133,28 +134,47 @@ public class Bone {
         }
         vec3 pos;
         for (Octant octant : this.octants) {
-            if ((pos = octant.checkIfCrosses(rayTrace_WORLDCOORDINATES)) != null) {
-                double d = pos.subFromThis(rayTrace_WORLDCOORDINATES.getOnPoint()).length();
-                int k = 0;
-                for (; k < distance.length; k++) {
-                    if (distance[k] == 0 || distance[k] < d) {
-                        for (int l = k; l < distance.length; l++) {
-                            if (distance[l-1] != 0)
-                                distance[l] = distance[l-1];
-                            else
-                                break;
-                        }
-                        distance[k] = d;
-                        break;
+            if (octant.isActive()) {
+                if (octant.isInside(rayTrace_BONE.getOnPoint())) {
+                    this.rayTraceResult.add(0, octant);
+                    double tmp = distance[0];
+                    for (int l = 1; l < distance.length; l++) {
+                        if (l > 0 && distance[l - 1] != 0) {
+                            double tt = distance[l];
+                            distance[l] = tmp;
+                            tmp = tt;
+                        } else
+                            break;
                     }
                 }
-                this.rayTraceResult.add(k, octant);
+                if ((pos = octant.checkIfCrosses(rayTrace_BONE)) != null) {
+                    double d = pos.subFromThis(rayTrace_BONE.getOnPoint()).length();
+                    int k = 0;
+                    for (; k < distance.length; k++) {
+                        if (distance[k] == 0 || distance[k] > d) {
+                            if (distance[k] != 0) {
+                                double tmp = distance[k];
+                                for (int l = k + 1; l < distance.length; l++) {
+                                    if (l > 0 && distance[l - 1] != 0) {
+                                        double tt = distance[l];
+                                        distance[l] = tmp;
+                                        tmp = tt;
+                                    } else
+                                        break;
+                                }
+                            }
+                            distance[k] = d;
+                            break;
+                        }
+                    }
+                    this.rayTraceResult.add(k, octant);
+                }
             }
         }
         for (Octant octant : this.rayTraceResult) {
             Content result;
-            if ((result = octant.getRayTraceResult(rayTrace_WORLDCOORDINATES)) != null)
-                return result;
+            if ((result = octant.getRayTraceResult(rayTrace_BONE)) != null)
+                return new RayTraceResult(this, rayTrace_BONE, result, result.getCrossedFaceVecAndAngle(rayTrace_BONE, editMode));
         }
         return null;
     }
@@ -170,10 +190,10 @@ public class Bone {
             this.I.setActive(true);
         if (!this.II.isActive())
             this.II.setActive(true);
-        Cube cube1 = new Cube(this, new vec3.IntVec(0, 0, 0), 1).createBoundingGeometry();
-        this.I.addContent(new vec3.IntVec(0, 0, 0), cube1);
-        Cube cube2 = new Cube(this, new vec3.IntVec(-1, 0, 0), 1).createBoundingGeometry();
-        this.II.addContent(new vec3.IntVec(-1, 0, 0), cube2);
+        Gridded_CUBE griddedCUBE1 = new Gridded_CUBE(this, new vec3.IntVec(0, 0, 0), 1).createBoundingGeometry();
+        this.I.addContent(new vec3.IntVec(0, 0, 0), griddedCUBE1);
+        Gridded_CUBE griddedCUBE2 = new Gridded_CUBE(this, new vec3.IntVec(-1, 0, 0), 1).createBoundingGeometry();
+        this.II.addContent(new vec3.IntVec(-1, 0, 0), griddedCUBE2);
     }
 
     public void octantEmpty(Octant octant) {
@@ -183,6 +203,14 @@ public class Bone {
         }
     }
 
+    private static final vec3.DoubleVec eye = new vec3.DoubleVec(39, 100.5, 123.5), look = new vec3.DoubleVec(-1, 0, 0);
+    private static final RayTrace3D theRayTrace = new RayTrace3D(eye, look, 100, true);
+
     public static void main(String[] args) {
+        Bone b = new Bone(new vec3.IntVec(30, 100, 123));
+        b.addContent(null);
+        theRayTrace.update(eye, look);
+        long time = System.currentTimeMillis();
+        System.out.println(System.currentTimeMillis() - time);
     }
 }

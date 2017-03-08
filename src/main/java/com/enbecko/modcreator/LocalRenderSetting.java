@@ -1,6 +1,7 @@
 package com.enbecko.modcreator;
 
-import com.enbecko.modcreator.events.EditModeEnums;
+import com.enbecko.modcreator.contentholder.RayTraceResult;
+import com.enbecko.modcreator.events.BlockSetModes.BlockSetMode;
 import com.enbecko.modcreator.linalg.RayTrace3D;
 
 import javax.annotation.Nonnull;
@@ -16,16 +17,18 @@ public abstract class LocalRenderSetting {
 
     public static class CrossedByRayTrace extends LocalRenderSetting{
         private RayTrace3D theRayTrace;
+        private RayTraceResult result;
         private GlobalRenderSetting.RenderOption option;
-        private EditModeEnums editMode;
+        private BlockSetMode editMode;
 
-        public CrossedByRayTrace(@Nonnull RayTrace3D rayTrace3D, @Nonnull EditModeEnums editMode) {
+        public CrossedByRayTrace(@Nonnull RayTrace3D rayTrace3D, @Nonnull RayTraceResult result, @Nonnull BlockSetMode editMode) {
             this.theRayTrace = rayTrace3D;
             this.editMode = editMode;
+            this.result = result;
         }
 
-        public CrossedByRayTrace(@Nonnull RayTrace3D rayTrace3D, @Nonnull EditModeEnums editMode, @Nullable GlobalRenderSetting.RenderOption option) {
-            this(rayTrace3D, editMode);
+        public CrossedByRayTrace(@Nonnull RayTrace3D rayTrace3D, @Nonnull RayTraceResult result, @Nonnull BlockSetMode editMode, @Nullable GlobalRenderSetting.RenderOption option) {
+            this(rayTrace3D, result, editMode);
             this.option = option;
         }
 
@@ -39,6 +42,15 @@ public abstract class LocalRenderSetting {
 
         public LocalRenderSetting setTheRayTrace(@Nonnull RayTrace3D rayTrace3D) {
             this.theRayTrace = rayTrace3D;
+            return this;
+        }
+
+        public RayTraceResult getResult() {
+            return this.result;
+        }
+
+        public LocalRenderSetting setResult(@Nonnull RayTraceResult result) {
+            this.result = result;
             return this;
         }
 

@@ -47,6 +47,9 @@ public abstract class Parallelogram3D extends Quadrilateral3D {
             super.LOW_RIGHT.update(super.LOW_LEFT.addToThis(vec1), false);
             super.TOP_LEFT.update(super.LOW_LEFT.addToThis(vec1).addToThis(vec2), false);
             super.TOP_RIGHT.update(super.LOW_LEFT.addToThis(vec2), false);
+            this.updateIsConvex();
+            this.updateIsSymmetric();
+            this.updateIsFlat();
             return this;
         }
 
@@ -58,6 +61,9 @@ public abstract class Parallelogram3D extends Quadrilateral3D {
             super.LOW_RIGHT.update(super.LOW_LEFT.addToThis(this.vec1), false);
             super.TOP_LEFT.update(super.LOW_LEFT.addToThis(this.vec1).addToThis(this.vec2), false);
             super.TOP_RIGHT.update(super.LOW_LEFT.addToThis(this.vec2), false);
+            this.updateIsConvex();
+            this.updateIsSymmetric();
+            this.updateIsFlat();
             return this;
         }
 
@@ -71,7 +77,14 @@ public abstract class Parallelogram3D extends Quadrilateral3D {
             super.LOW_RIGHT.update(super.LOW_LEFT.addToThis(this.vec1), false);
             super.TOP_LEFT.update(super.LOW_LEFT.addToThis(this.vec1).addToThis(this.vec2), false);
             super.TOP_RIGHT.update(super.LOW_LEFT.addToThis(this.vec2), false);
+            this.updateIsConvex();
+            this.updateIsSymmetric();
+            this.updateIsFlat();
             return this;
+        }
+
+        @Override
+        public void makeCriticalVecsForRayTrace() {
         }
     }
 
@@ -79,6 +92,10 @@ public abstract class Parallelogram3D extends Quadrilateral3D {
     public static class ParallelogramNoUpdate extends Parallelogram3D {
         public ParallelogramNoUpdate(vec3 onPoint, vec3 vec1, vec3 vec2, boolean isEndless) {
             super(new vec3.DoubleVec(onPoint, false), new vec3.DoubleVec(vec1, false), new vec3.DoubleVec(vec2, false), isEndless);
+        }
+
+        @Override
+        public void makeCriticalVecsForRayTrace() {
         }
     }
 }

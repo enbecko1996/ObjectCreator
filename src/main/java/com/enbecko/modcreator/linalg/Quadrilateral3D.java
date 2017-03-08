@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 /**
  * Created by enbec on 21.02.2017.
  */
-public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
+public abstract class Quadrilateral3D extends Polygon3D<RenderQuadrilateral> {
 
     public final vec3 LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT;
     //For example if objects should bounce of this surface.
@@ -22,10 +22,10 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
     boolean isFlat;
     final double isFaceRectThreshold = 0.001;
     boolean isSymmetric;
-    private vec3 criticalConvexOnPoint = new vec3.DoubleVec();
-    private vec3 criticalConvexFirst = new vec3.DoubleVec();
-    private vec3 criticalConvexSec = new vec3.DoubleVec();
-    private vec3 criticalConvexDiag = new vec3.DoubleVec();
+    protected vec3 criticalConvexOnPoint = new vec3.DoubleVec();
+    protected vec3 criticalConvexFirst = new vec3.DoubleVec();
+    protected vec3 criticalConvexSec = new vec3.DoubleVec();
+    protected vec3 criticalConvexDiag = new vec3.DoubleVec();
     boolean isConvex;
 
     public Quadrilateral3D(vec3 LOW_LEFT, vec3 LOW_RIGHT, vec3 TOP_RIGHT, vec3 TOP_LEFT) {
@@ -37,10 +37,12 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
         this.updateIsFlat();
         this.updateIsSymmetric();
         this.updateIsConvex();
+        this.calculateNormals();
     }
 
+    public abstract void makeCriticalVecsForRayTrace();
+
     /**
-     *
      * @param rayTrace3D's vecs are changed during the process. Should be made back to normal afterwards.
      * @return null if no cross. crossposition as vec3 otherwise.
      */
@@ -48,6 +50,7 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
     @Nullable
     public vec3 checkIfCrosses(RayTrace3D rayTrace3D) {
         synchronized (rayTrace3D) {
+            this.makeCriticalVecsForRayTrace();
             if (this.isSymmetric()) {
                 Matrix.Matrix_NxN matrix = Matrix.NxN_FACTORY.makeMatrixFromColumns(this.criticalConvexSec, this.criticalConvexFirst, rayTrace3D.getVec().mulToThis(-1));
                 rayTrace3D.getVec().mulToThis(-1);
@@ -55,7 +58,7 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
                 matrix.doLUDecomposition();
                 vec_n_DOUBLE r_s_t = matrix.solveLGS_fromLU(tmpRhs);
                 double[] rst = r_s_t.getVecD();
-                if (rst[2] >  0 && rst[2] < rayTrace3D.getLimit() && rst[0] >= 0 && rst[0] <= 1 && rst[1] >= 0 && rst[1] <= 1) {
+                if (rst[2] > 0 && rst[2] < rayTrace3D.getLimit() && rst[0] >= 0 && rst[0] <= 1 && rst[1] >= 0 && rst[1] <= 1) {
                     return rayTrace3D.advanceOnVecAndReturnPosition(rst[2]);
                 }
             } else {
@@ -66,7 +69,7 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
                 vec_n_DOUBLE r_s_t_1 = matrix.solveLGS_fromLU(tmpRhs);
                 //System.out.println(matrix + ""+tmpRhs +""+ r_s_t_1);
                 double[] rst = r_s_t_1.getVecD();
-                if (rst[2] >  0 && rst[2] < rayTrace3D.getLimit() && rst[0] >= 0 && rst[0] <= 1 && rst[1] >= 0 && rst[1] <= 1 && rst[0] + rst[1] <= 1) {
+                if (rst[2] > 0 && rst[2] < rayTrace3D.getLimit() && rst[0] >= 0 && rst[0] <= 1 && rst[1] >= 0 && rst[1] <= 1 && rst[0] + rst[1] <= 1) {
                     return rayTrace3D.advanceOnVecAndReturnPosition(rst[2]);
                 } else {
                     matrix.setColumn(0, this.criticalConvexDiag);
@@ -75,12 +78,42 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
                     vec_n_DOUBLE r_s_t_2 = matrix.solveLGS_fromLU(tmpRhs);
                     //System.out.println(matrix + ""+tmpRhs +""+ r_s_t_2);
                     rst = r_s_t_2.getVecD();
-                    if (rst[2] >  0 && rst[2] < rayTrace3D.getLimit() && rst[0] >= 0 && rst[0] <= 1 && rst[1] >= 0 && rst[1] <= 1 && rst[0] + rst[1] <= 1) {
+                    if (rst[2] > 0 && rst[2] < rayTrace3D.getLimit() && rst[0] >= 0 && rst[0] <= 1 && rst[1] >= 0 && rst[1] <= 1 && rst[0] + rst[1] <= 1) {
                         return rayTrace3D.advanceOnVecAndReturnPosition(rst[2]);
                     }
                 }
             }
         }
+        return null;
+    }
+
+    /*
+    *   TODO
+     */
+    public vec3 getNormal() {
+        if (this.isFlat())
+            return this.normTriang1;
+        else
+            return null;
+    }
+
+    /*
+    *  TODO
+    */
+    public double getAngle(RayTrace3D rayTrace3D, vec3 normal) {
+        if (this.isFlat())
+            return this.getTriangleNormal1().angleTo360(rayTrace3D.getVec(), normal);
+        else
+            return 0;
+    }
+
+    /*
+    *  TODO
+    */
+    @Nullable
+    public vec4 getAngleAndAngleNormal(RayTrace3D rayTrace3D) {
+        if (this.isFlat())
+            return this.getTriangleNormal1().angleTo360(rayTrace3D.getVec());
         return null;
     }
 
@@ -124,14 +157,14 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
         vec3 tmp = (vec3) new vec3.DoubleVec(this.TOP_RIGHT).subFromThis(this.TOP_LEFT);
         vec3 tmp2 = (vec3) new vec3.DoubleVec(this.LOW_RIGHT).subFromThis(this.TOP_RIGHT);
         vec3 normal = (vec3) tmp.cross(tmp2, false).normalize();
-        double ang1  = tmp.angleTo360(tmp2, normal);
+        double ang1 = tmp.angleTo360(tmp2, normal);
         tmp.update(this.LOW_LEFT).subFromThis(this.LOW_RIGHT);
-        double ang2  = tmp2.angleTo360(tmp, normal);
+        double ang2 = tmp2.angleTo360(tmp, normal);
         tmp2.update(this.TOP_LEFT).subFromThis(this.LOW_LEFT);
-        double ang3  = tmp.angleTo360(tmp2, normal);
+        double ang3 = tmp.angleTo360(tmp2, normal);
         tmp.update(this.TOP_RIGHT).subFromThis(this.TOP_LEFT);
-        double ang4  = tmp2.angleTo360(tmp, normal);
-        if ((ang1 > Math.PI && ang2 > Math.PI) || (ang1 > Math.PI && ang3 > Math.PI) || (ang1 > Math.PI && ang4 > Math.PI) || (ang2 > Math.PI && ang3 > Math.PI) || (ang2 > Math.PI && ang4 > Math.PI) || (ang3 > Math.PI && ang4 > Math.PI))  {
+        double ang4 = tmp2.angleTo360(tmp, normal);
+        if ((ang1 > Math.PI && ang2 > Math.PI) || (ang1 > Math.PI && ang3 > Math.PI) || (ang1 > Math.PI && ang4 > Math.PI) || (ang2 > Math.PI && ang3 > Math.PI) || (ang2 > Math.PI && ang4 > Math.PI) || (ang3 > Math.PI && ang4 > Math.PI)) {
             ang1 = Math.PI * 2 - ang1;
             ang2 = Math.PI * 2 - ang2;
             ang3 = Math.PI * 2 - ang3;
@@ -177,35 +210,28 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
 
     public void setPhysical(boolean physical) {
         this.isPhysical = physical;
-        if (this.isPhysical)
-            this.calculateNormals();
-        else {
-            this.normTriang1 = null;
-            this.normTriang2 = null;
-        }
     }
 
     public vec3 getTriangleNormal1() {
-        if (this.isPhysical) {
-            return this.normTriang1;
-        } else
-            throw new RuntimeException("You can't get the normals of a Face which is not physical: " + this);
+        return this.normTriang1;
     }
 
     public vec3 getTriangleNormal2() {
-        if (this.isPhysical) {
-            return this.normTriang2;
-        } else
-            throw new RuntimeException("You can't get the normals of a Face which is not physical: " + this);
+        return this.normTriang2;
     }
 
     public boolean isPhysical() {
         return this.isPhysical;
     }
 
-    public static class AutoUpdateOnVecChange extends Quadrilateral3D {
-        public AutoUpdateOnVecChange(vec3 LOW_LEFT, vec3 LOW_RIGHT, vec3 TOP_RIGHT, vec3 TOP_LEFT) {
+    public static class AutoUpdate extends Quadrilateral3D {
+        public AutoUpdate(vec3 LOW_LEFT, vec3 LOW_RIGHT, vec3 TOP_RIGHT, vec3 TOP_LEFT) {
             super(LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT);
+        }
+
+        @Override
+        public void makeCriticalVecsForRayTrace() {
+            this.updateIsConvex();
         }
 
         @Override
@@ -237,6 +263,35 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
             this.updateIsConvex();
             return super.isConvex();
         }
+
+        public static class Symmetrical extends AutoUpdate {
+            public Symmetrical(vec3 LOW_LEFT, vec3 LOW_RIGHT, vec3 TOP_RIGHT, vec3 TOP_LEFT) {
+                super(LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT);
+            }
+
+            @Override
+            public boolean isFlat() {
+                return true;
+            }
+
+            @Override
+            public void makeCriticalVecsForRayTrace() {
+                this.criticalConvexDiag.update(this.LOW_RIGHT).subFromThis(this.TOP_LEFT);
+                this.criticalConvexFirst.update(this.LOW_LEFT).subFromThis(this.TOP_LEFT);
+                this.criticalConvexSec.update(this.TOP_RIGHT).subFromThis(this.TOP_LEFT);
+                this.criticalConvexOnPoint.update(this.TOP_LEFT);
+            }
+
+            @Override
+            public boolean isSymmetric() {
+                return true;
+            }
+
+            @Override
+            public boolean isConvex() {
+                return true;
+            }
+        }
     }
 
     public static class ManualUpdate extends Quadrilateral3D {
@@ -245,13 +300,16 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
             super(vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), LOW_LEFT, false), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), LOW_RIGHT, false), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), TOP_RIGHT, false), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), TOP_LEFT, false));
         }
 
+        @Override
+        public void makeCriticalVecsForRayTrace() {
+        }
+
         public Quadrilateral3D updateLowLeft(@Nonnull vec3 lowLeft) {
             this.LOW_LEFT.update(lowLeft, false);
             this.updateIsFlat();
             this.updateIsSymmetric();
             this.updateIsConvex();
-            if (this.isPhysical())
-                this.calculateNormals();
+            this.calculateNormals();
             return this;
         }
 
@@ -260,8 +318,7 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
             this.updateIsFlat();
             this.updateIsSymmetric();
             this.updateIsConvex();
-            if (this.isPhysical())
-                this.calculateNormals();
+            this.calculateNormals();
             return this;
         }
 
@@ -270,8 +327,7 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
             this.updateIsFlat();
             this.updateIsSymmetric();
             this.updateIsConvex();
-            if (this.isPhysical())
-                this.calculateNormals();
+            this.calculateNormals();
             return this;
         }
 
@@ -280,8 +336,7 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
             this.updateIsFlat();
             this.updateIsSymmetric();
             this.updateIsConvex();
-            if (this.isPhysical())
-                this.calculateNormals();
+            this.calculateNormals();
             return this;
         }
 
@@ -293,8 +348,7 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
             this.updateIsFlat();
             this.updateIsSymmetric();
             this.updateIsConvex();
-            if (this.isPhysical())
-                this.calculateNormals();
+            this.calculateNormals();
             return this;
         }
     }
@@ -304,10 +358,14 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
             //super(new vec3(LOW_LEFT), new vec3(LOW_RIGHT), new vec3(TOP_RIGHT), new vec3(TOP_LEFT));
             super(vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), LOW_LEFT, false).setChangeable(false), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), LOW_RIGHT, false).setChangeable(false), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), TOP_RIGHT, false).setChangeable(false), vec3.newVecWithPrecision(LOW_LEFT.getPrecision(), TOP_LEFT, false).setChangeable(false));
         }
+
+        @Override
+        public void makeCriticalVecsForRayTrace() {
+        }
     }
 
     public static void main(String[] args) {
-        Quadrilateral3D face = new AutoUpdateOnVecChange(
+        Quadrilateral3D face = new AutoUpdate(
                 new vec3.DoubleVec(0, 0, 0, false),
                 new vec3.DoubleVec(1, 0, 0.99, false),
                 new vec3.DoubleVec(0.5, 0.1, 0, false),
@@ -317,7 +375,7 @@ public abstract class Quadrilateral3D extends Polygon3D <RenderQuadrilateral> {
         long startTime = System.currentTimeMillis();
         //int testCount = 100;
         //for (int k = 0; k < testCount; k++)
-            System.out.println(face.checkIfCrosses(rayTrace3D));
+        System.out.println(face.checkIfCrosses(rayTrace3D));
         System.out.println("Time: " + (System.currentTimeMillis() - startTime));
     }
 }

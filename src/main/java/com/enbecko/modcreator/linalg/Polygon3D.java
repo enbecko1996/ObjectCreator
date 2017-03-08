@@ -31,4 +31,10 @@ public abstract class Polygon3D <T extends RenderPolygon> {
     public abstract boolean isSymmetric();
 
     public abstract boolean isConvex();
+
+    public abstract double getAngle(RayTrace3D rayTrace3D, vec3 normal);
+
+    public abstract vec4 getAngleAndAngleNormal(RayTrace3D rayTrace3D);
+
+    public abstract vec3 getNormal();
 }

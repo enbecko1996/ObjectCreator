@@ -1,7 +1,6 @@
 package com.enbecko.modcreator.Visible;
 
 import com.enbecko.modcreator.LocalRenderSetting;
-import com.enbecko.modcreator.LocalRenderSetting.CrossedByRayTrace;
 import com.enbecko.modcreator.RenderQuadrilateral;
 import com.enbecko.modcreator.contentholder.Bone;
 import com.enbecko.modcreator.contentholder.Content;
@@ -17,19 +16,17 @@ import java.util.List;
 /**
  * Created by enbec on 24.02.2017.
  */
-public class Cube extends Content.CubicContent implements ITextured <RenderQuadrilateral.Colored> {
+public class Gridded_CUBE extends Content.CubicContent implements ITextured <RenderQuadrilateral.Colored>, IGridded{
     private final int dimension;
     private List<RenderQuadrilateral.Colored> rectangles = new ArrayList<RenderQuadrilateral.Colored>();
 
-    public Cube(Bone parentBone, vec3.IntVec positionInBone, int dimension) {
+    public Gridded_CUBE(Bone parentBone, vec3.IntVec positionInBone, int dimension) {
         super(parentBone, positionInBone, dimension, vec_n.vecPrec.INT);
         this.dimension = dimension;
-        Quadrilateral3D face = new Quadrilateral3D.AutoUpdateOnVecChange(new vec3.FloatVec(0,0,0),
-                new vec3.FloatVec(0,0,1), new vec3.FloatVec(0,1,1), new vec3.FloatVec(0,1,0));
     }
 
     @Override
-    public Cube createBoundingGeometry() {
+    public Gridded_CUBE createBoundingGeometry() {
         this.makeHexahedralEdgesAndFacesNoUpdate();
         Quadrilateral3D face;
         this.rectangles.add((RenderQuadrilateral.Colored) (face = this.getBoundingFace(Faces.FRONT_X)).setRenderer(new RenderQuadrilateral.Colored(face, new vec4.FloatVec(1, 0, 0, 1), true)));
@@ -66,19 +63,34 @@ public class Cube extends Content.CubicContent implements ITextured <RenderQuadr
                     face.getRenderer().draw(Tessellator.getInstance().getBuffer(), 1);
             }
         }
-        for (LocalRenderSetting localRenderSetting : localRenderSettings) {
-            switch (localRenderSetting.getType()) {
-                case CROSSED_BY_RAYTRACE:
-                    Quadrilateral3D crossed = this.getCrossedFace(((CrossedByRayTrace)localRenderSetting).getTheRayTrace());
-                    if (crossed != null && crossed.getRenderer() != null)
-                        crossed.getRenderer().draw(Tessellator.getInstance().getBuffer(), 1, localRenderSetting);
-                    break;
-            }
-        }
     }
 
     @Override
     public List<RenderQuadrilateral.Colored> getRenderPolygons() {
         return this.rectangles;
+    }
+
+    public String toString() {
+        return "Colored Gridded_CUBE " + this.getGeometryInfo();
+    }
+
+    @Override
+    public vec3.IntVec getPosition() {
+        return (vec3.IntVec) this.positionInBoneCoords;
+    }
+
+    @Override
+    public int getXDim() {
+        return this.dimension;
+    }
+
+    @Override
+    public int getYDim() {
+        return this.dimension;
+    }
+
+    @Override
+    public int getZDim() {
+        return this.dimension;
     }
 }
