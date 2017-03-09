@@ -1,5 +1,7 @@
 package com.enbecko.modcreator.test;
 
+import com.enbecko.modcreator.Log;
+import com.enbecko.modcreator.Log.LogEnums;
 import com.enbecko.modcreator.linalg.vec3;
 
 /**
@@ -12,13 +14,13 @@ public class OctantTest {
         Octant tmp = new Octant(b, center, 1, 1, 1, Octant.OCTANTS.VIII);
         tmp.addNewChild(new FirstOrderHolder(b, ));
         tmp.setActive(true);
-        System.out.println(tmp);*/
+        Log.d(Log.LogEnums.ETC, tmp);*/
        int size = 4;
        vec3.DoubleVec decisiveVec = new vec3.DoubleVec(-1.5, 5, 2);
         vec3 pos = new vec3.DoubleVec(decisiveVec);
-        System.out.println(pos);
+        Log.d(LogEnums.ETC, pos);
         pos.divToThis(size);
         vec3 pos1 = (vec3) new vec3.IntVec(pos, true).mulToThis(size);
-        System.out.println(pos1);
+        Log.d(LogEnums.ETC, pos1);
     }
 }

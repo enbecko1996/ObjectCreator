@@ -16,6 +16,8 @@ public class ItemGriddedCube extends ItemContent implements IGriddable {
          if (option instanceof GriddedCube) {
              GriddedCube opt = (GriddedCube)option;
              return new Gridded_CUBE(parentBone, new vec3.IntVec(positionInBoneCoords), opt.getSize());
+         } else if (option == null) {
+             return new Gridded_CUBE(parentBone, new vec3.IntVec(positionInBoneCoords), 1);
          }
          throw new RuntimeException("Can't create new Gridded_CUBE with this option: " + option);
     }

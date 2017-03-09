@@ -1,6 +1,7 @@
 package com.enbecko.modcreator.minecraft;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
+import com.enbecko.modcreator.GlobalSettings;
 import com.enbecko.modcreator.events.BlockSetModes.BlockSetModes;
 import com.enbecko.modcreator.events.BlockSetModes.BlockSetMode;
 import net.minecraft.creativetab.CreativeTabs;
@@ -26,6 +27,7 @@ public class Main_BlockHeroes
     public static BlockSetMode current_BlockSetMode = BlockSetModes.SINGLE_GRIDDED_MODE;
 
     public static BlockEditor editorBlock;
+    public static ItemContent griddedCube_Item;
 
     private static final CreativeTabs modMakerTab = new CreativeTabs("Enbecko's Mod Maker") {
         @NotNull
@@ -39,11 +41,14 @@ public class Main_BlockHeroes
     public void init(FMLInitializationEvent event) {
         proxy.init(event);
         editorBlock = (BlockEditor) new BlockEditor().setUnlocalizedName("editorblock").setCreativeTab(modMakerTab);
-        GlobalRenderSetting.putRenderMode(GlobalRenderSetting.RenderMode.DEBUG);
+        griddedCube_Item = (ItemContent) new ItemGriddedCube().setUnlocalizedName("gridded_cube").setCreativeTab(modMakerTab);
+
+        GlobalSettings.setDebugMode();
 
         GameRegistry.registerTileEntity(TE_Editor.class, "te_editorblock");
 
         GameRegistry.registerBlock(editorBlock, "editorblock");
+        GameRegistry.registerItem(griddedCube_Item, "gridded_cube");
     }
 
     @EventHandler

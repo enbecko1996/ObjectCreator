@@ -2,6 +2,7 @@ package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
 import com.enbecko.modcreator.LocalRenderSetting;
+import com.enbecko.modcreator.Log;
 import com.enbecko.modcreator.Visible.IGridded;
 import com.enbecko.modcreator.linalg.RayTrace3D;
 import com.enbecko.modcreator.linalg.vec3;
@@ -48,6 +49,12 @@ public class FirstOrderHolder extends CubicContentHolderGeometry implements Cont
     @Override
     public boolean addNewChild(@Nonnull Content content) {
         if (!this.content.contains(content)) {
+            for (Content other : this.content) {
+                if (other.isColliding(content)) {
+                    Log.d(Log.LogEnums.CONTENTHOLDER, "The Content you want to add: " + content +" is colliding with " + other);
+                    return false;
+                }
+            }
             if (content instanceof IGridded) {
                 IGridded gridded = (IGridded)content;
                 vec3.IntVec tmp = (vec3.IntVec) new vec3.IntVec(gridded.getPosition()).subFromThis(this.getPositionInBoneCoords());
@@ -148,5 +155,9 @@ public class FirstOrderHolder extends CubicContentHolderGeometry implements Cont
             }
         }
         return tmpResult;
+    }
+
+    public String toString() {
+        return "FirstOrderHolder " + this.getGeometryInfo();
     }
 }

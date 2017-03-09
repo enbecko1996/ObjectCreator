@@ -13,8 +13,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntityBeacon;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+
+import java.util.Arrays;
 
 import static com.enbecko.modcreator.GlobalRenderSetting.RenderOption.OVERLAY_GREEN;
 
@@ -25,6 +28,8 @@ public class Render_EditorBlock extends TileEntitySpecialRenderer <TE_Editor> im
     private final vec3.DoubleVec eye = new vec3.DoubleVec(), look = new vec3.DoubleVec();
     private final RayTrace3D theRayTrace = new RayTrace3D(eye, look, 100, true);
     private RayTraceResult rayTraceResult;
+    private boolean rayTraceIsVirgin;
+    private float tmpPartial;
 
     public Render_EditorBlock() {
         EventDispatcher.getTheEventDispatcher().addMouseListener(this);
@@ -37,10 +42,12 @@ public class Render_EditorBlock extends TileEntitySpecialRenderer <TE_Editor> im
         GlStateManager.bindTexture(0);
         GlStateManager.translate(x, y, z);
         entity.getBoneAt(0).render();
+        tmpPartial = partialTicks;
         if (entity.isActive()) {
-            EntityPlayer thePlayer = Minecraft.getMinecraft().thePlayer;
+          /**  EntityPlayer thePlayer = Minecraft.getMinecraft().thePlayer;
             this.theRayTrace.update(eye.update(thePlayer.getPositionEyes(partialTicks), false), look.update(thePlayer.getLook(partialTicks), false));
             this.rayTraceResult = entity.getBoneAt(0).getRayTraceResult(theRayTrace, Main_BlockHeroes.current_BlockSetMode);
+            rayTraceIsVirgin = true;*/
             if (this.rayTraceResult != null)
                 this.renderOverlays(new CrossedByRayTrace(theRayTrace, this.rayTraceResult, Main_BlockHeroes.current_BlockSetMode, OVERLAY_GREEN));
         }
@@ -61,11 +68,17 @@ public class Render_EditorBlock extends TileEntitySpecialRenderer <TE_Editor> im
 
     @Override
     public void onMouseEvent(MouseEvent event) {
-        if (Main_BlockHeroes.current_BlockSetMode != null) {
-            if(event.getButton() == -1)
-                Main_BlockHeroes.current_BlockSetMode.dispatchMouseMoved(event, this.rayTraceResult, Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem());
-            else
-                Main_BlockHeroes.current_BlockSetMode.dispatchMouseClickedReleased(event, this.rayTraceResult, Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem());
+        if (Main_BlockHeroes.active_Editor_Block != null) {
+            EntityPlayer thePlayer = Minecraft.getMinecraft().thePlayer;
+            this.theRayTrace.update(eye.update(thePlayer.getPositionEyes(tmpPartial), false), look.update(thePlayer.getLook(tmpPartial), false));
+            this.rayTraceResult = Main_BlockHeroes.active_Editor_Block.getBoneAt(0).getRayTraceResult(theRayTrace, Main_BlockHeroes.current_BlockSetMode);
+
+            if (Main_BlockHeroes.current_BlockSetMode != null) {
+                if (event.getButton() == -1)
+                    Main_BlockHeroes.current_BlockSetMode.dispatchMouseMoved(event, this.rayTraceResult, Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem());
+                else
+                    Main_BlockHeroes.current_BlockSetMode.dispatchMouseClickedReleased(event, this.rayTraceResult, Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem());
+            }
         }
     }
 
@@ -73,5 +86,9 @@ public class Render_EditorBlock extends TileEntitySpecialRenderer <TE_Editor> im
     public void onKeyEvent(InputEvent.KeyInputEvent event) {
         if (Main_BlockHeroes.current_BlockSetMode != null)
             Main_BlockHeroes.current_BlockSetMode.dispatchKeyEvent(event, this.rayTraceResult, Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem());
+    }
+
+    public boolean isGlobalRenderer(TE_Editor te) {
+        return true;
     }
 }

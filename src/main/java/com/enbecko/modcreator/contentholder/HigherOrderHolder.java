@@ -2,6 +2,8 @@ package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
 import com.enbecko.modcreator.LocalRenderSetting;
+import com.enbecko.modcreator.Log;
+import com.enbecko.modcreator.Log.LogEnums;
 import com.enbecko.modcreator.linalg.RayTrace3D;
 import com.enbecko.modcreator.linalg.vec_n;
 import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
@@ -113,9 +115,22 @@ public class HigherOrderHolder extends CubicContentHolderGeometry implements Con
     @Override
     public boolean addContent(@Nonnull vec3 decisiveVec, @Nonnull Content toAdd) {
         if (this.isInside(decisiveVec)) {
+            for (int k = 0; k < Main_BlockHeroes.contentCubesPerCube; k++) {
+                for (int l = 0; l < Main_BlockHeroes.contentCubesPerCube; l++) {
+                    for (CubicContentHolderGeometry aContent : this.content[k][l]) {
+                        if (aContent != null) {
+                            if (aContent.isInside(decisiveVec)) {
+                                if (aContent instanceof ContentHolder) {
+                                    Log.d(LogEnums.CONTENTHOLDER, this + " \nadd in already existing child: " + aContent + " content = " + toAdd);
+                                    return ((ContentHolder) aContent).addContent(decisiveVec, toAdd);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             vec3.IntVec pos = (vec3.IntVec) new vec3.IntVec(decisiveVec, true).subFromThis(this.positionInBoneCoords);
             int size = (this.getSize() / Main_BlockHeroes.contentCubesPerCube);
-            System.out.println(this.getOrder() + " " + this.getSize() + " " + size +" " +Main_BlockHeroes.contentCubesPerCube);
             int k = pos.getX() / size, l = pos.getY() / size, m = pos.getZ() / size;
             vec3.IntVec pos1 = (vec3.IntVec) this.positionInBoneCoords.addAndMakeNew(vec_n.vecPrec.INT, false, k * size, l * size, m * size);
             if (k < 0 || k >= Main_BlockHeroes.contentCubesPerCube || l < 0 || l >= Main_BlockHeroes.contentCubesPerCube || m < 0 || m >= Main_BlockHeroes.contentCubesPerCube)
@@ -123,18 +138,15 @@ public class HigherOrderHolder extends CubicContentHolderGeometry implements Con
             switch (this.getOrder()) {
                 case 2:
                     FirstOrderHolder firstOrderHolder = (FirstOrderHolder) new FirstOrderHolder(this.getParentBone(), pos1, true).createBoundingGeometry();
-                    firstOrderHolder.addContent(decisiveVec, toAdd);
                     firstOrderHolder.addParent(this);
                     this.addNewChild(firstOrderHolder);
-                    break;
+                    return firstOrderHolder.addContent(decisiveVec, toAdd);
                 default:
                     HigherOrderHolder higherOrderHolder = (HigherOrderHolder) new HigherOrderHolder(this.getParentBone(), pos1, (byte) (this.getOrder() - 1), false).createBoundingGeometry();
-                    higherOrderHolder.addContent(decisiveVec, toAdd);
                     higherOrderHolder.addParent(this);
                     this.addNewChild(higherOrderHolder);
-                    break;
+                    return higherOrderHolder.addContent(decisiveVec, toAdd);
             }
-            return true;
         } else
             throw new RuntimeException(toAdd + " is not in here: " + this);
     }

@@ -1,5 +1,8 @@
 package com.enbecko.modcreator.linalg;
 
+import com.enbecko.modcreator.Log;
+import com.enbecko.modcreator.Log.LogEnums;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -11,7 +14,7 @@ public class Matrix {
     public static void main(String[] args) {
         vec_n_DOUBLE[] rows = {new vec_n_DOUBLE(1, 2, 3), new vec_n_DOUBLE(4, 5, 6), new vec_n_DOUBLE(7, 8, 8)};
         Matrix_NxN test = NxN_FACTORY.makeMatrixFromRows(rows);
-        System.out.println(test);
+        Log.d(LogEnums.MATH, test);
         test.doLUDecomposition();
         long startLU = System.currentTimeMillis();
         int testCount = 1000000;
@@ -23,7 +26,7 @@ public class Matrix {
             //test.solveLGS_fromLU(rhs);
             test.getInverse_fromLU();
         }
-        System.out.println("\nLU time: " + (System.currentTimeMillis() - startLU) + " " + test.solveLGS_fromLU(rhs));
+        Log.d(LogEnums.MATH, "\nLU time: " + (System.currentTimeMillis() - startLU) + " " + test.solveLGS_fromLU(rhs));
         long startGauss = System.currentTimeMillis();
         System.out.print("0/" + testCount);
         for (int k = 0; k < testCount; k++) {
@@ -31,7 +34,7 @@ public class Matrix {
             //test.solveLGS_Gaussian(rhs);
             test.getInverse_Gaussian();
         }
-        System.out.println("\nGauss time: " + (System.currentTimeMillis() - startLU) + " " + test.solveLGS_Gaussian(rhs));
+        Log.d(LogEnums.MATH, "\nGauss time: " + (System.currentTimeMillis() - startLU) + " " + test.solveLGS_Gaussian(rhs));
     }
 
     public static class MxN_FACTORY {
@@ -581,7 +584,7 @@ public class Matrix {
                 }
             }
             //DEBUG
-            //System.out.println("lhs: "+this.LU_lhs+" rhs: "+this.LU_rhs+" permut: "+this.LU_permutation);
+            //Log.d(Log.LogEnums.MATH, "lhs: "+this.LU_lhs+" rhs: "+this.LU_rhs+" permut: "+this.LU_permutation);
         }
 
         public Matrix_NxN invert() {

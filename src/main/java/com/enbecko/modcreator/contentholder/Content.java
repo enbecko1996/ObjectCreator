@@ -285,12 +285,8 @@ public abstract class Content {
 
         @Override
         public boolean isColliding(Content content) {
-            for (int k = 0; k < content.getBoundingCornerCount(); k++) {
-                vec3 act = content.getCorner(k);
-                if (this.isInside(act))
-                    return true;
-            }
-            return false;
+            return content.getMaxX() > this.getMinX() && content.getMaxY() > this.getMinY() && content.getMaxZ() > this.getMinZ() &&
+                    content.getMinX() < this.getMaxZ() && content.getMinY() < this.getMaxY() && content.getMinZ() < this.getMaxZ();
         }
 
         @Override

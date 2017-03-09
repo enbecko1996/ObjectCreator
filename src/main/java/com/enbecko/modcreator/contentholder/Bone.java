@@ -1,22 +1,24 @@
 package com.enbecko.modcreator.contentholder;
 
+import com.enbecko.modcreator.Log;
+import com.enbecko.modcreator.Log.LogEnums;
 import com.enbecko.modcreator.Visible.Gridded_CUBE;
 import com.enbecko.modcreator.events.BlockSetModes.BlockSetMode;
-import com.enbecko.modcreator.linalg.Matrix;
-import com.enbecko.modcreator.linalg.RayTrace3D;
-import com.enbecko.modcreator.linalg.vec3;
+import com.enbecko.modcreator.events.ManipulatingEvent;
+import com.enbecko.modcreator.linalg.*;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.enbecko.modcreator.linalg.vec_n.vecPrec.DOUBLE;
 import static com.enbecko.modcreator.linalg.vec_n.vecPrec.INT;
 
 /**
  * Created by enbec on 07.01.2017.
  */
-public class Bone {
+public class Bone extends Content.CuboidContent{
     @Deprecated
     private CubicContentHolderGeometry boneContent = null;
     private vec3 center_global;
@@ -30,11 +32,13 @@ public class Bone {
 
     @SideOnly(Side.CLIENT)
     public Bone(vec3 center_global) {
+        super(null, new vec3.IntVec(-1, -1, -1), 2, 2, 2, INT);
+        this.createBoundingGeometry();
         this.center_global = center_global;
-        System.out.println(this.center_global);
+        Log.d(LogEnums.CONTENTHOLDER, this.center_global);
         this.transform.translate(this.center_global.getVecD());
         ((Matrix.Matrix_NxN)this.inverseTransform.update(transform)).invert();
-        System.out.println(transform + " " + this.inverseTransform);
+        Log.d(LogEnums.CONTENTHOLDER, transform + " " + this.inverseTransform);
         vec3.IntVec center = new vec3.IntVec();
         this.I = new Octant(this, center, 1, 1, 1, Octant.OCTANTS.I);
         this.II = new Octant(this, (vec3.IntVec) center.addAndMakeNew(INT, false, -1, 0, 0), 1, 1, 1, Octant.OCTANTS.II);
@@ -52,6 +56,27 @@ public class Bone {
         this.octants[5] = this.VI;
         this.octants[6] = this.VII;
         this.octants[7] = this.VIII;
+    }
+
+    public vec3.IntVec getMaxPos3InWorld() {
+        return new vec3.IntVec(this.getMaxPos4InWorld(), true);
+    }
+
+    public vec3.IntVec getMinPos3InWorld() {
+        return new vec3.IntVec(this.getMinPos4InWorld(), true);
+    }
+
+    public vec4.IntVec getMaxPos4InWorld() {
+        return (vec4.IntVec) this.transform.multiplyWithVector(new vec4.IntVec(), this.getMaxX(), this.getMaxY(), this.getMaxZ(), 1);
+    }
+
+    public vec4.IntVec getMinPos4InWorld() {
+        return (vec4.IntVec) this.transform.multiplyWithVector(new vec4.IntVec(), this.getMinX(), this.getMinY(), this.getMinZ(), 1);
+    }
+
+    @Override
+    public void manipulateMe(ManipulatingEvent event, RayTrace3D rayTrace3D) {
+
     }
 
     /**
@@ -113,7 +138,7 @@ public class Bone {
                     }
                 }
             }
-            System.out.println(posInNext+ " " + posInOrder1+" "+base.isFullInside(content));
+            Log.d(Log.LogEnums.CONTENTHOLDER, posInNext+ " " + posInOrder1+" "+base.isFullInside(content));
         } else if ( !this.boneContent.isInside(content.getPositionInBoneCoords())) {
 
         } else {
@@ -121,6 +146,12 @@ public class Bone {
         }
     }
     */
+
+    @Override
+    public Content createBoundingGeometry() {
+        super.makeHexahedralEdgesAndFacesAutoUpdate();
+        return this;
+    }
 
     public RayTraceResult getRayTraceResult(RayTrace3D rayTrace_GLOBAL, BlockSetMode editMode) {
         RayTrace3D rayTrace_BONE = new RayTrace3D(rayTrace_GLOBAL);
@@ -186,14 +217,36 @@ public class Bone {
     }
 
     public void addContent(Content content, Content ... adjacent) {
-        if (!this.I.isActive())
-            this.I.setActive(true);
-        if (!this.II.isActive())
-            this.II.setActive(true);
-        Gridded_CUBE griddedCUBE1 = new Gridded_CUBE(this, new vec3.IntVec(0, 0, 0), 1).createBoundingGeometry();
-        this.I.addContent(new vec3.IntVec(0, 0, 0), griddedCUBE1);
-        Gridded_CUBE griddedCUBE2 = new Gridded_CUBE(this, new vec3.IntVec(-1, 0, 0), 1).createBoundingGeometry();
-        this.II.addContent(new vec3.IntVec(-1, 0, 0), griddedCUBE2);
+        /**
+         * TODO
+         * STUB
+         */
+        Log.d(LogEnums.CONTENTHOLDER, "check octant ");
+        for (Octant octant : this.octants) {
+            if (octant.isInside(content.getPositionInBoneCoords())) {
+                Log.d(LogEnums.CONTENTHOLDER, "is in " + octant);
+                if (!octant.addContent(content.getPositionInBoneCoords(), content)) {
+                    Log.d(LogEnums.CONTENTHOLDER, "Can not add " + content);
+                    content.removeMe();
+                } else {
+                    double tmp;
+                    double minX = this.getMinX(), minY = this.getMinY(), minZ = this.getMinZ(), maxX = this.getMaxX(), maxY = this.getMaxY(), maxZ = this.getMaxZ();
+                    if ((tmp = octant.getMinX()) < minX)
+                        minX = tmp;
+                    if ((tmp = octant.getMaxX()) > maxX)
+                        maxX = tmp;
+                    if ((tmp = octant.getMinY()) < minY)
+                        minY = tmp;
+                    if ((tmp = octant.getMaxY()) > maxY)
+                        maxY = tmp;
+                    if ((tmp = octant.getMinZ()) < minZ)
+                        minZ = tmp;
+                    if ((tmp = octant.getMaxZ()) > maxZ)
+                        maxZ = tmp;
+                    this.update(minX, minY, minZ, maxX, maxY, maxZ);
+                }
+            }
+        }
     }
 
     public void octantEmpty(Octant octant) {
@@ -211,6 +264,6 @@ public class Bone {
         b.addContent(null);
         theRayTrace.update(eye, look);
         long time = System.currentTimeMillis();
-        System.out.println(System.currentTimeMillis() - time);
+        Log.d(LogEnums.CONTENTHOLDER, System.currentTimeMillis() - time);
     }
 }

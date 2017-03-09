@@ -1,5 +1,8 @@
 package com.enbecko.modcreator.linalg;
 
+import com.enbecko.modcreator.Log;
+import com.enbecko.modcreator.Log.LogEnums;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -60,6 +63,24 @@ public class MathHelper {
         return (float)Math.sqrt(tmp);
     }
 
+    public static double getSmallest(double ... choose) {
+        double tt = Double.POSITIVE_INFINITY;
+        for (double tmp : choose) {
+            if (tmp < tt)
+                tt = tmp;
+        }
+        return tt;
+    }
+
+    public static double getBiggest(double ... choose) {
+        double tt = Double.NEGATIVE_INFINITY;
+        for (double tmp : choose) {
+            if (tmp > tt)
+                tt = tmp;
+        }
+        return tt;
+    }
+
     /**
      * @return an array containing the line
      * @throws ArrayStoreException if the runtime type of the specified array
@@ -74,7 +95,7 @@ public class MathHelper {
         double mY = delta.getY() / delta.getX();
         float up = 0;
         int upSteps = 0;
-        System.out.println(p1+" "+p2+" "+delta+" "+mY);
+        Log.d(LogEnums.MATH, p1+" "+p2+" "+delta+" "+mY);
         for (double x = p1.getXD(); x <= p2.getXD(); x += oneUnit) {
             up += mY * oneUnit;
             if(up >= oneUnit) {
@@ -86,7 +107,7 @@ public class MathHelper {
         double mZ = delta.getY() / delta.getZ();
         up = 0;
         upSteps = 0;
-        System.out.println(p1+" "+p2+" "+delta+" "+mZ);
+        Log.d(LogEnums.MATH, p1+" "+p2+" "+delta+" "+mZ);
         for (double z = p1.getZD(); z <= p2.getZD(); z += oneUnit) {
             up += mZ * oneUnit;
             if(up >= oneUnit) {
@@ -98,7 +119,7 @@ public class MathHelper {
         double mX = delta.getZ() / delta.getX();
         up = 0;
         upSteps = 0;
-        System.out.println(p1+" "+p2+" "+delta+" "+mX);
+        Log.d(LogEnums.MATH, p1+" "+p2+" "+delta+" "+mX);
         for (double x = p1.getXD(); x <= p2.getXD(); x += oneUnit) {
             up += mX * oneUnit;
             if(up >= oneUnit) {
@@ -107,7 +128,7 @@ public class MathHelper {
             }
             addToList(prec, tmpVecsX, x, p1.getYD(), upSteps * oneUnit);
         }
-        System.out.println(tmpVecsX+" "+tmpVecsY+" "+tmpVecsZ);
+        Log.d(LogEnums.MATH, tmpVecsX+" "+tmpVecsY+" "+tmpVecsZ);
         vec3[] out = null;
         switch (prec) {
             case BYTE:
