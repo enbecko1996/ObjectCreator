@@ -40,17 +40,17 @@ public class GlobalRenderSetting {
                 color.update(red, green, blue, 1).normalize().mulToThis(overlayStrength).addToThis(1).normalize();
             }
         }, OVERLAY_RED {
-            private final vec4.FloatVec red = (vec4.FloatVec) new vec4.FloatVec(1, 0, 0, 1);
+            private final vec4.FloatVec red = (vec4.FloatVec) new vec4.FloatVec(1, 0, 0, 0.44F);
             public vec4.FloatVec getColor() {
                 return red;
             }
         }, OVERLAY_GREEN {
-            private final vec4.FloatVec green = (vec4.FloatVec) new vec4.FloatVec(0.3F, 1, 0.3F, 1);
+            private final vec4.FloatVec green = (vec4.FloatVec) new vec4.FloatVec(0.3F, 1, 0.3F, 0.44F);
             public vec4.FloatVec getColor() {
                 return green;
             }
         }, OVERLAY_CUSTOM {
-            private final vec4.FloatVec color = (vec4.FloatVec) new vec4.FloatVec(1, 1, 1, 1);
+            private final vec4.FloatVec color = (vec4.FloatVec) new vec4.FloatVec(1, 1, 1, 0.44F);
             public vec4.FloatVec getColor() {
                 return color;
             }
@@ -60,6 +60,6 @@ public class GlobalRenderSetting {
             }
         };
 
-        abstract vec4.FloatVec getColor();
+        public abstract vec4.FloatVec getColor();
     }
 }

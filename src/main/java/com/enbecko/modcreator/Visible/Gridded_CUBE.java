@@ -6,9 +6,12 @@ import com.enbecko.modcreator.contentholder.Bone;
 import com.enbecko.modcreator.contentholder.Content;
 import com.enbecko.modcreator.events.ManipulatingEvent;
 import com.enbecko.modcreator.linalg.*;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,11 +59,20 @@ public class Gridded_CUBE extends Content.CubicContent implements ITextured <Ren
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void render(LocalRenderSetting... localRenderSettings) {
+    public void render(VertexBuffer buffer, LocalRenderSetting... localRenderSettings) {
+        GlStateManager.bindTexture(0);
         for (Quadrilateral3D face : this.boundingFacesInBoneCoords) {
             if(face != null) {
-                if (face.getRenderer() != null)
-                    face.getRenderer().draw(Tessellator.getInstance().getBuffer(), 1);
+                if (face.getRenderer() != null) {
+                    face.getRenderer().draw(buffer, 1);
+                }
+            }
+        }
+        for (Quadrilateral3D face : this.boundingFacesInBoneCoords) {
+            if(face != null) {
+                if (face.getRenderer() != null) {
+                    face.getRenderer().draw(buffer, 1, localRenderSettings);
+                }
             }
         }
     }
@@ -75,7 +87,7 @@ public class Gridded_CUBE extends Content.CubicContent implements ITextured <Ren
     }
 
     @Override
-    public vec3.IntVec getPosition() {
+    public vec3.IntVec getPositionInBoneInt() {
         return (vec3.IntVec) this.positionInBoneCoords;
     }
 

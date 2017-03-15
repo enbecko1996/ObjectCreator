@@ -1,5 +1,7 @@
 package com.enbecko.modcreator.linalg;
 
+import com.enbecko.modcreator.Log;
+import com.enbecko.modcreator.Log.LogEnums;
 import com.enbecko.modcreator.RenderQuadrilateral;
 
 import javax.annotation.Nonnull;
@@ -67,7 +69,7 @@ public abstract class Quadrilateral3D extends Polygon3D<RenderQuadrilateral> {
                 matrix.doLUDecomposition();
                 tmpRhs.update(rayTrace3D.getOnPoint(), false).subFromThis(this.criticalConvexOnPoint);
                 vec_n_DOUBLE r_s_t_1 = matrix.solveLGS_fromLU(tmpRhs);
-                //System.out.println(matrix + ""+tmpRhs +""+ r_s_t_1);
+                //Log.d(Log.LogEnums.GEOMETRY, matrix + ""+tmpRhs +""+ r_s_t_1);
                 double[] rst = r_s_t_1.getVecD();
                 if (rst[2] > 0 && rst[2] < rayTrace3D.getLimit() && rst[0] >= 0 && rst[0] <= 1 && rst[1] >= 0 && rst[1] <= 1 && rst[0] + rst[1] <= 1) {
                     return rayTrace3D.advanceOnVecAndReturnPosition(rst[2]);
@@ -76,7 +78,7 @@ public abstract class Quadrilateral3D extends Polygon3D<RenderQuadrilateral> {
                     matrix.setColumn(1, this.criticalConvexSec);
                     matrix.doLUDecomposition();
                     vec_n_DOUBLE r_s_t_2 = matrix.solveLGS_fromLU(tmpRhs);
-                    //System.out.println(matrix + ""+tmpRhs +""+ r_s_t_2);
+                    //Log.d(Log.LogEnums.GEOMETRY, matrix + ""+tmpRhs +""+ r_s_t_2);
                     rst = r_s_t_2.getVecD();
                     if (rst[2] > 0 && rst[2] < rayTrace3D.getLimit() && rst[0] >= 0 && rst[0] <= 1 && rst[1] >= 0 && rst[1] <= 1 && rst[0] + rst[1] <= 1) {
                         return rayTrace3D.advanceOnVecAndReturnPosition(rst[2]);
@@ -222,6 +224,10 @@ public abstract class Quadrilateral3D extends Polygon3D<RenderQuadrilateral> {
 
     public boolean isPhysical() {
         return this.isPhysical;
+    }
+
+    public String toString() {
+        return "Quadliteral: [low_left = " + this.LOW_LEFT + ", low_right = " + this.LOW_RIGHT + ", top_rigtht = " + this.TOP_RIGHT + ", top_left = " + this.TOP_LEFT+"]";
     }
 
     public static class AutoUpdate extends Quadrilateral3D {
@@ -375,7 +381,7 @@ public abstract class Quadrilateral3D extends Polygon3D<RenderQuadrilateral> {
         long startTime = System.currentTimeMillis();
         //int testCount = 100;
         //for (int k = 0; k < testCount; k++)
-        System.out.println(face.checkIfCrosses(rayTrace3D));
-        System.out.println("Time: " + (System.currentTimeMillis() - startTime));
+        Log.d(LogEnums.GEOMETRY, face.checkIfCrosses(rayTrace3D));
+        Log.d(LogEnums.GEOMETRY, "Time: " + (System.currentTimeMillis() - startTime));
     }
 }

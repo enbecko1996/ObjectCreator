@@ -2,16 +2,16 @@ package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.GlobalRenderSetting;
 import com.enbecko.modcreator.LocalRenderSetting;
-import com.enbecko.modcreator.Visible.IGridded;
+import com.enbecko.modcreator.Log;
 import com.enbecko.modcreator.linalg.RayTrace3D;
 import com.enbecko.modcreator.linalg.vec3;
-import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -19,7 +19,6 @@ import java.util.List;
  */
 public class FirstOrderHolder extends CubicContentHolderGeometry implements ContentHolder<Content> {
     private List<Content> content = new ArrayList<Content>();
-    private final IGridded[][][] gridded = new IGridded[Main_BlockHeroes.contentCubesPerCube][Main_BlockHeroes.contentCubesPerCube][Main_BlockHeroes.contentCubesPerCube];
     ContentHolder parent;
 
     public FirstOrderHolder(Bone parentBone, vec3.IntVec positionInBoneCoords, boolean isMaxOrder) {
@@ -48,18 +47,10 @@ public class FirstOrderHolder extends CubicContentHolderGeometry implements Cont
     @Override
     public boolean addNewChild(@Nonnull Content content) {
         if (!this.content.contains(content)) {
-            if (content instanceof IGridded) {
-                IGridded gridded = (IGridded)content;
-                vec3.IntVec tmp = (vec3.IntVec) new vec3.IntVec(gridded.getPosition()).subFromThis(this.getPositionInBoneCoords());
-                for (int x = 0; x < (gridded.getXDim() > Main_BlockHeroes.contentCubesPerCube - tmp.getX() ? Main_BlockHeroes.contentCubesPerCube - tmp.getX() : gridded.getXDim()); x++) {
-                    for (int y = 0; y < (gridded.getYDim() > Main_BlockHeroes.contentCubesPerCube - tmp.getY() ? Main_BlockHeroes.contentCubesPerCube - tmp.getY() : gridded.getYDim()); y++) {
-                        for (int z = 0; z < (gridded.getZDim() > Main_BlockHeroes.contentCubesPerCube - tmp.getZ() ? Main_BlockHeroes.contentCubesPerCube - tmp.getZ() : gridded.getZDim()); z++) {
-                            if (this.gridded[tmp.getX() + x][tmp.getY() + y][tmp.getZ() + z] == null) {
-                                this.gridded[tmp.getX() + x][tmp.getY() + y][tmp.getZ() + z] = gridded;
-                            } else
-                                throw new RuntimeException("There seems to be an Gridded object where you want to add one " + Arrays.deepToString(this.gridded) +" " + content + ", x = " + (tmp.getX() + x)+ ", y = " + (tmp.getY() + y)+ ", z = " + (tmp.getZ() + z));
-                        }
-                    }
+            for (Content other : this.content) {
+                if (other.isColliding(content)) {
+                    Log.d(Log.LogEnums.CONTENTHOLDER, "The Content you want to add: " + content +" is colliding with " + other);
+                    return false;
                 }
             }
             this.content.add(content);
@@ -72,20 +63,6 @@ public class FirstOrderHolder extends CubicContentHolderGeometry implements Cont
     public boolean removeChild(@Nonnull Content content) {
         if (this.content.contains(content)) {
             this.content.remove(content);
-            if (content instanceof IGridded) {
-                IGridded gridded = (IGridded)content;
-                vec3.IntVec tmp = (vec3.IntVec) new vec3.IntVec(gridded.getPosition()).subFromThis(this.getPositionInBoneCoords());
-                for (int x = 0; x < (gridded.getXDim() > Main_BlockHeroes.contentCubesPerCube - tmp.getX() ? Main_BlockHeroes.contentCubesPerCube - tmp.getX() : gridded.getXDim()); x++) {
-                    for (int y = 0; y < (gridded.getYDim() > Main_BlockHeroes.contentCubesPerCube - tmp.getY() ? Main_BlockHeroes.contentCubesPerCube - tmp.getY() : gridded.getYDim()); y++) {
-                        for (int z = 0; z < (gridded.getZDim() > Main_BlockHeroes.contentCubesPerCube - tmp.getZ() ? Main_BlockHeroes.contentCubesPerCube - tmp.getZ() : gridded.getZDim()); z++) {
-                            if (this.gridded[tmp.getX() + x][tmp.getY() + y][tmp.getZ() + z] != null) {
-                                this.gridded[tmp.getX() + x][tmp.getY() + y][tmp.getZ() + z] = null;
-                            } else
-                                throw new RuntimeException("There seems to be nothing where you want to remove one gridded " + Arrays.deepToString(this.gridded) +" " + content + ", x = " + (tmp.getX() + x)+ ", y = " + (tmp.getY() + y)+ ", z = " + (tmp.getZ() + z));
-                        }
-                    }
-                }
-            }
             if (this.content.size() <= 0)
                 this.getParent().removeChild(this);
             return true;
@@ -127,11 +104,22 @@ public class FirstOrderHolder extends CubicContentHolderGeometry implements Cont
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void render(LocalRenderSetting... localRenderSettings) {
+    public void render(VertexBuffer buffer, LocalRenderSetting... localRenderSettings) {
         if (GlobalRenderSetting.getRenderMode() == GlobalRenderSetting.RenderMode.DEBUG)
-            super.render();
+            super.render(buffer);
         for (Content child : this.content) {
-            child.render();
+            child.render(buffer, localRenderSettings);
+        }
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void renderContentWithExceptions(VertexBuffer buffer, @Nullable List<Content> exceptions, LocalRenderSetting... localRenderSettings) {
+        if (GlobalRenderSetting.getRenderMode() == GlobalRenderSetting.RenderMode.DEBUG)
+            super.render(buffer);
+        for (Content child : this.content) {
+            if(exceptions == null || !exceptions.contains(child))
+                child.render(buffer);
         }
     }
 
@@ -143,10 +131,16 @@ public class FirstOrderHolder extends CubicContentHolderGeometry implements Cont
             vec3 pos;
             if ((pos = content.checkIfCrosses(rayTrace3D)) != null) {
                 double d = pos.subFromThis(rayTrace3D.getOnPoint()).length();
-                if (d < smallestDist)
+                if (d < smallestDist) {
+                    smallestDist = d;
                     tmpResult = content;
+                }
             }
         }
         return tmpResult;
+    }
+
+    public String toString() {
+        return "FirstOrderHolder " + this.getGeometryInfo();
     }
 }

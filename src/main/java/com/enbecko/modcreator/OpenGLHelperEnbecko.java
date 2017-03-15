@@ -37,7 +37,7 @@ public class OpenGLHelperEnbecko {
     @SideOnly(Side.CLIENT)
     public static void drawLine(vec3 start, vec3 end, float red, float green, float blue, float alpha, float width) {
         GlStateManager.glLineWidth(width);
-        GL11.glColor4f(red, green, blue, alpha);
+        GlStateManager.color(red, green, blue, alpha);
         GlStateManager.glBegin(GL11.GL_LINES);
         GlStateManager.glVertex3f(start.getXF(), start.getYF(), start.getZF());
         GlStateManager.glVertex3f(end.getXF(), end.getYF(), end.getZF());

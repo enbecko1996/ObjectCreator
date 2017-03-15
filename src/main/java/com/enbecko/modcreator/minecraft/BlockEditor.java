@@ -1,5 +1,7 @@
 package com.enbecko.modcreator.minecraft;
 
+import com.enbecko.modcreator.Log;
+import com.enbecko.modcreator.Log.LogEnums;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateBase;
@@ -38,7 +40,7 @@ public class BlockEditor extends BlockContainer {
     }
 
     public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor){
-        System.out.println("Hallo" + Arrays.toString(Thread.currentThread().getStackTrace()));
+        Log.d(LogEnums.MINECRAFT, "Hallo" + Arrays.toString(Thread.currentThread().getStackTrace()));
     }
 
     @NotNull
@@ -51,14 +53,14 @@ public class BlockEditor extends BlockContainer {
 
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
         TE_Editor editor = (TE_Editor) worldIn.getTileEntity(pos);
-        System.out.println(editor + " is Now active: " + editor.setActive(!editor.isActive()));
+        Log.d(LogEnums.MINECRAFT, editor + " is Now active: " + editor.setActive(!editor.isActive()));
         return true;
     }
 
     public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
         TE_Editor editor = (TE_Editor) world.getTileEntity(pos);
         editor.setActive(false);
-        System.out.println(editor+" is Now active: "+editor.isActive()+" && dead ");
+        Log.d(LogEnums.MINECRAFT, editor+" is Now active: "+editor.isActive()+" && dead ");
         return super.removedByPlayer(state, world, pos, player, willHarvest);
     }
 

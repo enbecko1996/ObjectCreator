@@ -102,6 +102,12 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
         return (vec3) super.update(0, floor, other.xCoord, other.yCoord, other.zCoord);
     }
 
+    public double updateAndGetDelta(Vec3d other, boolean floor) {
+        double out = Math.sqrt(Math.pow(other.xCoord - this.vec[0], 2) + Math.pow(other.yCoord - this.vec[1], 2) + Math.pow(other.zCoord - this.vec[2], 2));
+        this.update(other, floor);
+        return out;
+    }
+
     public abstract void setX(double x);
     public abstract void setY(double y);
     public abstract void setZ(double z);
