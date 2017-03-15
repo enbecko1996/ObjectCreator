@@ -5,6 +5,7 @@ import com.enbecko.modcreator.OpenGLHelperEnbecko;
 import com.enbecko.modcreator.events.BlockSetModes.BlockSetMode;
 import com.enbecko.modcreator.events.ManipulatingEvent;
 import com.enbecko.modcreator.linalg.*;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -21,7 +22,7 @@ public abstract class Content {
     protected final vec3 positionInBoneCoords;
     private final List<ContentHolder> parents = new ArrayList<ContentHolder>();
     @Nonnull
-    private final Bone parentBone;
+    protected final Bone parentBone;
     protected Line3D[] boundingEdgesInBoneCoords;
     protected Quadrilateral3D[] boundingFacesInBoneCoords;
     private boolean canChangePosition;
@@ -56,7 +57,7 @@ public abstract class Content {
     }
 
     @SuppressWarnings("unchecked")
-    public void removeMe() {
+    void removeMe() {
         for (int k = 0; k < this.getParentCount(); k++)
             this.getParent(k).removeChild(this);
     }
@@ -94,13 +95,13 @@ public abstract class Content {
 
     public abstract vec3 checkIfCrosses(RayTrace3D rayTrace3D);
 
-    public abstract FaceCrossposAngle getCrossedFaceVecAndAngle(RayTrace3D rayTrace3D, BlockSetMode editMode);
+    public abstract FaceCrossPosAngle getCrossedFaceVecAndAngle(RayTrace3D rayTrace3D, BlockSetMode editMode);
 
     @SideOnly(Side.CLIENT)
     public abstract void manipulateMe(ManipulatingEvent event, RayTrace3D rayTrace3D);
 
     @SideOnly(Side.CLIENT)
-    public abstract void render(LocalRenderSetting... localRenderSettings);
+    public abstract void render(VertexBuffer buffer, LocalRenderSetting... localRenderSettings);
 
     public double getMaxX() {
         double max = Double.NEGATIVE_INFINITY, tmp;
@@ -190,14 +191,14 @@ public abstract class Content {
     }
 
     public abstract static class PolyhedralContent extends Content {
-        public PolyhedralContent(Bone parentBone, vec3 positionInBoneCoords, boolean canChangePos,  vec3 ... vec3s) {
+        public PolyhedralContent(Bone parentBone, vec3 positionInBoneCoords, boolean canChangePos, vec3... vec3s) {
             super(parentBone, positionInBoneCoords, vec3s.length, canChangePos);
             for (int k = 0; k < this.boundingCornersInBoneCoords.length; k++) {
                 this.boundingCornersInBoneCoords[k] = vec3s[k];
             }
         }
 
-        public PolyhedralContent(Bone parentBone, vec3 positionInBoneCoords, vec3 ... vec3s) {
+        public PolyhedralContent(Bone parentBone, vec3 positionInBoneCoords, vec3... vec3s) {
             super(parentBone, positionInBoneCoords, vec3s.length);
             for (int k = 0; k < this.boundingCornersInBoneCoords.length; k++)
                 this.boundingCornersInBoneCoords[k] = vec3s[k];
@@ -286,7 +287,7 @@ public abstract class Content {
         @Override
         public boolean isColliding(Content content) {
             return content.getMaxX() > this.getMinX() && content.getMaxY() > this.getMinY() && content.getMaxZ() > this.getMinZ() &&
-                    content.getMinX() < this.getMaxZ() && content.getMinY() < this.getMaxY() && content.getMinZ() < this.getMaxZ();
+                    content.getMinX() < this.getMaxX() && content.getMinY() < this.getMaxY() && content.getMinZ() < this.getMaxZ();
         }
 
         @Override
@@ -321,9 +322,9 @@ public abstract class Content {
                     //BACK_X FACE CLOCKWISE (CW)
                     vec3.newVecWithPrecision(prec, pos.getXD() + xSize, pos.getYD(), pos.getZD() + zSize, false),
                     vec3.newVecWithPrecision(prec, pos.getXD() + xSize, pos.getYD(), pos.getZD(), false),
-                    vec3.newVecWithPrecision(prec,pos.getXD() + xSize, pos.getYD() + ySize, pos.getZD(), false),
+                    vec3.newVecWithPrecision(prec, pos.getXD() + xSize, pos.getYD() + ySize, pos.getZD(), false),
                     vec3.newVecWithPrecision(prec, pos.getXD() + xSize, pos.getYD() + ySize, pos.getZD() + zSize, false));
-            if (xSize > 0 && ySize > 0 && zSize > 0) {
+            if (xSize >= 0 && ySize >= 0 && zSize >= 0) {
                 this.xSize = xSize;
                 this.ySize = ySize;
                 this.zSize = zSize;
@@ -468,34 +469,34 @@ public abstract class Content {
         }
 
         @Override
-        public FaceCrossposAngle getCrossedFaceVecAndAngle(RayTrace3D rayTrace3D, BlockSetMode editMode) {
+        public FaceCrossPosAngle getCrossedFaceVecAndAngle(RayTrace3D rayTrace3D, BlockSetMode editMode) {
             vec3 vec = rayTrace3D.getVec();
             vec3 tmp;
             Polygon3D tmp2;
             if (vec.getXD() > 0) {
                 if ((tmp = (tmp2 = this.getBoundingFace(Faces.FRONT_X)).checkIfCrosses(rayTrace3D)) != null)
-                    return new FaceCrossposAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
+                    return new FaceCrossPosAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
             } else if (vec.getXD() < 0)
                 if ((tmp = (tmp2 = this.getBoundingFace(Faces.BACK_X)).checkIfCrosses(rayTrace3D)) != null)
-                    return new FaceCrossposAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
+                    return new FaceCrossPosAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
             if (vec.getYD() > 0) {
                 if ((tmp = (tmp2 = this.getBoundingFace(Faces.BOTTOM_Y)).checkIfCrosses(rayTrace3D)) != null)
-                    return new FaceCrossposAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
+                    return new FaceCrossPosAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
             } else if (vec.getYD() < 0)
                 if ((tmp = (tmp2 = this.getBoundingFace(Faces.TOP_Y)).checkIfCrosses(rayTrace3D)) != null)
-                    return new FaceCrossposAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
+                    return new FaceCrossPosAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
             if (vec.getZD() > 0) {
                 if ((tmp = (tmp2 = this.getBoundingFace(Faces.LEFT_Z)).checkIfCrosses(rayTrace3D)) != null)
-                    return new FaceCrossposAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
+                    return new FaceCrossPosAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
             } else if (vec.getZD() < 0)
                 if ((tmp = (tmp2 = this.getBoundingFace(Faces.RIGHT_Z)).checkIfCrosses(rayTrace3D)) != null)
-                    return new FaceCrossposAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
+                    return new FaceCrossPosAngle(tmp2, tmp, tmp2.getAngleAndAngleNormal(rayTrace3D));
             return null;
         }
 
         public String getGeometryInfo() {
             return "{pos = " + this.positionInBoneCoords + ", xSize = " + this.xSize +
-                    ", ySize = " + this.ySize + ", zSize = " + this.zSize +"}";
+                    ", ySize = " + this.ySize + ", zSize = " + this.zSize + "}";
         }
 
         public Quadrilateral3D getBoundingFace(Faces face) {
@@ -526,7 +527,7 @@ public abstract class Content {
 
         @Override
         @SideOnly(Side.CLIENT)
-        public void render(LocalRenderSetting... localRenderSettings) {
+        public void render(VertexBuffer buffer, LocalRenderSetting... localRenderSettings) {
             for (Line3D line : this.boundingEdgesInBoneCoords)
                 OpenGLHelperEnbecko.drawLine(line, 4);
         }

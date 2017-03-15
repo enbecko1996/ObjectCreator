@@ -1,6 +1,9 @@
 package com.enbecko.modcreator.events.BlockSetModes;
 
+import com.enbecko.modcreator.contentholder.Bone;
+import com.enbecko.modcreator.contentholder.Content;
 import com.enbecko.modcreator.contentholder.RayTraceResult;
+import com.enbecko.modcreator.events.RayTraceDispatcher;
 import com.enbecko.modcreator.linalg.vec3;
 import com.enbecko.modcreator.minecraft.ClientProxy;
 import net.minecraft.item.ItemStack;
@@ -21,6 +24,7 @@ public abstract class BlockSetMode {
     private final vec3.IntVec FAIL = new vec3.IntVec();
     private final List<BlockSetModeEvent> downs = new ArrayList<BlockSetModeEvent>();
     private final int mode;
+    protected final RayTraceDispatcher rayTraceDispatcher = RayTraceDispatcher.getTheRayTraceDispatcher();
 
     BlockSetMode(int mode, vec3.IntVec... positions) {
         this.positions = positions;
@@ -37,36 +41,44 @@ public abstract class BlockSetMode {
 
     public abstract BlockSetEnum getEnum();
 
-    public abstract void clicked(BlockSetModeEvent event, RayTraceResult result, ItemStack toSet);
+    public abstract void clickedMouse(MouseEvent mouseEvent, BlockSetModeEvent event, RayTraceResult result, ItemStack toSet);
+
+    public abstract void clickedKey(InputEvent.KeyInputEvent keyEvent, BlockSetModeEvent event, RayTraceResult result, ItemStack toSet);
 
     public abstract void dispatchMouseMoved(MouseEvent event, RayTraceResult result, ItemStack toSet);
 
-    public abstract void released(BlockSetModeEvent event, RayTraceResult result, ItemStack toSet);
+    public abstract void releasedMouse(MouseEvent mouseEvent, BlockSetModeEvent event, RayTraceResult result, ItemStack toSet);
+
+    public abstract void releasedKey(InputEvent.KeyInputEvent keyEvent, BlockSetModeEvent event, RayTraceResult result, ItemStack toSet);
 
     public abstract void tickDowns(List<BlockSetModeEvent> downs);
 
+    protected abstract void dispatchBuildItemStack(ItemStack toSet, RayTraceResult result, vec3 posInBone);
+
+    protected abstract void dispatchRemoveContent(Bone bone, Content content);
+
     @Nullable
-    public BlockSetModeEvent dispatchMouseClickedReleased(MouseEvent event, RayTraceResult result, ItemStack toSet) {
-        switch (event.getButton()) {
+    public BlockSetModeEvent dispatchMouseClickedReleased(MouseEvent mouseEvent, RayTraceResult result, ItemStack toSet) {
+        switch (mouseEvent.getButton()) {
             case 0:
-                if (event.isButtonstate()) {
-                    this.dispatchClicked(MOUSE_LEFT, result, toSet);
+                if (mouseEvent.isButtonstate()) {
+                    this.dispatchClickedMouse(mouseEvent, MOUSE_LEFT, result, toSet);
                 } else {
-                    this.dispatchReleased(MOUSE_LEFT, result, toSet);
+                    this.dispatchReleasedMouse(mouseEvent, MOUSE_LEFT, result, toSet);
                 }
                 return MOUSE_LEFT;
             case 1:
-                if (event.isButtonstate()) {
-                    this.dispatchClicked(MOUSE_RIGHT, result, toSet);
+                if (mouseEvent.isButtonstate()) {
+                    this.dispatchClickedMouse(mouseEvent, MOUSE_RIGHT, result, toSet);
                 } else {
-                    this.dispatchReleased(MOUSE_RIGHT, result, toSet);
+                    this.dispatchReleasedMouse(mouseEvent, MOUSE_RIGHT, result, toSet);
                 }
                 return MOUSE_RIGHT;
             case 2:
-                if (event.isButtonstate()) {
-                    this.dispatchClicked(MOUSE_MIDDLE, result, toSet);
+                if (mouseEvent.isButtonstate()) {
+                    this.dispatchClickedMouse(mouseEvent, MOUSE_MIDDLE, result, toSet);
                 } else {
-                    this.dispatchReleased(MOUSE_MIDDLE, result, toSet);
+                    this.dispatchReleasedMouse(mouseEvent, MOUSE_MIDDLE, result, toSet);
                 }
                 return MOUSE_MIDDLE;
         }
@@ -74,56 +86,76 @@ public abstract class BlockSetMode {
     }
 
     @Nullable
-    public BlockSetModeEvent dispatchKeyEvent(InputEvent.KeyInputEvent event, RayTraceResult result, ItemStack toSet) {
+    public BlockSetModeEvent dispatchKeyEvent(InputEvent.KeyInputEvent keyEvent, RayTraceResult result, ItemStack toSet) {
         if (ClientProxy.KEY_X.isKeyDown()) {
             if (!KEY_X.isDown) {
-                return this.dispatchClicked(KEY_X, result, toSet);
+                return this.dispatchClickedKey(keyEvent, KEY_X, result, toSet);
             }
         } else {
             if (KEY_X.isDown) {
-                return this.dispatchReleased(KEY_X, result, toSet);
+                return this.dispatchReleasedKey(keyEvent, KEY_X, result, toSet);
             }
         }
 
         if (ClientProxy.KEY_Y.isKeyDown()) {
             if (!KEY_Y.isDown) {
-                return this.dispatchClicked(KEY_Y, result, toSet);
+                return this.dispatchClickedKey(keyEvent, KEY_Y, result, toSet);
             }
         } else {
             if (KEY_Y.isDown) {
-                return this.dispatchReleased(KEY_Y, result, toSet);
+                return this.dispatchReleasedKey(keyEvent, KEY_Y, result, toSet);
             }
         }
 
         if (ClientProxy.KEY_Z.isKeyDown()) {
             if (!KEY_Z.isDown) {
-                return this.dispatchClicked(KEY_Z, result, toSet);
+                return this.dispatchClickedKey(keyEvent, KEY_Z, result, toSet);
             }
         } else {
             if (KEY_Z.isDown) {
-                return this.dispatchReleased(KEY_Z, result, toSet);
+                return this.dispatchReleasedKey(keyEvent, KEY_Z, result, toSet);
             }
         }
         return null;
     }
 
-    public BlockSetModeEvent dispatchClicked(BlockSetModeEvent event, RayTraceResult result, ItemStack toSet) {
+    private BlockSetModeEvent dispatchClickedMouse(MouseEvent mouseEvent, BlockSetModeEvent event, RayTraceResult result, ItemStack toSet) {
+        this.dispatchClick(event);
+        this.clickedMouse(mouseEvent, event, result, toSet);
+        return event;
+    }
+
+    private BlockSetModeEvent dispatchClickedKey(InputEvent.KeyInputEvent keyInputEvent, BlockSetModeEvent event, RayTraceResult result, ItemStack toSet) {
+        this.dispatchClick(event);
+        this.clickedKey(keyInputEvent, event, result, toSet);
+        return event;
+    }
+
+    private void dispatchClick(BlockSetModeEvent event) {
         event.lastClick = System.currentTimeMillis();
         event.deltaClicked = 0;
         event.isDown = true;
         if (!this.downs.contains(event) && event.tickDown())
             this.downs.add(event);
-        this.clicked(event, result, toSet);
+    }
+
+    private BlockSetModeEvent dispatchReleasedMouse(MouseEvent mouseEvent, BlockSetModeEvent event, RayTraceResult result, ItemStack toSet) {
+        this.dispatchReleased(event);
+        this.releasedMouse(mouseEvent, event, result, toSet);
         return event;
     }
 
-    public BlockSetModeEvent dispatchReleased(BlockSetModeEvent event, RayTraceResult result, ItemStack toSet) {
+    private BlockSetModeEvent dispatchReleasedKey(InputEvent.KeyInputEvent keyInputEvent, BlockSetModeEvent event, RayTraceResult result, ItemStack toSet) {
+        this.dispatchReleased(event);
+        this.releasedKey(keyInputEvent, event, result, toSet);
+        return event;
+    }
+
+    private void dispatchReleased(BlockSetModeEvent event) {
         event.isDown = false;
         if (this.downs.contains(event))
             this.downs.remove(event);
         event.deltaClicked = System.currentTimeMillis() - event.lastClick;
-        this.released(event, result, toSet);
-        return event;
     }
 
     @Nullable

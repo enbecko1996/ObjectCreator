@@ -9,12 +9,12 @@ import javax.annotation.Nonnull;
 /**
  * Created by Niclas on 08.03.2017.
  */
-public class FaceCrossposAngle {
+public class FaceCrossPosAngle {
     private final Polygon3D face;
     private final vec3 vec;
     private final vec4 angle;
 
-    public FaceCrossposAngle(@Nonnull Polygon3D face, @Nonnull vec3 vec, vec4 angle) {
+    public FaceCrossPosAngle(@Nonnull Polygon3D face, @Nonnull vec3 vec, vec4 angle) {
         this.face = face;
         this.vec = vec;
         this.angle = angle;

@@ -44,9 +44,42 @@ public abstract class RenderQuadrilateral <T extends vec3Vert> extends RenderPol
             vec3.FloatVec sec = (vec3.FloatVec) this.getVertexAt(1).position.subAndMakeNew(vec_n.vecPrec.FLOAT, this.getVertexAt(0).position,false);
             vec3.FloatVec normal = first.cross(sec, false);
 
-            vertexBuffer.begin(7, DefaultVertexFormats.POSITION_TEX_NORMAL);
+            if (localRenderSettings.length > 0) {
+                for (LocalRenderSetting setting : localRenderSettings) {
+                    switch (setting.getOption()) {
+                        case OUTLINE:
+                            OpenGLHelperEnbecko.drawLine(this.getVertexAt(0).position, this.getVertexAt(1).position, GlobalRenderSetting.RenderOption.OUTLINE.getColor(), 5);
+                            OpenGLHelperEnbecko.drawLine(this.getVertexAt(1).position, this.getVertexAt(2).position, GlobalRenderSetting.RenderOption.OUTLINE.getColor(), 5);
+                            OpenGLHelperEnbecko.drawLine(this.getVertexAt(2).position, this.getVertexAt(3).position, GlobalRenderSetting.RenderOption.OUTLINE.getColor(), 5);
+                            OpenGLHelperEnbecko.drawLine(this.getVertexAt(3).position, this.getVertexAt(0).position, GlobalRenderSetting.RenderOption.OUTLINE.getColor(), 5);
+                            break;
+                        case OVERLAY_GREEN:
+                            vertexBuffer.begin(7, DefaultVertexFormats.POSITION_NORMAL);
+                            vec4.FloatVec col = OVERLAY_GREEN.getColor();
+                            GlStateManager.color(col.getR(), col.getG(), col.getB(), 0.44F);
+                            GL11.glEnable(GL11.GL_BLEND);
+                            GL11.glDisable(GL11.GL_LIGHTING);
+                            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                            for (int i = 0; i < nVertices; ++i) {
+                                vec3Vert.PosTex posTex = this.getVertexAt(i);
+                                this.putPosition(vertexBuffer, posTex.position, scale);
+                                this.putNormal(vertexBuffer, normal);
+                                vertexBuffer.endVertex();
+                            }
+                            Tessellator.getInstance().draw();
+                            GL11.glDisable(GL11.GL_BLEND);
+                            GL11.glEnable(GL11.GL_LIGHTING);
+                            break;
+                    }
+                }
+            } else {
+                vertexBuffer.begin(7, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL);
+                this.drawVerts(vertexBuffer, normal, scale);
+            }
+        }
 
-            for(int i = 0; i < nVertices; ++i) {
+        public void drawVerts(VertexBuffer vertexBuffer, vec3.FloatVec normal, float scale) {
+            for (int i = 0; i < nVertices; ++i) {
                 vec3Vert.PosTex posTex = this.getVertexAt(i);
                 this.putPosition(vertexBuffer, posTex.position, scale);
                 this.putTexture(vertexBuffer, posTex.texture);
@@ -96,7 +129,7 @@ public abstract class RenderQuadrilateral <T extends vec3Vert> extends RenderPol
                         case OVERLAY_GREEN:
                             vertexBuffer.begin(7, DefaultVertexFormats.POSITION_NORMAL);
                             vec4.FloatVec col = OVERLAY_GREEN.getColor();
-                            GlStateManager.color(col.getR(), col.getG(), col.getB(), 0.55F);
+                            GlStateManager.color(col.getR(), col.getG(), col.getB(), 0.44F);
                             GL11.glEnable(GL11.GL_BLEND);
                             GL11.glDisable(GL11.GL_LIGHTING);
                             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -109,6 +142,7 @@ public abstract class RenderQuadrilateral <T extends vec3Vert> extends RenderPol
                             Tessellator.getInstance().draw();
                             GL11.glDisable(GL11.GL_BLEND);
                             GL11.glEnable(GL11.GL_LIGHTING);
+                            break;
                     }
                 }
             } else {

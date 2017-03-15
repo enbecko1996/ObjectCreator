@@ -1,18 +1,21 @@
 package com.enbecko.modcreator.contentholder;
 
+import com.enbecko.modcreator.LocalRenderSetting;
 import com.enbecko.modcreator.Log;
 import com.enbecko.modcreator.Log.LogEnums;
-import com.enbecko.modcreator.Visible.Gridded_CUBE;
+import com.enbecko.modcreator.Visible.IGridded;
 import com.enbecko.modcreator.events.BlockSetModes.BlockSetMode;
 import com.enbecko.modcreator.events.ManipulatingEvent;
 import com.enbecko.modcreator.linalg.*;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.enbecko.modcreator.linalg.vec_n.vecPrec.DOUBLE;
 import static com.enbecko.modcreator.linalg.vec_n.vecPrec.INT;
 
 /**
@@ -21,7 +24,7 @@ import static com.enbecko.modcreator.linalg.vec_n.vecPrec.INT;
 public class Bone extends Content.CuboidContent{
     @Deprecated
     private CubicContentHolderGeometry boneContent = null;
-    private vec3 center_global;
+    private vec3 origin_global;
     private vec3.DoubleVec offset;
     private final Matrix.Matrix_NxN transform = Matrix.NxN_FACTORY.makeIdent(4);
     private final Matrix.Matrix_NxN inverseTransform = Matrix.NxN_FACTORY.makeIdent(4);
@@ -29,19 +32,23 @@ public class Bone extends Content.CuboidContent{
     private final Octant[] octants = new Octant[8];
     protected final List<Octant> rayTraceResult = new ArrayList<Octant>();
     protected double[] distance = new double[8];
+    private final Grid boneGrid;
+    private final RayTrace3D rayTrace_BONE = new RayTrace3D(new vec3.DoubleVec(), new vec3.DoubleVec(), 100, false);
+    vec4 tmpFillable = new vec4.DoubleVec();
 
     @SideOnly(Side.CLIENT)
-    public Bone(vec3 center_global) {
-        super(null, new vec3.IntVec(-1, -1, -1), 2, 2, 2, INT);
+    public Bone(vec3 origin_global) {
+        super(null, new vec3.IntVec(0, 0, 0), 0, 0, 0, INT);
+        this.boneGrid = new Grid(origin_global);
         this.createBoundingGeometry();
-        this.center_global = center_global;
-        Log.d(LogEnums.CONTENTHOLDER, this.center_global);
-        this.transform.translate(this.center_global.getVecD());
+        this.origin_global = origin_global;
+        Log.d(LogEnums.CONTENTHOLDER, this.origin_global);
+        this.transform.translate(this.origin_global.getVecD());
         ((Matrix.Matrix_NxN)this.inverseTransform.update(transform)).invert();
         Log.d(LogEnums.CONTENTHOLDER, transform + " " + this.inverseTransform);
         vec3.IntVec center = new vec3.IntVec();
-        this.I = new Octant(this, center, 1, 1, 1, Octant.OCTANTS.I);
-        this.II = new Octant(this, (vec3.IntVec) center.addAndMakeNew(INT, false, -1, 0, 0), 1, 1, 1, Octant.OCTANTS.II);
+        this.I = new Octant(this, center, 0, 0, 0, Octant.OCTANTS.I);
+        this.II = new Octant(this, (vec3.IntVec) center, 0, 0, 0, Octant.OCTANTS.II);
         this.III = new Octant(this, (vec3.IntVec) center.addAndMakeNew(INT, false, -1, -1, 0), 1, 1, 1, Octant.OCTANTS.III);
         this.IV = new Octant(this, (vec3.IntVec) center.addAndMakeNew(INT, false, 0, -1, 0), 1, 1, 1, Octant.OCTANTS.IV);
         this.V = new Octant(this, (vec3.IntVec) center.addAndMakeNew(INT, false, 0, 0, -1), 1, 1, 1, Octant.OCTANTS.V);
@@ -154,7 +161,7 @@ public class Bone extends Content.CuboidContent{
     }
 
     public RayTraceResult getRayTraceResult(RayTrace3D rayTrace_GLOBAL, BlockSetMode editMode) {
-        RayTrace3D rayTrace_BONE = new RayTrace3D(rayTrace_GLOBAL);
+        this.rayTrace_BONE.update(rayTrace_GLOBAL);
         rayTrace_BONE.transform(this.inverseTransform);
         this.rayTraceResult.clear();
         for (int l = 0; l < distance.length; l++) {
@@ -205,15 +212,35 @@ public class Bone extends Content.CuboidContent{
         for (Octant octant : this.rayTraceResult) {
             Content result;
             if ((result = octant.getRayTraceResult(rayTrace_BONE)) != null)
-                return new RayTraceResult(this, rayTrace_BONE, result, result.getCrossedFaceVecAndAngle(rayTrace_BONE, editMode));
+                return new RayTraceResult(this, rayTrace_GLOBAL, result, result.getCrossedFaceVecAndAngle(rayTrace_BONE, editMode));
         }
         return null;
     }
 
+    @Override
+    @Nullable
+    public vec3 checkIfCrosses(RayTrace3D rayTrace3D) {
+        this.rayTrace_BONE.update(rayTrace3D);
+        this.rayTrace_BONE.transform(this.inverseTransform);
+        return super.checkIfCrosses(this.rayTrace_BONE);
+    }
+
+
+    public void renderContent() {
+
+    }
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void render() {
+    public void render(VertexBuffer buffer, LocalRenderSetting ... localRenderSettings) {
         for (Octant octant : this.octants)
-            octant.render();
+            octant.render(buffer, localRenderSettings);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void renderContentWithExceptions(VertexBuffer buffer, @Nullable List<Content> exceptions, LocalRenderSetting ... localRenderSettings) {
+        for (Octant octant : this.octants)
+            octant.renderContentWithExceptions(buffer, exceptions, localRenderSettings);
     }
 
     public void addContent(Content content, Content ... adjacent) {
@@ -229,24 +256,58 @@ public class Bone extends Content.CuboidContent{
                     Log.d(LogEnums.CONTENTHOLDER, "Can not add " + content);
                     content.removeMe();
                 } else {
-                    double tmp;
-                    double minX = this.getMinX(), minY = this.getMinY(), minZ = this.getMinZ(), maxX = this.getMaxX(), maxY = this.getMaxY(), maxZ = this.getMaxZ();
-                    if ((tmp = octant.getMinX()) < minX)
-                        minX = tmp;
-                    if ((tmp = octant.getMaxX()) > maxX)
-                        maxX = tmp;
-                    if ((tmp = octant.getMinY()) < minY)
-                        minY = tmp;
-                    if ((tmp = octant.getMaxY()) > maxY)
-                        maxY = tmp;
-                    if ((tmp = octant.getMinZ()) < minZ)
-                        minZ = tmp;
-                    if ((tmp = octant.getMaxZ()) > maxZ)
-                        maxZ = tmp;
-                    this.update(minX, minY, minZ, maxX, maxY, maxZ);
+                    if (content instanceof IGridded) {
+                        IGridded gridded = (IGridded)content;
+                        vec3.IntVec tmp = gridded.getPositionInBoneInt();
+                        for (int x = 0; x < gridded.getXDim(); x++) {
+                            for (int y = 0; y < gridded.getYDim(); y++) {
+                                for (int z = 0; z < gridded.getZDim(); z++) {
+                                    this.boneGrid.setAt(tmp.getX() + x, tmp.getY() + y, tmp.getZ() + z, gridded);
+                                }
+                            }
+                        }
+                    }
+                    Log.d(LogEnums.BLOCKSETTING, this.boneGrid);
+                    this.adaptSizeOnOctantChange(octant);
                 }
             }
         }
+    }
+
+    public void removeContent(@Nonnull Content content) {
+        content.removeMe();
+        if (content instanceof IGridded) {
+            IGridded gridded = (IGridded)content;
+            vec3.IntVec tmp = gridded.getPositionInBoneInt();
+            for (int x = 0; x < gridded.getXDim(); x++) {
+                for (int y = 0; y < gridded.getYDim(); y++) {
+                    for (int z = 0; z < gridded.getZDim(); z++) {
+                        this.boneGrid.remove(tmp.getX() + x, tmp.getY() + y, tmp.getZ() + z);
+                    }
+                }
+            }
+        }
+        this.adaptSizeOnOctantChange(this.octants);
+    }
+
+    public void adaptSizeOnOctantChange(Octant ... changed) {
+        double tmp;
+        double minX = this.getMinX(), minY = this.getMinY(), minZ = this.getMinZ(), maxX = this.getMaxX(), maxY = this.getMaxY(), maxZ = this.getMaxZ();
+        for (Octant octant : changed) {
+            if ((tmp = octant.getMinX()) < minX)
+                minX = tmp;
+            if ((tmp = octant.getMaxX()) > maxX)
+                maxX = tmp;
+            if ((tmp = octant.getMinY()) < minY)
+                minY = tmp;
+            if ((tmp = octant.getMaxY()) > maxY)
+                maxY = tmp;
+            if ((tmp = octant.getMinZ()) < minZ)
+                minZ = tmp;
+            if ((tmp = octant.getMaxZ()) > maxZ)
+                maxZ = tmp;
+        }
+        this.update(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     public void octantEmpty(Octant octant) {
@@ -254,6 +315,22 @@ public class Bone extends Content.CuboidContent{
             if (octant == octant1)
                 octant1.setActive(false);
         }
+    }
+
+    public vec3 globalToLocal(vec3 world) {
+        this.inverseTransform.multiplyWithVector(tmpFillable, world.getXD(), world.getYD(), world.getZD(), 1);
+        return new vec3.DoubleVec(tmpFillable, true);
+    }
+
+    public vec3 localToGlobal(vec3 local) {
+        this.transform.multiplyWithVector(tmpFillable, local.getXD(), local.getYD(), local.getZD(), 1);
+        return new vec3.DoubleVec(tmpFillable, true);
+    }
+
+    @Override
+    public boolean isInside(vec3 vec) {
+        vec3 local = this.globalToLocal(vec);
+        return super.isInside(local);
     }
 
     private static final vec3.DoubleVec eye = new vec3.DoubleVec(39, 100.5, 123.5), look = new vec3.DoubleVec(-1, 0, 0);

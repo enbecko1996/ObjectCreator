@@ -2,14 +2,22 @@ package com.enbecko.modcreator.events.BlockSetModes;
 
 import com.enbecko.modcreator.Log;
 import com.enbecko.modcreator.Log.LogEnums;
+import com.enbecko.modcreator.Visible.MCBlockProxy;
+import com.enbecko.modcreator.contentholder.Bone;
 import com.enbecko.modcreator.contentholder.Content;
 import com.enbecko.modcreator.contentholder.RayTraceResult;
+import com.enbecko.modcreator.events.RayTraceDispatcher;
 import com.enbecko.modcreator.linalg.vec3;
 import com.enbecko.modcreator.minecraft.ContentOption;
 import com.enbecko.modcreator.minecraft.IGriddable;
 import com.enbecko.modcreator.minecraft.ItemContent;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.MouseEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 
 import java.util.List;
 
@@ -29,16 +37,12 @@ public class SINGLE_GRIDDED_MODE extends BlockSetMode {
     }
 
     @Override
-    public void clicked(BlockSetModeEvent event, RayTraceResult result, ItemStack toSet) {
-
-    }
-
-    @Override
-    public void released(BlockSetModeEvent event, RayTraceResult result, ItemStack toSet) {
-        if (toSet != null && toSet.getItem() instanceof IGriddable) {
-            if (result != null) {
-                switch (event) {
-                    case MOUSE_RIGHT:
+    public void releasedMouse(MouseEvent mouseEvent, BlockSetModeEvent event, RayTraceResult result, ItemStack toSet) {
+        Item item;
+        if (result != null) {
+            switch (event) {
+                case MOUSE_RIGHT:
+                    if (toSet != null && (((item = toSet.getItem()) instanceof ItemContent && item instanceof IGriddable) || item instanceof ItemBlock)) {
                         Log.d(LogEnums.BLOCKSETTING, "HI :)");
                         vec3 inverseRayTrace = (vec3) new vec3.DoubleVec(result.getTheRayTrace().getVec()).invert();
                         vec3 posOnFace = result.getFace().getCrossPosOnFace();
@@ -72,19 +76,59 @@ public class SINGLE_GRIDDED_MODE extends BlockSetMode {
                             posInBone.setY(nY);
                             posInBone.setZ(pZ);
                         }
-                        Log.d(LogEnums.BLOCKSETTING, posOnFace +" " +inverseRayTrace + " " + posInBone + " " + nX + " " + nY + " " +nZ);
-                        if (toSet.getItem() instanceof ItemContent) {
-                            ItemContent item = (ItemContent) toSet.getItem();
-                            if (item.canBeSetHere(posInBone, this)) {
-                                Log.d(LogEnums.BLOCKSETTING, "Add Content");
-                                result.getTheBone().addContent(item.createNewContentAndReturn(result.getTheBone(), posInBone, ContentOption.newContentOptionFromNBT(toSet.getTagCompound())).createBoundingGeometry());
-                            }
-                        }
-                }
-            } else {
+                        Log.d(LogEnums.BLOCKSETTING, posOnFace + " " + inverseRayTrace + " " + posInBone + " " + nX + " " + nY + " " + nZ);
+                        this.dispatchBuildItemStack(toSet, result, posInBone);
+                        //mouseEvent.setCanceled(true);
+                    }
+                    break;
+                case MOUSE_LEFT:
+                    this.dispatchRemoveContent(result.getTheBone(), result.getResult());
+                    //mouseEvent.setCanceled(true);
+                    break;
+            }
+        } else {
 
+        }
+    }
+
+    @Override
+    public void clickedMouse(MouseEvent mouseEvent, BlockSetModeEvent event, RayTraceResult result, ItemStack toSet) {
+
+    }
+
+    @Override
+    public void clickedKey(InputEvent.KeyInputEvent keyEvent, BlockSetModeEvent event, RayTraceResult result, ItemStack toSet) {
+
+    }
+
+    @Override
+    public void releasedKey(InputEvent.KeyInputEvent keyEvent, BlockSetModeEvent event, RayTraceResult result, ItemStack toSet) {
+
+    }
+
+    protected void dispatchBuildItemStack(ItemStack toSet, RayTraceResult result, vec3 posInBone) {
+        Item item = toSet.getItem();
+        Log.d(LogEnums.BLOCKSETTING, item);
+        if (item instanceof ItemContent) {
+            ItemContent itemContent = (ItemContent) toSet.getItem();
+            if (itemContent.canBeSetHere(posInBone, this)) {
+                result.getTheBone().addContent(itemContent.createNewContentAndReturn(result.getTheBone(), posInBone, ContentOption.newContentOptionFromNBT(toSet.getTagCompound())).createBoundingGeometry());
+                RayTraceDispatcher.getTheRayTraceDispatcher().forceReRayTrace();
+            }
+        } else if (item instanceof ItemBlock) {
+            ItemBlock itemBlock = (ItemBlock) toSet.getItem();
+            Block block = itemBlock.getBlock();
+            if (block == Blocks.ACACIA_DOOR) {
+
+            } else {
+                result.getTheBone().addContent(new MCBlockProxy(result.getTheBone(), new vec3.IntVec(posInBone), block.getDefaultState()).createBoundingGeometry());
             }
         }
+    }
+
+    protected void dispatchRemoveContent(Bone bone, Content content) {
+        bone.removeContent(content);
+        RayTraceDispatcher.getTheRayTraceDispatcher().forceReRayTrace();
     }
 
     @Override

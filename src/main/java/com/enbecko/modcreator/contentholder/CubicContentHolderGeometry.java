@@ -1,10 +1,12 @@
 package com.enbecko.modcreator.contentholder;
 
+import com.enbecko.modcreator.LocalRenderSetting;
 import com.enbecko.modcreator.events.ManipulatingEvent;
 import com.enbecko.modcreator.linalg.RayTrace3D;
 import com.enbecko.modcreator.linalg.vec_n;
 import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
 import com.enbecko.modcreator.linalg.vec3;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -81,4 +83,6 @@ public abstract class CubicContentHolderGeometry extends Content.CubicContent {
     public int getSize() {
         return this.size;
     }
+
+    public abstract void renderContentWithExceptions(VertexBuffer buffer, @Nullable List<Content> exceptions, LocalRenderSetting ... localRenderSettings);
 }

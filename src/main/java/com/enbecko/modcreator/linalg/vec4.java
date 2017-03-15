@@ -91,6 +91,11 @@ public abstract class vec4<T extends Number> extends vec_n<T> {
         return (float) this.vec[3];
     }
 
+    public vec4 normalizeW() {
+        this.update(this.vec[0] / this.vec[3], this.vec[1] / this.vec[3], this.vec[2] / this.vec[3], 1);
+        return this;
+    }
+
     public vec4 update(double r, double g, double b, double a) {
         this.update(r, g, b, a, false);
         return this;

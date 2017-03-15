@@ -8,10 +8,12 @@ import com.enbecko.modcreator.linalg.RayTrace3D;
 import com.enbecko.modcreator.linalg.vec_n;
 import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
 import com.enbecko.modcreator.linalg.vec3;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -231,14 +233,29 @@ public class HigherOrderHolder extends CubicContentHolderGeometry implements Con
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void render(LocalRenderSetting... localRenderSettings) {
+    public void render(VertexBuffer buffer, LocalRenderSetting... localRenderSettings) {
         if (GlobalRenderSetting.getRenderMode() == GlobalRenderSetting.RenderMode.DEBUG)
-            super.render();
+            super.render(buffer);
         for (int k = 0; k < Main_BlockHeroes.contentCubesPerCube; k++) {
             for (int l = 0; l < Main_BlockHeroes.contentCubesPerCube; l++) {
                 for (int m = 0; m < Main_BlockHeroes.contentCubesPerCube; m++) {
                     if (this.content[k][l][m] != null)
-                        this.content[k][l][m].render();
+                        this.content[k][l][m].render(buffer, localRenderSettings);
+                }
+            }
+        }
+    }
+
+
+    @Override
+    public void renderContentWithExceptions(VertexBuffer buffer, @Nullable List<Content> exceptions, LocalRenderSetting... localRenderSettings) {
+        if (GlobalRenderSetting.getRenderMode() == GlobalRenderSetting.RenderMode.DEBUG)
+            super.render(buffer);
+        for (int k = 0; k < Main_BlockHeroes.contentCubesPerCube; k++) {
+            for (int l = 0; l < Main_BlockHeroes.contentCubesPerCube; l++) {
+                for (int m = 0; m < Main_BlockHeroes.contentCubesPerCube; m++) {
+                    if (this.content[k][l][m] != null)
+                        this.content[k][l][m].renderContentWithExceptions(buffer, exceptions, localRenderSettings);
                 }
             }
         }

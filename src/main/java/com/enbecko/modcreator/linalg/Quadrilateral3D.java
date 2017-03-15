@@ -226,6 +226,10 @@ public abstract class Quadrilateral3D extends Polygon3D<RenderQuadrilateral> {
         return this.isPhysical;
     }
 
+    public String toString() {
+        return "Quadliteral: [low_left = " + this.LOW_LEFT + ", low_right = " + this.LOW_RIGHT + ", top_rigtht = " + this.TOP_RIGHT + ", top_left = " + this.TOP_LEFT+"]";
+    }
+
     public static class AutoUpdate extends Quadrilateral3D {
         public AutoUpdate(vec3 LOW_LEFT, vec3 LOW_RIGHT, vec3 TOP_RIGHT, vec3 TOP_LEFT) {
             super(LOW_LEFT, LOW_RIGHT, TOP_RIGHT, TOP_LEFT);

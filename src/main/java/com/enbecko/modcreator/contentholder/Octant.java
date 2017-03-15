@@ -11,10 +11,13 @@ import com.enbecko.modcreator.linalg.RayTrace3D;
 import com.enbecko.modcreator.linalg.vec_n;
 import com.enbecko.modcreator.minecraft.Main_BlockHeroes;
 import com.enbecko.modcreator.linalg.vec3;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -343,7 +346,7 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
                 this.getParentBone().octantEmpty(this);
                 return true;
             } else if (this.content.size() == 1) {
-                if (this.content.get(0) instanceof HigherOrderHolder) {
+                while (this.content.size() == 1 && this.content.get(0) instanceof HigherOrderHolder) {
                     HigherOrderHolder higherOrderHolder = (HigherOrderHolder) this.content.get(0);
                     synchronized (this.content) {
                         this.content.clear();
@@ -352,6 +355,9 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
                             holder.setMaxOrder(true).addParent(this);
                         this.makeSizeFromNewContentList();
                     }
+                }
+                if (this.content.size() == 1 && this.content.get(0) instanceof FirstOrderHolder) {
+                    this.makeSizeFromNewContentList();
                 }
             } else if (content.getMinX() == this.getMinX() || content.getMinY() == this.getMinY() || content.getMinZ() == this.getMinZ() ||
                     content.getMaxX() == this.getMaxX() || content.getMaxY() == this.getMaxY() || content.getMaxZ() == this.getMaxZ()) {
@@ -551,13 +557,25 @@ public class Octant extends Content.CuboidContent implements ContentHolder<Cubic
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void render(LocalRenderSetting... localRenderSettings) {
+    public void render(VertexBuffer buffer, LocalRenderSetting... localRenderSettings) {
+        this.renderMyOutline();
+        for (CubicContentHolderGeometry child : this.content)
+            child.render(buffer, localRenderSettings);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void renderContentWithExceptions(VertexBuffer buffer, @Nullable List<Content> exceptions, LocalRenderSetting... localRenderSettings) {
+        this.renderMyOutline();
+        for (CubicContentHolderGeometry child : this.content)
+            child.renderContentWithExceptions(buffer, exceptions, localRenderSettings);
+    }
+
+    private void renderMyOutline() {
         if (GlobalRenderSetting.getRenderMode() == GlobalRenderSetting.RenderMode.DEBUG) {
+            GlStateManager.bindTexture(0);
             for (Line3D line : this.boundingEdgesInBoneCoords)
                 OpenGLHelperEnbecko.drawLine(line, this.isActive() ? OpenGLHelperEnbecko.GREEN : OpenGLHelperEnbecko.RED, 4);
         }
-        for (CubicContentHolderGeometry child : this.content)
-            child.render();
     }
 
     public enum OCTANTS {

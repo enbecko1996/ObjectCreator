@@ -11,9 +11,9 @@ public class RayTraceResult {
     private final Bone theBone;
     private final RayTrace3D theRayTrace;
     private final Content result;
-    private final FaceCrossposAngle face;
+    private final FaceCrossPosAngle face;
 
-    public RayTraceResult(@Nonnull Bone bone, @Nonnull RayTrace3D rayTrace3D, @Nonnull Content result, @Nonnull FaceCrossposAngle face) {
+    public RayTraceResult(@Nonnull Bone bone, @Nonnull RayTrace3D rayTrace3D, @Nonnull Content result, @Nonnull FaceCrossPosAngle face) {
         this.theBone = bone;
         this.theRayTrace = rayTrace3D;
         this.result = result;
@@ -32,11 +32,11 @@ public class RayTraceResult {
         return this.result;
     }
 
-    public FaceCrossposAngle getFace() {
+    public FaceCrossPosAngle getFace() {
         return this.face;
     }
 
     public String toString() {
-        return "RayTraceResult: raytrace = " + theRayTrace +",\n content = " + this.result +",\n FaceCrossposAngle = " + this.face;
+        return "RayTraceResult: raytrace = " + theRayTrace +",\n content = " + this.result +",\n FaceCrossPosAngle = " + this.face;
     }
 }

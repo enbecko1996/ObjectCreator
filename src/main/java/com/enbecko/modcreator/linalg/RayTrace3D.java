@@ -6,9 +6,9 @@ import javax.annotation.Nonnull;
  * Created by enbec on 21.02.2017.
  */
 public class RayTrace3D extends Line3D.Line3DManualUpdate {
-    private final boolean isEndless;
+    private boolean isEndless;
     private final vec3.DoubleVec vec;
-    private final float limit;
+    private float limit;
     vec4 tmp = new vec4.DoubleVec();
 
     public RayTrace3D(vec3 onPoint, vec3 vec1, float limit, boolean isEndless) {
@@ -63,6 +63,15 @@ public class RayTrace3D extends Line3D.Line3DManualUpdate {
         this.onPoint.update(onPoint, false);
         this.vec.update(vec);
         this.endPoint.update(this.onPoint).addToThis(vec);
+        return this;
+    }
+
+    public RayTrace3D update(RayTrace3D rayTrace3D) {
+        this.onPoint.update(rayTrace3D.getOnPoint());
+        this.vec.update(rayTrace3D.getVec());
+        this.endPoint.update(rayTrace3D.getEndPoint());
+        this.limit = rayTrace3D.getLimit();
+        this.isEndless = rayTrace3D.isEndless();
         return this;
     }
 

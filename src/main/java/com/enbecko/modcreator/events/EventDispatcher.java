@@ -1,5 +1,6 @@
 package com.enbecko.modcreator.events;
 
+import com.enbecko.modcreator.Log;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -50,7 +51,6 @@ public class EventDispatcher {
         for (IMouseEventListener listener : mouseListeners) {
             listener.onMouseEvent(event);
         }
-
     }
 
     @SubscribeEvent

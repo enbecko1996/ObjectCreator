@@ -2,6 +2,9 @@ package com.enbecko.modcreator.linalg;
 
 import com.enbecko.modcreator.Log;
 import com.enbecko.modcreator.Log.LogEnums;
+import net.minecraft.util.math.Vec3i;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
