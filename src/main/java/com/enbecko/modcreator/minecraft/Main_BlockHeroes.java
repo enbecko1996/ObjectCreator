@@ -30,7 +30,6 @@ public class Main_BlockHeroes
 
     public static BlockEditor editorBlock;
     public static ItemContent griddedCube_Item;
-    public static ItemContent mcProxyCube;
 
     private static final CreativeTabs modMakerTab = new CreativeTabs("Enbecko's Mod Maker") {
         @NotNull
@@ -48,7 +47,6 @@ public class Main_BlockHeroes
 
         editorBlock = (BlockEditor) new BlockEditor().setUnlocalizedName("editorblock").setCreativeTab(modMakerTab);
         griddedCube_Item = (ItemContent) new ItemGriddedCube().setUnlocalizedName("gridded_cube").setCreativeTab(modMakerTab);
-        mcProxyCube = (ItemContent) new ItemMcProxyCube().setUnlocalizedName("mcproxycube").setCreativeTab(modMakerTab);
 
         GlobalSettings.setDebugMode();
 
@@ -56,7 +54,6 @@ public class Main_BlockHeroes
 
         GameRegistry.registerBlock(editorBlock, "editorblock");
         GameRegistry.registerItem(griddedCube_Item, "gridded_cube");
-        GameRegistry.registerItem(mcProxyCube, "mcproxycube");
     }
 
     @EventHandler

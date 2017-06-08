@@ -541,7 +541,7 @@ public abstract class Content {
      * Created by enbec on 21.02.2017.
      */
     public abstract static class CubicContent extends CuboidContent {
-        protected CubicContent(Bone parentBone, vec3.IntVec positonInBoneCoords, double size, vec_n.vecPrec prec) {
+        protected CubicContent(Bone parentBone, vec3 positonInBoneCoords, double size, vec_n.vecPrec prec) {
             super(parentBone, positonInBoneCoords, size, size, size, prec);
         }
 

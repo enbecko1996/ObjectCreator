@@ -1,7 +1,9 @@
 package com.enbecko.modcreator.Visible;
 
 import com.enbecko.modcreator.LocalRenderSetting;
+import com.enbecko.modcreator.Log;
 import com.enbecko.modcreator.contentholder.Bone;
+import com.enbecko.modcreator.contentholder.Grid;
 import com.enbecko.modcreator.events.ManipulatingEvent;
 import com.enbecko.modcreator.linalg.RayTrace3D;
 import com.enbecko.modcreator.linalg.vec3;
@@ -13,6 +15,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
@@ -26,9 +30,10 @@ import static com.enbecko.modcreator.GlobalRenderSetting.RenderOption.OVERLAY_GR
  */
 public class MCBlockProxy extends Gridded_CUBE {
     private final IBlockState blockState;
+    TileEntity tileEntity;
 
-    public MCBlockProxy(Bone parentBone, vec3.IntVec positonInBoneCoords, IBlockState state) {
-        super(parentBone, positonInBoneCoords, 1);
+    public MCBlockProxy(Bone parentBone, Grid parentGrid, vec3.IntVec posInGrid, IBlockState state) {
+        super(parentBone, parentGrid, posInGrid, 1);
         this.blockState = state;
         if (!BlockStateRenderer.isStateRegistered(this.blockState))
             BlockStateRenderer.registerBlockState(this.blockState);
@@ -70,8 +75,21 @@ public class MCBlockProxy extends Gridded_CUBE {
 
     @Override
     public MCBlockProxy createBoundingGeometry() {
+        Log.d(Log.LogEnums.ETC, "HOLLA" + this.blockState.getBoundingBox(this.getParentGrid(), this.getPositionInGridInt().asBlockPos()));
         this.makeHexahedralEdgesAndFacesNoUpdate();
         return this;
+    }
+
+    public IBlockState getBlockState() {
+        return this.blockState;
+    }
+
+    public boolean hasTileEntity() {
+        return this.blockState.getBlock().hasTileEntity();
+    }
+
+    public TileEntity getTileEntity() {
+        return this.tileEntity;
     }
 
     public String toString() {

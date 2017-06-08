@@ -33,13 +33,14 @@ public class Bone extends Content.CuboidContent{
     protected final List<Octant> rayTraceResult = new ArrayList<Octant>();
     protected double[] distance = new double[8];
     private final Grid boneGrid;
+    private final List<Grid> subGrids = new ArrayList<Grid>();
     private final RayTrace3D rayTrace_BONE = new RayTrace3D(new vec3.DoubleVec(), new vec3.DoubleVec(), 100, false);
     vec4 tmpFillable = new vec4.DoubleVec();
 
     @SideOnly(Side.CLIENT)
     public Bone(vec3 origin_global) {
         super(null, new vec3.IntVec(0, 0, 0), 0, 0, 0, INT);
-        this.boneGrid = new Grid(origin_global);
+        this.boneGrid = new Grid((byte) 1);
         this.createBoundingGeometry();
         this.origin_global = origin_global;
         Log.d(LogEnums.CONTENTHOLDER, this.origin_global);
@@ -84,6 +85,10 @@ public class Bone extends Content.CuboidContent{
     @Override
     public void manipulateMe(ManipulatingEvent event, RayTrace3D rayTrace3D) {
 
+    }
+
+    public Grid getBoneGrid() {
+        return this.boneGrid;
     }
 
     /**
@@ -258,11 +263,11 @@ public class Bone extends Content.CuboidContent{
                 } else {
                     if (content instanceof IGridded) {
                         IGridded gridded = (IGridded)content;
-                        vec3.IntVec tmp = gridded.getPositionInBoneInt();
+                        vec3.IntVec tmp = gridded.getPositionInGridInt();
                         for (int x = 0; x < gridded.getXDim(); x++) {
                             for (int y = 0; y < gridded.getYDim(); y++) {
                                 for (int z = 0; z < gridded.getZDim(); z++) {
-                                    this.boneGrid.setAt(tmp.getX() + x, tmp.getY() + y, tmp.getZ() + z, gridded);
+                                    gridded.getParentGrid().setAt(tmp.getX() + x, tmp.getY() + y, tmp.getZ() + z, gridded);
                                 }
                             }
                         }
@@ -278,11 +283,11 @@ public class Bone extends Content.CuboidContent{
         content.removeMe();
         if (content instanceof IGridded) {
             IGridded gridded = (IGridded)content;
-            vec3.IntVec tmp = gridded.getPositionInBoneInt();
+            vec3.IntVec tmp = gridded.getPositionInGridInt();
             for (int x = 0; x < gridded.getXDim(); x++) {
                 for (int y = 0; y < gridded.getYDim(); y++) {
                     for (int z = 0; z < gridded.getZDim(); z++) {
-                        this.boneGrid.remove(tmp.getX() + x, tmp.getY() + y, tmp.getZ() + z);
+                        gridded.getParentGrid().remove(tmp.getX() + x, tmp.getY() + y, tmp.getZ() + z);
                     }
                 }
             }

@@ -4,6 +4,7 @@ import com.enbecko.modcreator.LocalRenderSetting;
 import com.enbecko.modcreator.RenderQuadrilateral;
 import com.enbecko.modcreator.contentholder.Bone;
 import com.enbecko.modcreator.contentholder.Content;
+import com.enbecko.modcreator.contentholder.Grid;
 import com.enbecko.modcreator.events.ManipulatingEvent;
 import com.enbecko.modcreator.linalg.*;
 import net.minecraft.client.renderer.GlStateManager;
@@ -13,6 +14,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,10 +24,16 @@ import java.util.List;
 public class Gridded_CUBE extends Content.CubicContent implements ITextured <RenderQuadrilateral.Colored>, IGridded{
     private final int dimension;
     private List<RenderQuadrilateral.Colored> rectangles = new ArrayList<RenderQuadrilateral.Colored>();
+    private final Grid parentGrid;
+    private final vec3.IntVec positionInGrid;
 
-    public Gridded_CUBE(Bone parentBone, vec3.IntVec positionInBone, int dimension) {
-        super(parentBone, positionInBone, dimension, vec_n.vecPrec.INT);
+    public Gridded_CUBE(Bone parentBone, @Nonnull Grid parentGrid, vec3.IntVec positionInGrid, int dimension) {
+        super(parentBone,
+                new vec3.DoubleVec(positionInGrid.getX() * parentGrid.getUnitLength(), positionInGrid.getY() * parentGrid.getUnitLength(), positionInGrid.getZ() * parentGrid.getUnitLength()),
+                dimension, vec_n.vecPrec.INT);
+        this.positionInGrid = positionInGrid;
         this.dimension = dimension;
+        this.parentGrid = parentGrid;
     }
 
     @Override
@@ -42,8 +50,8 @@ public class Gridded_CUBE extends Content.CubicContent implements ITextured <Ren
     }
 
     @Override
-    public vec3.IntVec getPositionInBoneCoords() {
-        return (vec3.IntVec) this.positionInBoneCoords;
+    public vec3 getPositionInBoneCoords() {
+        return this.positionInBoneCoords;
     }
 
     @Override
@@ -87,8 +95,8 @@ public class Gridded_CUBE extends Content.CubicContent implements ITextured <Ren
     }
 
     @Override
-    public vec3.IntVec getPositionInBoneInt() {
-        return (vec3.IntVec) this.positionInBoneCoords;
+    public vec3.IntVec getPositionInGridInt() {
+        return this.positionInGrid;
     }
 
     @Override
@@ -104,5 +112,10 @@ public class Gridded_CUBE extends Content.CubicContent implements ITextured <Ren
     @Override
     public int getZDim() {
         return this.dimension;
+    }
+
+    @Override
+    public Grid getParentGrid() {
+        return this.parentGrid;
     }
 }

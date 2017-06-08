@@ -248,6 +248,8 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
     }
 
     public static class IntVec extends vec3<Integer> {
+        private BlockPos blockPos;
+
         public IntVec() {
             super();
         }
@@ -359,6 +361,12 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
                 throw new RuntimeException("Can't create vec3 from content with not 3 components.");
             }
         }
+
+        public BlockPos asBlockPos() {
+            if (this.blockPos == null)
+                this.blockPos = new BlockPos(this.getX(), this.getY(), this.getZ());
+            return this.blockPos;
+        }
     }
 
     public static class LongVec extends vec3<Long> {
@@ -468,6 +476,7 @@ public abstract class vec3 <T extends Number> extends vec_n<T> {
                 throw new RuntimeException("Can't create vec3 from content with not 3 components.");
             }
         }
+
     }
 
     public static class DoubleVec extends vec3<Double> {

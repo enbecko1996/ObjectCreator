@@ -1,7 +1,16 @@
 package com.enbecko.modcreator.contentholder;
 
 import com.enbecko.modcreator.Visible.IGridded;
+import com.enbecko.modcreator.Visible.MCBlockProxy;
 import com.enbecko.modcreator.linalg.vec3;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.Biome;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -13,13 +22,13 @@ import java.util.Set;
 /**
  * Created by Niclas on 09.03.2017.
  */
-public class Grid {
-    private final vec3 origin_global;
+public class Grid implements IBlockAccess {
+    private byte lengthInOneThroughTheThisToPowerOfTwo;
     private final HashSet<HashSet<HashSet<Content>>> grid1 = new HashSet<HashSet<HashSet<Content>>>();
     private final HashMap<Integer, HashMap<Integer, HashMap<Integer, IGridded>>> grid = new HashMap<Integer, HashMap<Integer, HashMap<Integer, IGridded>>>();
 
-    public Grid(@Nonnull vec3 origin_global) {
-        this.origin_global = origin_global;
+    public Grid(byte lengthInOneThroughTheThisToPowerOfTwo) {
+        this.lengthInOneThroughTheThisToPowerOfTwo = lengthInOneThroughTheThisToPowerOfTwo;
     }
 
     @Nullable
@@ -87,5 +96,67 @@ public class Grid {
         }
         builder.append("<- GRID");
         return builder.toString();
+    }
+
+    @Nullable
+    @Override
+    public TileEntity getTileEntity(BlockPos pos) {
+        IGridded tmp;
+        if ((tmp = this.getAt(pos.getX(), pos.getY(), pos.getZ())) instanceof MCBlockProxy) {
+            if (((MCBlockProxy)tmp).hasTileEntity())
+                return ((MCBlockProxy) tmp).getTileEntity();
+        }
+        return null;
+    }
+
+    @Override
+    public int getCombinedLight(BlockPos pos, int lightValue) {
+        return 0;
+    }
+
+    @Override
+    public IBlockState getBlockState(BlockPos pos) {
+        IGridded tmp;
+        if ((tmp = this.getAt(pos.getX(), pos.getY(), pos.getZ())) instanceof MCBlockProxy) {
+            return ((MCBlockProxy)tmp).getBlockState();
+        }
+        return Blocks.AIR.getDefaultState();
+    }
+
+    @Override
+    public boolean isAirBlock(BlockPos pos) {
+        IGridded tmp;
+        if ((tmp = this.getAt(pos.getX(), pos.getY(), pos.getZ())) instanceof MCBlockProxy) {
+            return ((MCBlockProxy)tmp).getBlockState() == Blocks.AIR.getDefaultState();
+        }
+        return true;
+    }
+
+    @Override
+    public Biome getBiome(BlockPos pos) {
+        return null;
+    }
+
+    @Override
+    public int getStrongPower(BlockPos pos, EnumFacing direction) {
+        return 0;
+    }
+
+    @Override
+    public WorldType getWorldType() {
+        return null;
+    }
+
+    @Override
+    public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default) {
+        IGridded tmp;
+        if ((tmp = this.getAt(pos.getX(), pos.getY(), pos.getZ())) instanceof MCBlockProxy) {
+            return ((MCBlockProxy)tmp).getBlockState().isSideSolid(this, pos, side);
+        }
+        return true;
+    }
+
+    public float getUnitLength() {
+        return (float) (1/Math.pow(this.lengthInOneThroughTheThisToPowerOfTwo, 2));
     }
 }

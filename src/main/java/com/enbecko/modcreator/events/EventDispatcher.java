@@ -5,6 +5,7 @@ import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+import org.lwjgl.input.Mouse;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class EventDispatcher {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.NORMAL)
+    @SubscribeEvent
     public void onMouseEvent(MouseEvent event) {
         for (IMouseEventListener listener : mouseListeners) {
             listener.onMouseEvent(event);

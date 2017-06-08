@@ -78,12 +78,10 @@ public class SINGLE_GRIDDED_MODE extends BlockSetMode {
                         }
                         Log.d(LogEnums.BLOCKSETTING, posOnFace + " " + inverseRayTrace + " " + posInBone + " " + nX + " " + nY + " " + nZ);
                         this.dispatchBuildItemStack(toSet, result, posInBone);
-                        //mouseEvent.setCanceled(true);
                     }
                     break;
                 case MOUSE_LEFT:
                     this.dispatchRemoveContent(result.getTheBone(), result.getResult());
-                    //mouseEvent.setCanceled(true);
                     break;
             }
         } else {
@@ -112,7 +110,11 @@ public class SINGLE_GRIDDED_MODE extends BlockSetMode {
         if (item instanceof ItemContent) {
             ItemContent itemContent = (ItemContent) toSet.getItem();
             if (itemContent.canBeSetHere(posInBone, this)) {
-                result.getTheBone().addContent(itemContent.createNewContentAndReturn(result.getTheBone(), posInBone, ContentOption.newContentOptionFromNBT(toSet.getTagCompound())).createBoundingGeometry());
+                result.getTheBone().addContent(itemContent.createNewContentAndReturn(result.getTheBone(), posInBone, ContentOption.newContentOptionFromNBT(toSet.getTagCompound()),
+                        /**
+                         * TODO
+                         */
+                        result.getTheBone().getBoneGrid()).createBoundingGeometry());
                 RayTraceDispatcher.getTheRayTraceDispatcher().forceReRayTrace();
             }
         } else if (item instanceof ItemBlock) {
@@ -121,7 +123,11 @@ public class SINGLE_GRIDDED_MODE extends BlockSetMode {
             if (block == Blocks.ACACIA_DOOR) {
 
             } else {
-                result.getTheBone().addContent(new MCBlockProxy(result.getTheBone(), new vec3.IntVec(posInBone), block.getDefaultState()).createBoundingGeometry());
+                result.getTheBone().addContent(new MCBlockProxy(result.getTheBone(),
+                        /**
+                         * TODO
+                         */
+                        result.getTheBone().getBoneGrid(), new vec3.IntVec(posInBone), block.getDefaultState()).createBoundingGeometry());
             }
         }
     }

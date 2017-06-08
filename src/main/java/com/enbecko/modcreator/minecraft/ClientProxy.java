@@ -29,6 +29,8 @@ public class ClientProxy extends CommonProxy {
     public void init(FMLInitializationEvent e) {
         this.bindRenderers();
         this.registerKeyBindings();
+        Minecraft mc = Minecraft.getMinecraft();
+        mc.entityRenderer = new CustomEntityRenderer(mc, mc.getResourceManager());
         MinecraftForge.EVENT_BUS.register(EventDispatcher.getTheEventDispatcher());
     }
 

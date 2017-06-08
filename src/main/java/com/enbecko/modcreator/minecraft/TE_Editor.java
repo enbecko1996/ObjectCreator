@@ -116,7 +116,7 @@ public class TE_Editor extends TileEntity implements ITickable {
         if (this.bones.size() == 0) {
             Log.d(LogEnums.MINECRAFT, this.getPos());
             this.addBone(new vec3.IntVec(this.getPos()));
-            this.bones.get(0).addContent(new Gridded_CUBE(this.getBoneAt(0), new vec3.IntVec(-2, 0, 0), 1).createBoundingGeometry());
+            this.bones.get(0).addContent(new Gridded_CUBE(this.getBoneAt(0), this.getBoneAt(0).getBoneGrid(), new vec3.IntVec(-2, 0, 0), 1).createBoundingGeometry());
         }
 
         if (this.isActive()) {
